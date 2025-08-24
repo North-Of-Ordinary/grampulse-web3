@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+
+// Color schemes for light and dark themes
+final lightColorScheme = ColorScheme(
+  brightness: Brightness.light,
+  primary: const Color(0xFF1A73E8),
+  onPrimary: Colors.white,
+  primaryContainer: const Color(0xFFD6E4FF),
+  onPrimaryContainer: const Color(0xFF001D36),
+  secondary: const Color(0xFF4CAF50),
+  onSecondary: Colors.white,
+  secondaryContainer: const Color(0xFFAEF4AE),
+  onSecondaryContainer: const Color(0xFF002105),
+  tertiary: const Color(0xFFFF6D00),
+  onTertiary: Colors.white,
+  tertiaryContainer: const Color(0xFFFFDBCC),
+  onTertiaryContainer: const Color(0xFF331400),
+  error: const Color(0xFFD32F2F),
+  onError: Colors.white,
+  errorContainer: const Color(0xFFFFDAD6),
+  onErrorContainer: const Color(0xFF410002),
+  background: const Color(0xFFF5F5F5),
+  onBackground: const Color(0xFF212121),
+  surface: Colors.white,
+  onSurface: const Color(0xFF212121),
+  surfaceVariant: const Color(0xFFE1E2EC),
+  onSurfaceVariant: const Color(0xFF757575),
+  outline: const Color(0xFF838599),
+);
+
+final darkColorScheme = ColorScheme(
+  brightness: Brightness.dark,
+  primary: const Color(0xFF90CAF9),
+  onPrimary: const Color(0xFF003258),
+  primaryContainer: const Color(0xFF00497B),
+  onPrimaryContainer: const Color(0xFFCFE5FF),
+  secondary: const Color(0xFF81C784),
+  onSecondary: const Color(0xFF003913),
+  secondaryContainer: const Color(0xFF005321),
+  onSecondaryContainer: const Color(0xFFB4FFBC),
+  tertiary: const Color(0xFFFFB74D),
+  onTertiary: const Color(0xFF502900),
+  tertiaryContainer: const Color(0xFF733C00),
+  onTertiaryContainer: const Color(0xFFFFDBC6),
+  error: const Color(0xFFEF5350),
+  onError: const Color(0xFF690003),
+  errorContainer: const Color(0xFF93000A),
+  onErrorContainer: const Color(0xFFFFDAD4),
+  background: const Color(0xFF1A1C1E),
+  onBackground: const Color(0xFFE2E2E5),
+  surface: const Color(0xFF121212),
+  onSurface: const Color(0xFFE2E2E5),
+  surfaceVariant: const Color(0xFF44464F),
+  onSurfaceVariant: const Color(0xFFC5C6D0),
+  outline: const Color(0xFF8F9099),
+);
+
+// Status colors
+final statusColors = {
+  'new': const Color(0xFF2196F3),
+  'in_progress': const Color(0xFFFF9800),
+  'resolved': const Color(0xFF4CAF50),
+  'overdue': const Color(0xFFF44336),
+  'verified': const Color(0xFF9C27B0),
+};
