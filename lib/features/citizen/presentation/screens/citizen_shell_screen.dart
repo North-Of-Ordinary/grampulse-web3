@@ -30,6 +30,7 @@ class CitizenShellScreen extends StatelessWidget {
     // Only show FAB on Home and Explore tabs
     if (location == '/citizen/home' || location == '/citizen/explore') {
       return FloatingActionButton.extended(
+        heroTag: "report_issue_fab_$location", // Unique hero tag
         onPressed: () => context.goNamed('report_issue'),
         label: const Text('Report Issue'),
         icon: const Icon(Icons.add_circle),

@@ -28,10 +28,10 @@ class ApiResponse<T> {
 
 class ApiService {
   // Use --dart-define to override at run-time: --dart-define=API_BASE=http://<host>:5000/api
-  // Fallback defaults to your machine's Wi‑Fi IP so physical devices can reach it on LAN.
+  // Use localhost with ADB reverse tunnel for Android device connection
   static const String baseUrl = String.fromEnvironment(
     'API_BASE',
-    defaultValue: 'http://10.12.225.144:5000/api',
+    defaultValue: 'http://localhost:5000/api',
   );
 
   // Headers with token
@@ -73,15 +73,80 @@ class ApiService {
     await prefs.remove('token');
   }
 
-  Future<ApiResponse<dynamic>> requestOtp(String phone) async {
+  // Request OTP
+  Future<ApiResponse<dynamic>> requestOtp(String phone, {String? name, String? village}) async {
     print('🎯 API SERVICE: Requesting OTP for $phone');
     
-    return await post(  // Just call 'post' directly, not '_apiService.post'
-        '/auth/request-otp',  // Endpoint
-        {'phone': phone},     // Request body
-        (data) => data,       // Data parser (simple pass-through)
+    final body = <String, dynamic>{'phone': phone};
+    if (name != null) body['name'] = name;
+    if (village != null) body['village'] = village;
+    
+    return await post(
+        '/auth/request-otp',
+        body,
+        (data) => data,
     );
+  }
+
+  // Verify OTP
+  Future<ApiResponse<dynamic>> verifyOtp(String phone, String otp) async {
+    print('🎯 API SERVICE: Verifying OTP for $phone');
+    
+    final response = await post(
+        '/auth/verify-otp',
+        {'phone': phone, 'otp': otp},
+        (data) => data,
+    );
+    
+    // Save token if verification successful
+    if (response.success && response.data != null && response.data['token'] != null) {
+      await saveToken(response.data['token']);
+      print('✅ Token saved successfully');
     }
+    
+    return response;
+  }
+
+  // Get categories
+  Future<ApiResponse<List<dynamic>>> getCategories() async {
+    return await get('/incidents/categories', (data) => data as List<dynamic>);
+  }
+
+  // Get my incidents
+  Future<ApiResponse<List<dynamic>>> getMyIncidents() async {
+    return await get('/incidents/my', (data) => data as List<dynamic>);
+  }
+
+  // Create incident
+  Future<ApiResponse<dynamic>> createIncident({
+    required String title,
+    required String description,
+    required String category,
+    required Map<String, dynamic> location,
+    String priority = 'medium',
+  }) async {
+    return await post(
+        '/incidents',
+        {
+          'title': title,
+          'description': description,
+          'category': category,
+          'location': location,
+          'priority': priority,
+        },
+        (data) => data,
+    );
+  }
+
+  // Check if authenticated
+  Future<bool> isAuthenticated() async {
+    final token = await getToken();
+    if (token == null) return false;
+    
+    // Test token with health check
+    final healthResponse = await health();
+    return healthResponse.success;
+  }
 
 
   // GET request

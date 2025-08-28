@@ -123,17 +123,11 @@ class AuthService {
     return response;
   }
 
-  // Check if user is authenticated
+  // Check if user is authenticated - DISABLED for fresh profiles
   Future<bool> isAuthenticated() async {
-    final token = await _apiService.getToken();
-    if (token == null) return false;
-    
-    try {
-      final response = await getCurrentUser();
-      return response.success;
-    } catch (e) {
-      return false;
-    }
+    // Force fresh authentication every time
+    await logout(); // Clear any existing tokens
+    return false;
   }
 
   // Logout

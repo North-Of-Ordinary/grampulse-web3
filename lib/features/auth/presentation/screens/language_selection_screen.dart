@@ -19,7 +19,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   Widget build(BuildContext context) {
     return BlocListener<LanguageBloc, LanguageState>(
       listener: (context, state) {
-        if (state is LanguageSelected) {
+        if (state is LanguageUpdated) {
           context.go('/login');
         }
       },
@@ -66,7 +66,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       onPressed: _selectedLanguage == null
                           ? null
                           : () {
-                              context.read<LanguageBloc>().add(SelectLanguage(_selectedLanguage!));
+                              context.read<LanguageBloc>().add(LanguageSelectedEvent(languageCode: _selectedLanguage!));
                             },
                       child: state is LanguageUpdating
                           ? const SizedBox(

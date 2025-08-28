@@ -7,6 +7,8 @@ import 'package:grampulse/core/theme/app_theme.dart';
 import 'package:grampulse/core/theme/spacing.dart';
 import 'package:grampulse/features/citizen/domain/models/issue_model.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citizen_home_bloc.dart';
+import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citizen_home_event.dart';
+import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citizen_home_state.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/nearby_issues/nearby_issues_bloc.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/my_issues/my_issues_bloc.dart';
 import 'package:grampulse/features/citizen/presentation/widgets/issue_card.dart';
@@ -21,7 +23,7 @@ class CitizenHomeScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<CitizenHomeBloc>(
-          create: (context) => CitizenHomeBloc()..add(LoadDashboard()),
+          create: (context) => CitizenHomeBloc()..add(const LoadDashboard()),
         ),
         BlocProvider<NearbyIssuesBloc>(
           create: (context) => NearbyIssuesBloc()..add(LoadNearbyIssues()),
@@ -35,7 +37,7 @@ class CitizenHomeScreen extends StatelessWidget {
           return Scaffold(
             body: RefreshIndicator(
               onRefresh: () async {
-                context.read<CitizenHomeBloc>().add(RefreshDashboard());
+                context.read<CitizenHomeBloc>().add(const RefreshDashboard());
                 await Future.delayed(Duration(seconds: 1));
               },
               child: CustomScrollView(
@@ -67,7 +69,7 @@ class CitizenHomeScreen extends StatelessWidget {
                             SizedBox(height: AppSpacing.md),
                             ElevatedButton(
                               onPressed: () {
-                                context.read<CitizenHomeBloc>().add(LoadDashboard());
+                                context.read<CitizenHomeBloc>().add(const LoadDashboard());
                               },
                               child: Text('Retry'),
                             ),

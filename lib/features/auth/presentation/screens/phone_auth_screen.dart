@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:grampulse/core/theme/spacing.dart';
-import 'package:grampulse/features/auth/presentation/bloc/phone_auth_bloc.dart';
+import '../../domain/auth_events_states.dart';
+import '../blocs/auth_bloc.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({Key? key}) : super(key: key);
@@ -14,36 +14,52 @@ class PhoneAuthScreen extends StatefulWidget {
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final _phoneController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _villageController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     _phoneController.dispose();
+    _nameController.dispose();
+    _villageController.dispose();
     super.dispose();
   }
 
-  void _startVoiceInput(BuildContext context) {
-    // TODO: Implement voice input for phone number
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Voice input coming soon!'),
-      ),
-    );
+  void _requestOtp() {
+    if (_formKey.currentState!.validate()) {
+      final phone = _phoneController.text.trim();
+      final name = _nameController.text.trim();
+      final village = _villageController.text.trim();
+
+      context.read<AuthBloc>().add(RequestOtpEvent(
+        phone: phone,
+        name: name.isNotEmpty ? name : null,
+        village: village.isNotEmpty ? village : null,
+      ));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        title: const Text('Phone Authentication'),
         elevation: 0,
       ),
-      body: BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
+      body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is PhoneAuthSuccess) {
-            context.go('/otp-verification/${_phoneController.text}');
-          } else if (state is PhoneAuthFailure) {
+          if (state is OtpRequestedState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
+              SnackBar(content: Text(state.message)),
+            );
+            context.go('/otp-verification', extra: state.phone);
+          } else if (state is AuthErrorState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         },

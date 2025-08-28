@@ -1,41 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:equatable/equatable.dart';
 
-// Events
-abstract class LanguageEvent {}
-
-class SelectLanguage extends LanguageEvent {
-  final String languageCode;
-  SelectLanguage(this.languageCode);
-}
-
-// States
-abstract class LanguageState {}
-
-class LanguageInitial extends LanguageState {}
-
-class LanguageUpdating extends LanguageState {}
-
-class LanguageSelected extends LanguageState {
-  final String languageCode;
-  LanguageSelected(this.languageCode);
-}
-
-class LanguageUpdated extends LanguageState {
-  final String languageCode;
-  LanguageUpdated(this.languageCode);
-}
-
-class LanguageError extends LanguageState {
-  final String message;
-  LanguageError(this.message);
-}
+part 'language_event.dart';
+part 'language_state.dart';
 
 // Bloc
 class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
-  LanguageBloc() : super(LanguageInitial()) {
-    on<SelectLanguage>((event, emit) {
+  LanguageBloc() : super(const LanguageInitial()) {
+    on<LanguageSelectedEvent>((event, emit) {
       emit(LanguageUpdating());
-      emit(LanguageSelected(event.languageCode));
+      emit(LanguageUpdated(languageCode: event.languageCode));
     });
   }
 }

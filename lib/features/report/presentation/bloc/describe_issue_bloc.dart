@@ -2,10 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grampulse/features/report/domain/models/updated_report_models.dart';
 import 'package:grampulse/features/report/presentation/bloc/describe_issue_event.dart';
 import 'package:grampulse/features/report/presentation/bloc/describe_issue_state.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+// import 'package:speech_to_text/speech_to_text.dart' as stt; // Temporarily disabled
 
 class DescribeIssueBloc extends Bloc<DescribeIssueEvent, DescribeIssueState> {
-  final stt.SpeechToText _speechToText = stt.SpeechToText();
+  // final stt.SpeechToText _speechToText = stt.SpeechToText(); // Temporarily disabled
   
   DescribeIssueBloc({
     required double initialLatitude,
@@ -107,32 +107,25 @@ class DescribeIssueBloc extends Bloc<DescribeIssueEvent, DescribeIssueState> {
       emit(currentState.copyWith(isProcessingVoice: true));
       
       try {
-        // Initialize speech recognition
-        bool available = await _speechToText.initialize();
-        if (available) {
-          // Placeholder for speech to text conversion
-          // In a real app, you would process the audio file here
-          // This is a simplified version that simulates processing
-          await Future.delayed(const Duration(seconds: 2));
-          
-          // Add transcribed text to description
-          final currentDescription = currentState.description;
-          const transcribedText = "This is a sample voice transcription. "
-              "Replace this with actual transcription from the audio file.";
-          
-          final updatedDescription = currentDescription.isEmpty 
-              ? transcribedText
-              : "$currentDescription\n\n$transcribedText";
-          
-          emit(currentState.copyWith(
-            description: updatedDescription,
-            isProcessingVoice: false,
-          ));
-        } else {
-          emit(currentState.copyWith(isProcessingVoice: false));
-          emit(const DescribeError(message: 'Speech recognition not available'));
-          emit(currentState);
-        }
+        // Speech recognition temporarily disabled
+        // Placeholder for speech to text conversion
+        // In a real app, you would process the audio file here
+        // This is a simplified version that simulates processing
+        await Future.delayed(const Duration(seconds: 2));
+        
+        // Add transcribed text to description
+        final currentDescription = currentState.description;
+        const transcribedText = "This is a sample voice transcription. "
+            "Replace this with actual transcription from the audio file.";
+        
+        final updatedDescription = currentDescription.isEmpty 
+            ? transcribedText
+            : "$currentDescription\n\n$transcribedText";
+        
+        emit(currentState.copyWith(
+          description: updatedDescription,
+          isProcessingVoice: false,
+        ));
       } catch (e) {
         emit(currentState.copyWith(isProcessingVoice: false));
         emit(DescribeError(message: 'Failed to process voice: ${e.toString()}'));

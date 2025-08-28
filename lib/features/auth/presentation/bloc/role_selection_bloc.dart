@@ -1,51 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:grampulse/core/services/api_service.dart';
 import 'package:grampulse/features/auth/domain/services/auth_service.dart' as domain_auth;
 
-// Events
-abstract class RoleSelectionEvent {}
+part 'role_selection_event.dart';
+part 'role_selection_state.dart';
 
-class RoleSelectionRoleChanged extends RoleSelectionEvent {
-  final String role;
-  RoleSelectionRoleChanged(this.role); // Removed const
-}
-
-class RoleSelectionSubmitted extends RoleSelectionEvent {
-  RoleSelectionSubmitted(); // Removed const
-}
-
-// States
-enum RoleSelectionStatus { initial, submitting, success, failure }
-
-class RoleSelectionState {
-  final String? selectedRole;
-  final RoleSelectionStatus status;
-  final String? errorMessage;
-
-  const RoleSelectionState({
-    this.selectedRole,
-    this.status = RoleSelectionStatus.initial,
-    this.errorMessage,
-  });
-
-  RoleSelectionState copyWith({
-    String? selectedRole,
-    RoleSelectionStatus? status,
-    String? errorMessage,
-  }) {
-    return RoleSelectionState(
-      selectedRole: selectedRole ?? this.selectedRole,
-      status: status ?? this.status,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
-}
-
-class RoleSelectionInitial extends RoleSelectionState {}
-
-// Bloc
 class RoleSelectionBloc extends Bloc<RoleSelectionEvent, RoleSelectionState> {
-  RoleSelectionBloc() : super(RoleSelectionInitial()) {
+  RoleSelectionBloc() : super(const RoleSelectionState()) {
     on<RoleSelectionRoleChanged>((event, emit) {
       emit(state.copyWith(selectedRole: event.role));
     });

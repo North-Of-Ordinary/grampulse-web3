@@ -18,6 +18,7 @@ import 'package:grampulse/features/auth/presentation/bloc/profile_setup_bloc.dar
 
 // Citizen imports
 import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citizen_home_bloc.dart';
+import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citizen_home_event.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/nearby_issues/nearby_issues_bloc.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/my_issues/my_issues_bloc.dart';
 import 'package:grampulse/features/citizen/presentation/screens/citizen_home_screen.dart';
@@ -236,7 +237,7 @@ final appRouter = GoRouter(
           name: 'citizen_home',
           builder: (context, state) => MultiBlocProvider(
             providers: [
-              BlocProvider(create: (_) => CitizenHomeBloc()..add(LoadDashboard())),
+              BlocProvider(create: (_) => CitizenHomeBloc()..add(const LoadDashboard())),
               BlocProvider(create: (_) => NearbyIssuesBloc()..add(LoadNearbyIssues())),
               BlocProvider(create: (_) => MyIssuesBloc()..add(LoadMyIssues())),
             ],

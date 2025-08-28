@@ -7,13 +7,21 @@ abstract class SplashState extends Equatable {
   List<Object> get props => [];
 }
 
-class SplashInitial extends SplashState {}
+class SplashInitial extends SplashState {
+  const SplashInitial();
+}
 
-class SplashLoading extends SplashState {}
+class SplashLoading extends SplashState {
+  const SplashLoading();
+}
 
-class SplashAuthenticated extends SplashState {}
+class SplashAuthenticated extends SplashState {
+  const SplashAuthenticated();
+}
 
-class SplashUnauthenticated extends SplashState {}
+class SplashUnauthenticated extends SplashState {
+  const SplashUnauthenticated();
+}
 
 class SplashUpdateRequired extends SplashState {
   final String currentVersion;

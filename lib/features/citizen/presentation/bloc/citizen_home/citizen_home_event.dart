@@ -1,4 +1,4 @@
-part of 'citizen_home_bloc.dart';
+import 'package:equatable/equatable.dart';
 
 /// Events for the Citizen Home screen
 abstract class CitizenHomeEvent extends Equatable {
@@ -9,10 +9,14 @@ abstract class CitizenHomeEvent extends Equatable {
 }
 
 /// Event to load dashboard data initially
-class LoadDashboard extends CitizenHomeEvent {}
+class LoadDashboard extends CitizenHomeEvent {
+  const LoadDashboard();
+}
 
 /// Event to refresh dashboard data
-class RefreshDashboard extends CitizenHomeEvent {}
+class RefreshDashboard extends CitizenHomeEvent {
+  const RefreshDashboard();
+}
 
 /// Event to search for issues
 class SearchIssues extends CitizenHomeEvent {

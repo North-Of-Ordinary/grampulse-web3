@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../domain/models/issue_model.dart';
 
 part 'nearby_issues_event.dart';

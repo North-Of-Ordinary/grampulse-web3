@@ -1,4 +1,4 @@
-part of 'citizen_home_bloc.dart';
+import 'package:equatable/equatable.dart';
 
 /// States for the Citizen Home screen
 abstract class CitizenHomeState extends Equatable {
@@ -9,10 +9,14 @@ abstract class CitizenHomeState extends Equatable {
 }
 
 /// Initial state
-class CitizenHomeInitial extends CitizenHomeState {}
+class CitizenHomeInitial extends CitizenHomeState {
+  const CitizenHomeInitial();
+}
 
 /// Loading state when first fetching data
-class CitizenHomeLoading extends CitizenHomeState {}
+class CitizenHomeLoading extends CitizenHomeState {
+  const CitizenHomeLoading();
+}
 
 /// Refreshing state when refreshing data but still displaying old data
 class CitizenHomeRefreshing extends CitizenHomeState {

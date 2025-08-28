@@ -1,42 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'citizen_home_event.dart';
+import 'citizen_home_state.dart';
 
-// Events
-abstract class CitizenHomeEvent {}
-
-class LoadDashboard extends CitizenHomeEvent {}
-
-class RefreshDashboard extends CitizenHomeEvent {}
-
-// States
-abstract class CitizenHomeState {}
-
-class CitizenHomeInitial extends CitizenHomeState {}
-
-class CitizenHomeLoading extends CitizenHomeState {}
-
-class CitizenHomeLoaded extends CitizenHomeState {
-  final String userName;
-  
-  CitizenHomeLoaded({this.userName = "John Doe"});
-}
-
-class CitizenHomeError extends CitizenHomeState {
-  final String message;
-  
-  CitizenHomeError(this.message);
-}
-
-// Bloc
 class CitizenHomeBloc extends Bloc<CitizenHomeEvent, CitizenHomeState> {
-  CitizenHomeBloc() : super(CitizenHomeInitial()) {
+  CitizenHomeBloc() : super(const CitizenHomeInitial()) {
     on<LoadDashboard>((event, emit) {
-      emit(CitizenHomeLoading());
-      emit(CitizenHomeLoaded());
+      emit(const CitizenHomeLoading());
+      emit(const CitizenHomeLoaded(
+        userName: 'Test User',
+        statistics: {},
+      ));
     });
     
     on<RefreshDashboard>((event, emit) {
-      emit(CitizenHomeLoading());
-      emit(CitizenHomeLoaded());
+      emit(const CitizenHomeLoading());
+      emit(const CitizenHomeLoaded(
+        userName: 'Test User',
+        statistics: {},
+      ));
     });
   }
 }
