@@ -45,6 +45,9 @@ class CitizenShellScreen extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       currentIndex: _calculateSelectedIndex(location),
       onTap: (int idx) => _onItemTapped(idx, context),
+      selectedItemColor: Theme.of(context).primaryColor,
+      unselectedItemColor: Colors.grey,
+      showUnselectedLabels: true,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),

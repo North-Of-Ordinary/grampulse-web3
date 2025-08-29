@@ -7,6 +7,8 @@ import 'package:grampulse/core/theme/app_theme.dart';
 import 'package:grampulse/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:grampulse/features/auth/domain/auth_events_states.dart';
 import 'package:grampulse/core/utils/l10n/app_localizations.dart';
+import 'package:grampulse/features/citizen/presentation/bloc/incident/incident_bloc.dart';
+import 'package:grampulse/features/citizen/domain/repositories/incident_repository.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -33,6 +35,11 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider<AuthBloc>(
           create: (context) => AuthBloc()..add(CheckAuthStatusEvent()),
+        ),
+        BlocProvider<IncidentBloc>(
+          create: (context) => IncidentBloc(
+            repository: IncidentRepository(),
+          ),
         ),
       ],
       child: MaterialApp.router(

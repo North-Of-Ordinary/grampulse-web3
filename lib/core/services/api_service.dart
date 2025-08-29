@@ -39,10 +39,19 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     
-    return {
+    final headers = {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     };
+    
+    print('🔑 API HEADERS: ${headers.keys.join(', ')}');
+    if (token != null) {
+      print('🎫 TOKEN PRESENT: ${token.substring(0, 20)}...');
+    } else {
+      print('❌ NO TOKEN FOUND');
+    }
+    
+    return headers;
   }
 
   // Headers for multipart requests
@@ -109,30 +118,72 @@ class ApiService {
 
   // Get categories
   Future<ApiResponse<List<dynamic>>> getCategories() async {
+    print('🎯 API SERVICE: Getting categories');
     return await get('/incidents/categories', (data) => data as List<dynamic>);
   }
 
   // Get my incidents
   Future<ApiResponse<List<dynamic>>> getMyIncidents() async {
+    print('🎯 API SERVICE: Getting my incidents');
     return await get('/incidents/my', (data) => data as List<dynamic>);
+  }
+
+  // Get nearby incidents (now returns ALL incidents for citizen dashboard)
+  Future<ApiResponse<List<dynamic>>> getNearbyIncidents({
+    double? latitude,  // Made optional
+    double? longitude, // Made optional
+    double radius = 5000, // radius in meters
+  }) async {
+    print('🎯 API SERVICE: Getting all incidents for citizen dashboard');
+    
+    // For citizen dashboard, we want ALL incidents, not just nearby ones
+    // This ensures the nearby issues count matches the statistics
+    String endpoint = '/incidents/nearby';
+    
+    // Add location parameters if provided (for future geolocation filtering if needed)
+    if (latitude != null && longitude != null) {
+      endpoint += '?lat=$latitude&lng=$longitude&radius=$radius';
+      print('🌍 Using location: lat: $latitude, lng: $longitude');
+    }
+    
+    final response = await get(
+      endpoint,
+      (data) => data as List<dynamic>,
+    );
+    
+    print('📊 NEARBY INCIDENTS RESPONSE: Success=${response.success}, Data Length=${response.data?.length ?? 0}');
+    if (response.data != null) {
+      print('📋 First incident preview: ${response.data!.isNotEmpty ? response.data![0] : 'No incidents'}');
+    }
+    
+    return response;
+  }
+
+  // Get incident statistics
+  Future<ApiResponse<Map<String, dynamic>>> getIncidentStatistics() async {
+    print('🎯 API SERVICE: Getting incident statistics');
+    return await get('/incidents/statistics', (data) => data as Map<String, dynamic>);
   }
 
   // Create incident
   Future<ApiResponse<dynamic>> createIncident({
     required String title,
     required String description,
-    required String category,
+    required String categoryId,
     required Map<String, dynamic> location,
-    String priority = 'medium',
+    int severity = 1, // 1: Low, 2: Medium, 3: High
+    bool isAnonymous = false,
   }) async {
+    print('🎯 API SERVICE: Creating incident - $title');
     return await post(
         '/incidents',
         {
           'title': title,
           'description': description,
-          'category': category,
+          'categoryId': categoryId,
           'location': location,
-          'priority': priority,
+          'severity': severity,
+          'isAnonymous': isAnonymous,
         },
         (data) => data,
     );
@@ -331,6 +382,176 @@ class ApiService {
         success: false,
         message: 'Failed to parse response: ${e.toString()}',
         statusCode: response.statusCode,
+      );
+    }
+  }
+
+  // Profile Management API Endpoints
+
+  /// Get current user profile
+  Future<ApiResponse<Map<String, dynamic>>> getProfile() async {
+    try {
+      print('👤 API SERVICE: Getting user profile');
+      
+      final headers = await _getHeaders();
+      print('🚀 ATTEMPTING REQUEST TO: $baseUrl/profile');
+      print('🔑 API HEADERS: ${headers.keys.join(', ')}');
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/profile'),
+        headers: headers,
+      );
+
+      print('📥 RESPONSE STATUS: ${response.statusCode}');
+      print('📥 RESPONSE BODY: ${response.body}');
+
+      return _processResponse<Map<String, dynamic>>(
+        response, 
+        (data) => data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      print('❌ GET PROFILE ERROR: $e');
+      return ApiResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        statusCode: 500,
+      );
+    }
+  }
+
+  /// Update user profile
+  Future<ApiResponse<Map<String, dynamic>>> updateProfile(Map<String, dynamic> profileData) async {
+    try {
+      print('✏️ API SERVICE: Updating user profile');
+      print('📝 UPDATE DATA: $profileData');
+      
+      final headers = await _getHeaders();
+      print('🚀 ATTEMPTING REQUEST TO: $baseUrl/profile');
+      print('📤 SENDING DATA: $profileData');
+      
+      final response = await http.put(
+        Uri.parse('$baseUrl/profile'),
+        headers: headers,
+        body: jsonEncode(profileData),
+      );
+
+      print('📥 RESPONSE STATUS: ${response.statusCode}');
+      print('📥 RESPONSE BODY: ${response.body}');
+
+      return _processResponse<Map<String, dynamic>>(
+        response, 
+        (data) => data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      print('❌ UPDATE PROFILE ERROR: $e');
+      return ApiResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        statusCode: 500,
+      );
+    }
+  }
+
+  /// Get profile completeness information
+  Future<ApiResponse<Map<String, dynamic>>> getProfileCompleteness() async {
+    try {
+      print('🔍 API SERVICE: Getting profile completeness');
+      
+      final headers = await _getHeaders();
+      print('🚀 ATTEMPTING REQUEST TO: $baseUrl/profile/completeness');
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/profile/completeness'),
+        headers: headers,
+      );
+
+      print('📥 RESPONSE STATUS: ${response.statusCode}');
+      print('📥 RESPONSE BODY: ${response.body}');
+
+      return _processResponse<Map<String, dynamic>>(
+        response, 
+        (data) => data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      print('❌ GET PROFILE COMPLETENESS ERROR: $e');
+      return ApiResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        statusCode: 500,
+      );
+    }
+  }
+
+  /// Upload profile image
+  Future<ApiResponse<Map<String, dynamic>>> uploadProfileImage(File imageFile) async {
+    try {
+      print('📸 API SERVICE: Uploading profile image');
+      
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/profile/upload-image'),
+      );
+      
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+      
+      request.files.add(
+        await http.MultipartFile.fromPath('profileImage', imageFile.path),
+      );
+
+      print('🚀 ATTEMPTING UPLOAD TO: $baseUrl/profile/upload-image');
+      print('📤 UPLOADING FILE: ${imageFile.path}');
+      
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print('📥 RESPONSE STATUS: ${response.statusCode}');
+      print('📥 RESPONSE BODY: ${response.body}');
+
+      return _processResponse<Map<String, dynamic>>(
+        response, 
+        (data) => data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      print('❌ UPLOAD PROFILE IMAGE ERROR: $e');
+      return ApiResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        statusCode: 500,
+      );
+    }
+  }
+
+  /// Delete profile image
+  Future<ApiResponse<Map<String, dynamic>>> deleteProfileImage() async {
+    try {
+      print('🗑️ API SERVICE: Deleting profile image');
+      
+      final headers = await _getHeaders();
+      print('🚀 ATTEMPTING REQUEST TO: $baseUrl/profile/image');
+      
+      final response = await http.delete(
+        Uri.parse('$baseUrl/profile/image'),
+        headers: headers,
+      );
+
+      print('📥 RESPONSE STATUS: ${response.statusCode}');
+      print('📥 RESPONSE BODY: ${response.body}');
+
+      return _processResponse<Map<String, dynamic>>(
+        response, 
+        (data) => data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      print('❌ DELETE PROFILE IMAGE ERROR: $e');
+      return ApiResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        statusCode: 500,
       );
     }
   }

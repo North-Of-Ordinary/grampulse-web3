@@ -34,95 +34,53 @@ class CitizenHomeScreen extends StatelessWidget {
       ],
       child: BlocBuilder<CitizenHomeBloc, CitizenHomeState>(
         builder: (context, state) {
-          return Scaffold(
-            body: RefreshIndicator(
-              onRefresh: () async {
-                context.read<CitizenHomeBloc>().add(const RefreshDashboard());
-                await Future.delayed(Duration(seconds: 1));
-              },
-              child: CustomScrollView(
-                slivers: [
-                  _buildAppBar(context, state),
-                  if (state is CitizenHomeLoaded) ...[
-                    _buildLocationBar(context, state),
-                    _buildNearbyIssuesSection(context),
-                    _buildMyIssuesSection(context),
-                  ] else if (state is CitizenHomeLoading) ...[
-                    SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator(),
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<CitizenHomeBloc>().add(const RefreshDashboard());
+              await Future.delayed(Duration(seconds: 1));
+            },
+            child: CustomScrollView(
+              slivers: [
+                _buildAppBar(context, state),
+                if (state is CitizenHomeLoaded) ...[
+                  _buildLocationBar(context, state),
+                  _buildNearbyIssuesSection(context),
+                  _buildMyIssuesSection(context),
+                ] else if (state is CitizenHomeLoading) ...[
+                  SliverFillRemaining(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ] else if (state is CitizenHomeError) ...[
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 48,
+                          ),
+                          SizedBox(height: AppSpacing.md),
+                          Text(state.message),
+                          SizedBox(height: AppSpacing.md),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<CitizenHomeBloc>().add(const LoadDashboard());
+                            },
+                            child: Text('Retry'),
+                          ),
+                        ],
                       ),
                     ),
-                  ] else if (state is CitizenHomeError) ...[
-                    SliverFillRemaining(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: Colors.red,
-                              size: 48,
-                            ),
-                            SizedBox(height: AppSpacing.md),
-                            Text(state.message),
-                            SizedBox(height: AppSpacing.md),
-                            ElevatedButton(
-                              onPressed: () {
-                                context.read<CitizenHomeBloc>().add(const LoadDashboard());
-                              },
-                              child: Text('Retry'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                  SliverToBoxAdapter(
-                    child: SizedBox(height: 80),
                   ),
                 ],
-              ),
-            ),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () => context.go('/report-issue'),
-              label: Text('Report Issue'),
-              icon: Icon(Icons.add_circle),
-              backgroundColor: Theme.of(context).colorScheme.tertiary,
-            ),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: 0,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.explore),
-                  label: 'Explore',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.assignment),
-                  label: 'My Reports',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
+                SliverToBoxAdapter(
+                  child: SizedBox(height: 80),
                 ),
               ],
-              onTap: (index) {
-                switch (index) {
-                  case 1:
-                    context.go('/explore');
-                    break;
-                  case 2:
-                    context.go('/my-reports');
-                    break;
-                  case 3:
-                    context.go('/profile');
-                    break;
-                }
-              },
             ),
           );
         },

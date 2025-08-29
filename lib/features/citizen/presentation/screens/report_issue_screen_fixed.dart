@@ -32,7 +32,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
   @override
   void initState() {
     super.initState();
-    // Categories will be loaded after BlocProvider is created
+    _loadCategories();
     _getCurrentLocation();
   }
 
@@ -84,11 +84,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingLocation = false;
-        });
-      }
+      setState(() {
+        _isLoadingLocation = false;
+      });
     }
   }
 
@@ -132,7 +130,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => IncidentBloc()..add(LoadCategories()),
+      create: (context) => IncidentBloc(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Report an Issue'),
@@ -157,11 +155,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                 ),
               );
             } else if (state is IncidentLoaded) {
-              if (mounted) {
-                setState(() {
-                  _categories = state.categories;
-                });
-              }
+              setState(() {
+                _categories = state.categories;
+              });
             }
           },
           builder: (context, state) {

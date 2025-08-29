@@ -21,11 +21,13 @@ import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citize
 import 'package:grampulse/features/citizen/presentation/bloc/citizen_home/citizen_home_event.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/nearby_issues/nearby_issues_bloc.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/my_issues/my_issues_bloc.dart';
+import 'package:grampulse/features/citizen/presentation/bloc/incident/incident_bloc.dart';
+import 'package:grampulse/features/citizen/domain/repositories/incident_repository.dart';
 import 'package:grampulse/features/citizen/presentation/screens/citizen_home_screen.dart';
 import 'package:grampulse/features/citizen/presentation/screens/citizen_shell_screen.dart';
 import 'package:grampulse/features/citizen/presentation/screens/explore_screen.dart';
 import 'package:grampulse/features/citizen/presentation/screens/my_reports_screen.dart';
-import 'package:grampulse/features/citizen/presentation/screens/profile_screen.dart';
+import 'package:grampulse/features/profile/presentation/screens/profile_screen.dart' as new_profile;
 import 'package:grampulse/features/citizen/presentation/screens/report_issue_screen.dart';
 
 // Volunteer imports
@@ -247,7 +249,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/citizen/explore',
           name: 'citizen_explore',
-          builder: (context, state) => const ExploreScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => IncidentBloc(
+              repository: context.read<IncidentRepository>(),
+            ),
+            child: const ExploreScreen(),
+          ),
         ),
         GoRoute(
           path: '/citizen/my-reports',
@@ -257,7 +264,7 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/citizen/profile',
           name: 'citizen_profile',
-          builder: (context, state) => const ProfileScreen(),
+          builder: (context, state) => const new_profile.ProfileScreen(),
         ),
         GoRoute(
           path: '/citizen/report-issue',

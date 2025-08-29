@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/screens/phone_auth_screen_new.dart';
 import '../features/auth/presentation/screens/otp_verification_screen_new.dart';
 import '../features/citizen/presentation/screens/citizen_home_screen_new.dart';
+import '../features/citizen/presentation/screens/citizen_dashboard_screen.dart';
+import '../features/citizen/presentation/screens/report_issue_screen.dart';
+import '../features/citizen/presentation/screens/my_reports_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/auth',
@@ -24,6 +27,24 @@ final appRouter = GoRouter(
       path: '/citizen-home',
       name: 'citizen-home',
       builder: (context, state) => const CitizenHomeScreenNew(),
+    ),
+    // New citizen features with nested routing
+    GoRoute(
+      path: '/citizen',
+      name: 'citizen',
+      builder: (context, state) => const CitizenDashboardScreen(),
+      routes: [
+        GoRoute(
+          path: 'report',
+          name: 'citizen-report',
+          builder: (context, state) => const ReportIssueScreen(),
+        ),
+        GoRoute(
+          path: 'reports',
+          name: 'citizen-reports',
+          builder: (context, state) => const MyReportsScreen(),
+        ),
+      ],
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
