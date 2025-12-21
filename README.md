@@ -1,161 +1,295 @@
-# GramPulse Backend
+# GramPulse Backend API
 
-## 🚀 Overview
+Node.js/Express RESTful API server for the GramPulse Rural Grievance Management System. Provides secure authentication, incident management, and role-based access control.
 
-GramPulse Backend is a clean, robust Node.js/Express API server for the Rural Grievance Management System. This backend provides essential functionality for user authentication, incident reporting, and category management with a focus on simplicity and reliability.
+## Overview
 
-## 📋 Table of Contents
+The GramPulse Backend is a scalable API service that handles user authentication, incident reporting, category management, and role-based workflows for citizens, volunteers, officers, and administrators. Built with Express.js and MongoDB, it provides a robust foundation for the mobile application.
 
-- [Features](#features)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [File Structure](#file-structure)
-- [Usage](#usage)
-- [Testing](#testing)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
+## Features
 
-## ✨ Features
+### Authentication
+- Phone number-based OTP authentication
+- JWT token-based session management
+- Secure password hashing with bcryptjs
+- Role-based authorization middleware
+- Token refresh and expiration handling
 
-### Core Functionality
-- **User Authentication**: Phone-based OTP authentication with JWT tokens
-- **Incident Management**: Create, view, and manage incident reports
-- **Category System**: Pre-seeded categories for incident classification
-- **Role-Based Access**: Support for citizen, volunteer, officer, and admin roles
-- **File Upload**: Media attachment support for incident reports
-- **Location Support**: GPS coordinates for incident reporting
+### Incident Management
+- Create incidents with GPS coordinates
+- Category-based classification
+- Severity level assignment (Low, Medium, High, Critical)
+- Status tracking (Pending, In Progress, Resolved, Closed)
+- File attachment support
+- Location-based nearby incident queries
+- Anonymous reporting option
 
-### Technical Features
-- **Security**: CORS, rate limiting, helmet protection, JWT authentication
-- **Database**: MongoDB Atlas cloud database with Mongoose ODM
-- **Validation**: Input validation and error handling
-- **Logging**: Request/response logging for debugging
-- **Testing**: Comprehensive test suite for API validation
+### User Management
+- Multi-role user system (Citizen, Volunteer, Officer, Administrator)
+- Profile management
+- User statistics and activity tracking
+- Role-specific data access
 
-## 🏗️ Architecture
+### Additional Features
+- Pre-seeded category database
+- File upload with validation
+- Rate limiting for API protection
+- CORS configuration for cross-origin requests
+- Comprehensive error handling
+- Request/response logging
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Flutter App   │───▶│  Express API    │───▶│  MongoDB Atlas  │
-│   (Frontend)    │    │   (Backend)     │    │   (Database)    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+## Technology Stack
 
-### Technology Stack
-- **Runtime**: Node.js
-- **Framework**: Express.js 5.x
-- **Database**: MongoDB Atlas with Mongoose
-- **Authentication**: JWT with bcryptjs
-- **File Upload**: Multer
-- **Security**: Helmet, CORS, Rate Limiting
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Runtime | Node.js | 18+ |
+| Framework | Express.js | 5.1.0 |
+| Database | MongoDB | Atlas |
+| ODM | Mongoose | 8.18.0 |
+| Authentication | JWT | 9.0.2 |
+| Password Hash | bcryptjs | 2.4.3 |
+| File Upload | Multer | 1.4.5 |
+| Security | Helmet | 7.1.0 |
+| Rate Limiting | express-rate-limit | 7.1.5 |
 
-## 🛠️ Installation
+## Prerequisites
 
-### Prerequisites
-- Node.js (v18+ recommended)
-- MongoDB Atlas account
+- Node.js 18.x or higher
+- MongoDB Atlas account or local MongoDB instance
+- npm or yarn package manager
 - Git
 
-### Quick Start
+## Installation
+
+### 1. Clone Repository
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd GramPulse-Backend
-
-# Install dependencies
-npm install
-
-# Create environment file
-cp .env.example .env
-# Edit .env with your configuration
-
-# Seed the database
-npm run seed
-
-# Start the server
-npm start
+git clone https://github.com/naveen-astra/grampulse-icsrf.git
+cd GP-Backend
 ```
 
-## ⚙️ Configuration
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-### Environment Variables
+### 3. Environment Configuration
+
 Create a `.env` file in the root directory:
 
 ```env
 # Database Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/grampulse
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/grampulse?retryWrites=true&w=majority
 
 # Authentication
-JWT_SECRET=your-super-secret-jwt-key
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRE=30d
 
 # Server Configuration
-PORT=5000
+PORT=3000
 NODE_ENV=development
 
 # Rate Limiting
-RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_WINDOW=15
 RATE_LIMIT_MAX_REQUESTS=100
+
+# File Upload
+MAX_FILE_SIZE=5242880
+UPLOAD_DIR=uploads/
 ```
 
-### Database Setup
-1. Create a MongoDB Atlas account
-2. Create a new cluster
-3. Get the connection string
-4. Add it to your `.env` file
-5. Run the seed script: `npm run seed`
+### 4. Database Setup
 
-## 📡 API Endpoints
+Seed the database with initial categories:
+```bash
+npm run seed
+```
+
+### 5. Start Server
+
+**Development:**
+```bash
+npm run dev
+```
+
+**Production:**
+```bash
+npm start
+```
+
+Server will start on `http://localhost:3000` (or configured PORT)
+
+## Project Structure
+
+```
+GP-Backend/
+├── server.js                    # Application entry point
+├── package.json                 # Dependencies and scripts
+├── .env                         # Environment variables
+├── .gitignore                   # Git ignore rules
+│
+├── src/
+│   ├── config/
+│   │   └── database.js          # MongoDB connection
+│   │
+│   ├── models/
+│   │   ├── User.js              # User schema
+│   │   ├── Incident.js          # Incident schema
+│   │   ├── Category.js          # Category schema
+│   │   └── SHG.js               # Self-Help Group schema
+│   │
+│   ├── controllers/
+│   │   └── authController.js    # Authentication logic
+│   │
+│   ├── middleware/
+│   │   └── auth.js              # JWT verification middleware
+│   │
+│   └── routes/
+│       ├── authRoutes.js        # Authentication endpoints
+│       ├── incidents.js         # Incident endpoints
+│       ├── profile.js           # User profile endpoints
+│       └── shgRoutes.js         # Self-Help Group endpoints
+│
+├── tests/
+│   ├── seedCategories.js        # Database seeding
+│   ├── testAPI.js               # API testing
+│   └── statusCheck.js           # Health check
+│
+├── uploads/                     # File upload directory
+│   └── .gitkeep
+│
+└── backup/                      # Backup configurations
+    └── src_backup/
+```
+
+## API Endpoints
 
 ### Authentication
-- `POST /api/auth/request-otp` - Send OTP to phone number
-- `POST /api/auth/verify-otp` - Verify OTP and get JWT token
-- `POST /api/auth/complete-profile` - Complete user profile (requires auth)
-- `GET /api/auth/me` - Get current user info (requires auth)
 
-### Incident Management
-- `GET /api/incidents/categories` - Get all incident categories
-- `POST /api/incidents` - Create new incident (requires auth)
-- `GET /api/incidents/my` - Get user's incidents (requires auth)
-- `GET /api/incidents/nearby` - Get nearby incidents (requires auth)
-- `GET /api/incidents/statistics` - Get incident statistics (requires auth)
-
-### Utility
-- `GET /api/health` - Server health check
-- `GET /` - API status message
-
-### Authentication Flow
-```
-1. POST /api/auth/request-otp { "phone": "9876543210" }
-2. POST /api/auth/verify-otp { "phone": "9876543210", "otp": "123456" }
-3. POST /api/auth/complete-profile { "name": "John", "email": "john@example.com", "role": "citizen" }
-4. Use returned JWT token in Authorization header: "Bearer <token>"
+#### Register/Login
+```http
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/verify-otp
 ```
 
-## 🗄️ Database Schema
+**Request Body (Register):**
+```json
+{
+  "phoneNumber": "+919876543210",
+  "name": "User Name",
+  "role": "citizen"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "token": "jwt-token-here",
+  "user": {
+    "id": "user-id",
+    "name": "User Name",
+    "phoneNumber": "+919876543210",
+    "role": "citizen"
+  }
+}
+```
+
+### Incidents
+
+#### Create Incident
+```http
+POST /api/incidents
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "title": "Water Supply Issue",
+  "description": "No water supply for 3 days",
+  "category": "Water Supply",
+  "severity": "High",
+  "location": {
+    "type": "Point",
+    "coordinates": [77.5946, 12.9716]
+  },
+  "address": "123 Main Street, Village Name"
+}
+```
+
+#### Get All Incidents
+```http
+GET /api/incidents
+Authorization: Bearer {token}
+```
+
+#### Get Nearby Incidents
+```http
+GET /api/incidents/nearby?latitude=12.9716&longitude=77.5946&radius=5000
+Authorization: Bearer {token}
+```
+
+#### Get Incident by ID
+```http
+GET /api/incidents/:id
+Authorization: Bearer {token}
+```
+
+#### Update Incident Status
+```http
+PATCH /api/incidents/:id/status
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "status": "In Progress",
+  "remarks": "Officer assigned"
+}
+```
+
+### User Profile
+
+#### Get Profile
+```http
+GET /api/profile
+Authorization: Bearer {token}
+```
+
+#### Update Profile
+```http
+PUT /api/profile
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "name": "Updated Name",
+  "email": "user@example.com"
+}
+```
+
+### Categories
+
+#### Get All Categories
+```http
+GET /api/categories
+```
+
+## Database Schema
 
 ### User Model
 ```javascript
 {
-  phone: String (required, unique),
-  name: String,
+  name: String (required),
+  phoneNumber: String (required, unique),
   email: String,
-  role: String (enum: ['citizen', 'volunteer', 'officer', 'admin']),
-  language: String,
-  profileImageUrl: String,
-  kycStatus: String (enum: ['pending', 'verified', 'rejected']),
+  password: String,
+  role: Enum ['citizen', 'volunteer', 'officer', 'admin'],
   isVerified: Boolean,
-  isProfileComplete: Boolean,
-  lastLogin: Date,
-  wardVillageId: String,
-  department: String,
-  designation: String,
-  escalationLevel: Number,
-  otp: String,
   createdAt: Date,
   updatedAt: Date
 }
@@ -164,20 +298,20 @@ RATE_LIMIT_MAX_REQUESTS=100
 ### Incident Model
 ```javascript
 {
-  userId: ObjectId (ref: 'User'),
-  categoryId: ObjectId (ref: 'Category'),
   title: String (required),
   description: String (required),
+  category: ObjectId (ref: Category),
+  severity: Enum ['Low', 'Medium', 'High', 'Critical'],
+  status: Enum ['Pending', 'In Progress', 'Resolved', 'Closed'],
   location: {
-    latitude: Number,
-    longitude: Number,
-    address: String
+    type: String,
+    coordinates: [Number] // [longitude, latitude]
   },
-  severity: Number (1-5),
-  status: String (enum: ['submitted', 'acknowledged', 'in-progress', 'resolved', 'closed']),
-  priority: String (enum: ['low', 'medium', 'high', 'critical']),
-  mediaAttachments: [String],
-  assignedTo: ObjectId (ref: 'User'),
+  address: String,
+  reporter: ObjectId (ref: User),
+  assignedTo: ObjectId (ref: User),
+  images: [String],
+  isAnonymous: Boolean,
   createdAt: Date,
   updatedAt: Date
 }
@@ -186,261 +320,249 @@ RATE_LIMIT_MAX_REQUESTS=100
 ### Category Model
 ```javascript
 {
-  name: String (required),
+  name: String (required, unique),
   description: String,
   icon: String,
-  color: String,
   isActive: Boolean,
-  parentCategory: ObjectId (ref: 'Category'),
-  createdAt: Date,
-  updatedAt: Date
+  createdAt: Date
 }
 ```
 
-## 📁 File Structure
+## Authentication Flow
 
+1. User sends phone number for registration/login
+2. Server generates OTP (6-digit code)
+3. User verifies OTP
+4. Server issues JWT token
+5. Client includes token in Authorization header for protected routes
+6. Server validates token using middleware
+
+## Security Features
+
+### Implemented
+- JWT token authentication
+- Password hashing with bcryptjs
+- Rate limiting (100 requests per 15 minutes)
+- CORS configuration
+- Helmet security headers
+- Input validation
+- SQL injection prevention (NoSQL)
+- XSS protection
+
+### Best Practices
+- Environment variables for sensitive data
+- Token expiration handling
+- Role-based access control
+- Secure file upload validation
+
+## Error Handling
+
+All API responses follow a consistent format:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Operation successful"
+}
 ```
-GramPulse-Backend/
-├── 📄 server.js                 # Main application entry point
-├── 📄 package.json              # Dependencies and scripts
-├── 📄 .env                      # Environment variables
-├── 📄 .gitignore               # Git ignore rules
-├── 📄 README.md                # This file
-├── 📂 src/
-│   ├── 📂 config/
-│   │   └── 📄 database.js       # MongoDB connection
-│   ├── 📂 controllers/
-│   │   └── 📄 authController.js # Authentication logic
-│   ├── 📂 middleware/
-│   │   └── 📄 auth.js           # JWT authentication middleware
-│   ├── 📂 models/
-│   │   ├── 📄 User.js           # User data model
-│   │   ├── 📄 Incident.js       # Incident data model
-│   │   └── 📄 Category.js       # Category data model
-│   └── 📂 routes/
-│       ├── 📄 authRoutes.js     # Authentication routes
-│       └── 📄 incidents.js      # Incident management routes
-├── 📂 tests/
-│   ├── 📄 testAPI.js            # API testing suite
-│   ├── 📄 statusCheck.js        # Server status checker
-│   └── 📄 seedCategories.js     # Database seeding script
-├── 📂 uploads/                  # File upload directory
-└── 📂 backup/                   # Backup files (development)
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": "Error message",
+  "statusCode": 400
+}
 ```
 
-## 🚀 Usage
+### HTTP Status Codes
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 500: Internal Server Error
 
-### Starting the Server
+## Testing
+
+### Run Tests
 ```bash
-# Development mode with auto-restart
+# API endpoint testing
+npm test
+
+# Database connection check
+node check-database.js
+
+# Category seeding verification
+node check-categories-db.js
+```
+
+### Manual Testing with cURL
+
+**Register User:**
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phoneNumber": "+919876543210",
+    "name": "Test User",
+    "role": "citizen"
+  }'
+```
+
+**Create Incident:**
+```bash
+curl -X POST http://localhost:3000/api/incidents \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "title": "Test Incident",
+    "description": "Test Description",
+    "category": "CATEGORY_ID",
+    "severity": "Medium",
+    "location": {
+      "type": "Point",
+      "coordinates": [77.5946, 12.9716]
+    }
+  }'
+```
+
+## Development
+
+### Development Server
+```bash
 npm run dev
-
-# Production mode
-npm start
 ```
+Uses nodemon for automatic restart on file changes.
 
-### Running Tests
-```bash
-# Quick status check
-node tests/statusCheck.js
+### Code Standards
+- Use ES6+ syntax
+- Follow async/await pattern
+- Implement proper error handling
+- Add comments for complex logic
+- Maintain consistent naming conventions
 
-# Full API test suite
-npm test
+### Adding New Routes
+1. Create route file in `src/routes/`
+2. Define controller in `src/controllers/`
+3. Add middleware if needed in `src/middleware/`
+4. Register route in `server.js`
 
-# Individual endpoint testing
-curl http://localhost:5000/api/health
-```
-
-### Seeding Data
-```bash
-# Seed categories
-npm run seed
-```
-
-## 🧪 Testing
-
-### Manual Testing Commands
-```bash
-# Health Check
-curl http://localhost:5000/api/health
-
-# Get Categories
-curl http://localhost:5000/api/incidents/categories
-
-# Request OTP
-curl -X POST http://localhost:5000/api/auth/request-otp \
-  -H "Content-Type: application/json" \
-  -d '{"phone":"9876543210"}'
-
-# Verify OTP (replace with actual OTP)
-curl -X POST http://localhost:5000/api/auth/verify-otp \
-  -H "Content-Type: application/json" \
-  -d '{"phone":"9876543210","otp":"123456"}'
-```
-
-### Automated Testing
-```bash
-# Run comprehensive test suite
-npm test
-
-# Run status check
-node tests/statusCheck.js
-```
-
-### Testing from PowerShell (Windows)
-```powershell
-# Navigate to backend directory
-cd "d:\ICSRF\GramPulse-Backend"
-
-# Start server
-npm start
-
-# In another terminal, run tests
-npm test
-```
-
-## 🔨 Development
-
-### Adding New Endpoints
-1. Create route in `src/routes/`
-2. Add controller logic in `src/controllers/`
-3. Update server.js if needed
-4. Add tests in `tests/`
-
-### Database Changes
-1. Update model in `src/models/`
-2. Create migration script if needed
-3. Update seed data if required
-4. Test with existing data
+## Deployment
 
 ### Environment Setup
-```bash
-# Install development dependencies
-npm install
-
-# Set up environment
-cp .env.example .env
-# Edit .env with your settings
-
-# Start development server
-npm run dev
-```
-
-## 🚀 Deployment
-
-### Production Setup
-1. Set NODE_ENV=production in environment
+1. Set NODE_ENV to 'production'
 2. Use strong JWT_SECRET
-3. Configure production MongoDB cluster
-4. Set up proper CORS origins
-5. Configure rate limiting appropriately
+3. Configure production MongoDB URI
+4. Set appropriate rate limits
+5. Enable HTTPS
 
-### Environment Variables for Production
-```env
-NODE_ENV=production
-PORT=5000
-MONGODB_URI=mongodb+srv://user:pass@production-cluster.mongodb.net/grampulse
-JWT_SECRET=super-secure-production-secret
-RATE_LIMIT_MAX_REQUESTS=50
+### Platform-Specific Guides
+
+**Heroku:**
+```bash
+heroku create grampulse-api
+heroku config:set MONGODB_URI=your-mongodb-uri
+heroku config:set JWT_SECRET=your-secret
+git push heroku GP-Backend:main
 ```
 
-### Docker Deployment (Optional)
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 5000
-CMD ["npm", "start"]
+**Railway:**
+```bash
+railway login
+railway init
+railway add
+railway up
 ```
 
-## 📊 Performance & Monitoring
+**AWS EC2:**
+- Set up Node.js environment
+- Configure reverse proxy (nginx)
+- Set up SSL certificate
+- Configure environment variables
+- Use PM2 for process management
 
-### Built-in Features
-- Request/response logging
-- Error handling middleware
-- Rate limiting protection
-- Health check endpoint
+## Monitoring
 
-### Monitoring Endpoints
-- `GET /api/health` - Server status
-- `GET /api/incidents/statistics` - Usage statistics
+### Health Check
+```http
+GET /api/health
+```
 
-## 🔒 Security Features
+**Response:**
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-12-22T10:30:00.000Z",
+  "uptime": 3600,
+  "database": "connected"
+}
+```
 
-### Implemented Security
-- **CORS**: Cross-origin resource sharing protection
-- **Helmet**: Security headers
-- **Rate Limiting**: Request throttling
-- **JWT Authentication**: Secure token-based auth
-- **Input Validation**: Request data validation
-- **Password Hashing**: bcryptjs for secure password storage
-
-### Security Best Practices
-- Use environment variables for secrets
-- Implement proper error handling
-- Validate all inputs
-- Use HTTPS in production
-- Regular security updates
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
-#### Server Won't Start
-```bash
-# Check if port is in use
-netstat -an | findstr :5000
+**MongoDB Connection Failed:**
+- Verify MONGODB_URI in .env
+- Check network access in MongoDB Atlas
+- Ensure IP address is whitelisted
 
-# Check environment variables
-cat .env
+**JWT Token Invalid:**
+- Verify JWT_SECRET matches
+- Check token expiration
+- Ensure proper Authorization header format
 
-# Check database connection
-node -e "require('./src/config/database')"
+**File Upload Errors:**
+- Check UPLOAD_DIR permissions
+- Verify MAX_FILE_SIZE setting
+- Ensure multer configuration is correct
+
+**Rate Limit Exceeded:**
+- Adjust RATE_LIMIT_MAX_REQUESTS
+- Implement user-specific rate limiting
+- Use Redis for distributed rate limiting
+
+## Performance Optimization
+
+- Database indexing on frequently queried fields
+- Pagination for large datasets
+- Caching with Redis (optional)
+- Connection pooling for MongoDB
+- Compression middleware
+- Query optimization
+
+## Contributing
+
+Please refer to CONTRIBUTING.md for development guidelines and submission process.
+
+### Commit Message Format
+```
+<type>(<scope>): <description>
+
+Examples:
+feat(auth): Add password reset functionality
+fix(incidents): Resolve nearby query distance calculation
+docs: Update API endpoint documentation
 ```
 
-#### Database Connection Issues
-1. Verify MongoDB URI in .env
-2. Check network connectivity
-3. Verify database credentials
-4. Check MongoDB Atlas whitelist
+## License
 
-#### API Tests Failing
-1. Ensure server is running
-2. Check localhost vs 127.0.0.1
-3. Verify environment configuration
-4. Check database seeding
+This project is proprietary and confidential.
 
-## 🤝 Contributing
+## Support
 
-### Development Workflow
-1. Fork the repository
-2. Create feature branch
-3. Make changes
-4. Add tests
-5. Update documentation
-6. Submit pull request
+For issues, questions, or feature requests, please open an issue in the repository.
 
-### Code Standards
-- Use ESLint configuration
-- Follow existing code style
-- Add comments for complex logic
-- Write tests for new features
-- Update README for new endpoints
+## Changelog
 
-## 📝 License
-
-This project is licensed under the ISC License - see the LICENSE file for details.
-
-## 📞 Support
-
-For support and questions:
-- Check the troubleshooting section
-- Review the API documentation
-- Run the test suite to verify setup
-- Check server logs for errors
+See CHANGELOG.md for version history and release notes.
 
 ---
 
-**GramPulse Backend** - Simple, Clean, Reliable 🚀
+**Current Version:** 1.0.0  
+**Last Updated:** December 2024  
+**Status:** Production Ready
