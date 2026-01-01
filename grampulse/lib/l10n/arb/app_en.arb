@@ -1,0 +1,336 @@
+{
+  "@@locale": "en",
+  
+  "appTitle": "GramPulse",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "languageSelectionTitle": "Choose Your Language",
+  "@languageSelectionTitle": {
+    "description": "Title for language selection screen"
+  },
+  
+  "languageSelectionDescription": "Select your preferred language for the app",
+  "@languageSelectionDescription": {
+    "description": "Description text for language selection screen"
+  },
+  
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Text for continue button"
+  },
+  
+  "loginSignupTitle": "Login or Sign Up",
+  "@loginSignupTitle": {
+    "description": "Title for the phone authentication screen"
+  },
+  
+  "enterPhoneDescription": "Enter your phone number to continue. We will send you a 6-digit verification code.",
+  "@enterPhoneDescription": {
+    "description": "Description text for phone number entry"
+  },
+  
+  "phoneHint": "10-digit mobile number",
+  "@phoneHint": {
+    "description": "Placeholder text for phone number input"
+  },
+  
+  "getOtpButton": "Get OTP",
+  "@getOtpButton": {
+    "description": "Text for button to request OTP"
+  },
+  
+  "invalidPhoneError": "Please enter a valid 10-digit mobile number",
+  "@invalidPhoneError": {
+    "description": "Error message for invalid phone number"
+  },
+  
+  "speakPhoneNumber": "Speak phone number",
+  "@speakPhoneNumber": {
+    "description": "Text for voice input button"
+  },
+  
+  "verifyOtpTitle": "Verify OTP",
+  "@verifyOtpTitle": {
+    "description": "Title for OTP verification screen"
+  },
+  
+  "otpSentTo": "OTP sent to",
+  "@otpSentTo": {
+    "description": "Text indicating where OTP was sent"
+  },
+  
+  "resendOtp": "Resend OTP",
+  "@resendOtp": {
+    "description": "Text for resend OTP button"
+  },
+  
+  "resendOtpIn": "Resend OTP in {seconds} seconds",
+  "@resendOtpIn": {
+    "description": "Text showing countdown timer for resend OTP",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "45"
+      }
+    }
+  },
+  
+  "verifyAndContinue": "Verify & Continue",
+  "@verifyAndContinue": {
+    "description": "Text for verify and continue button"
+  },
+  
+  "profileSetupTitle": "Complete Your Profile",
+  "@profileSetupTitle": {
+    "description": "Title for profile setup screen"
+  },
+  
+  "fullNameLabel": "Full Name",
+  "@fullNameLabel": {
+    "description": "Label for full name input"
+  },
+  
+  "fullNameHint": "Enter your full name",
+  "@fullNameHint": {
+    "description": "Placeholder for full name input"
+  },
+  
+  "villageLabel": "Village/Ward",
+  "@villageLabel": {
+    "description": "Label for village/ward selection"
+  },
+  
+  "villageHint": "Select your village or ward",
+  "@villageHint": {
+    "description": "Placeholder for village/ward selection"
+  },
+  
+  "preferredLanguageLabel": "Preferred Language",
+  "@preferredLanguageLabel": {
+    "description": "Label for preferred language selection"
+  },
+  
+  "roleSelectionTitle": "Choose Your Role",
+  "@roleSelectionTitle": {
+    "description": "Title for role selection screen"
+  },
+  
+  "citizenRole": "Citizen",
+  "@citizenRole": {
+    "description": "Text for citizen role option"
+  },
+  
+  "citizenDescription": "Report local issues and track their resolution",
+  "@citizenDescription": {
+    "description": "Description for citizen role"
+  },
+  
+  "volunteerRole": "Volunteer",
+  "@volunteerRole": {
+    "description": "Text for volunteer role option"
+  },
+  
+  "volunteerDescription": "Verify reported issues and help coordinate solutions",
+  "@volunteerDescription": {
+    "description": "Description for volunteer role"
+  },
+  
+  "officerRole": "Officer",
+  "@officerRole": {
+    "description": "Text for officer role option"
+  },
+  
+  "officerDescription": "Review and resolve issues in your jurisdiction",
+  "@officerDescription": {
+    "description": "Description for officer role"
+  },
+  
+  "home": "Home",
+  "@home": {
+    "description": "Text for home tab"
+  },
+  
+  "explore": "Explore",
+  "@explore": {
+    "description": "Text for explore tab"
+  },
+  
+  "myReports": "My Reports",
+  "@myReports": {
+    "description": "Text for my reports tab"
+  },
+  
+  "profile": "Profile",
+  "@profile": {
+    "description": "Text for profile tab"
+  },
+  
+  "loadingLocation": "Loading location...",
+  "@loadingLocation": {
+    "description": "Text shown while location is loading"
+  },
+  
+  "reportIssue": "Report Issue",
+  "@reportIssue": {
+    "description": "Text for report issue button"
+  },
+  
+  "nearbyIssues": "Issues Near Me",
+  "@nearbyIssues": {
+    "description": "Title for nearby issues section"
+  },
+  
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "Text for view all button"
+  },
+  
+  "myReportedIssues": "My Reported Issues",
+  "@myReportedIssues": {
+    "description": "Title for my reported issues section"
+  },
+  
+  "noIssuesNearby": "No issues reported nearby",
+  "@noIssuesNearby": {
+    "description": "Text shown when no nearby issues are found"
+  },
+  
+  "noReportedIssues": "You haven't reported any issues yet",
+  "@noReportedIssues": {
+    "description": "Text shown when user has no reported issues"
+  },
+  
+  "captureMedia": "Capture Media",
+  "@captureMedia": {
+    "description": "Title for capture media screen"
+  },
+  
+  "describeIssue": "Describe the Issue",
+  "@describeIssue": {
+    "description": "Title for describe issue screen"
+  },
+  
+  "issueCategory": "Category",
+  "@issueCategory": {
+    "description": "Label for issue category selection"
+  },
+  
+  "issueSeverity": "Severity",
+  "@issueSeverity": {
+    "description": "Label for issue severity selection"
+  },
+  
+  "low": "Low",
+  "@low": {
+    "description": "Text for low severity option"
+  },
+  
+  "medium": "Medium",
+  "@medium": {
+    "description": "Text for medium severity option"
+  },
+  
+  "high": "High",
+  "@high": {
+    "description": "Text for high severity option"
+  },
+  
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Text for unknown status"
+  },
+  
+  "requestRelief": "Request Relief",
+  "@requestRelief": {
+    "description": "Title for request relief screen"
+  },
+  
+  "reviewSubmit": "Review & Submit",
+  "@reviewSubmit": {
+    "description": "Title for review and submit screen"
+  },
+  
+  "description": "Description",
+  "@description": {
+    "description": "Label for description field"
+  },
+  
+  "onlineSubmitMessage": "You are online. Your issue will be submitted immediately.",
+  "@onlineSubmitMessage": {
+    "description": "Message shown when user is online during submission"
+  },
+  
+  "offlineSubmitMessage": "You are offline. Your issue will be queued and submitted when you are back online.",
+  "@offlineSubmitMessage": {
+    "description": "Message shown when user is offline during submission"
+  },
+  
+  "supportingDocuments": "Supporting Documents",
+  "@supportingDocuments": {
+    "description": "Label for supporting documents section"
+  },
+  
+  "idProof": "ID Proof",
+  "@idProof": {
+    "description": "Label for ID proof document"
+  },
+  
+  "propertyDocument": "Property Document",
+  "@propertyDocument": {
+    "description": "Label for property document"
+  },
+  
+  "damagePhoto": "Damage Photo",
+  "@damagePhoto": {
+    "description": "Label for damage photo document"
+  },
+  
+  "tapToUpload": "Tap to Upload",
+  "@tapToUpload": {
+    "description": "Text shown in document upload button"
+  },
+  
+  "reliefAmount": "Relief: ₹{amount}",
+  "@reliefAmount": {
+    "description": "Text showing relief amount requested",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "10000"
+      }
+    }
+  },
+  
+  "mediaCount": "{count, plural, =0{No media} =1{1 photo} other{{count} photos}}",
+  "@mediaCount": {
+    "description": "Text showing count of media items",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  
+  "submit": "Submit",
+  "@submit": {
+    "description": "Text for submit button"
+  },
+  
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Text for cancel button"
+  },
+  
+  "back": "Back",
+  "@back": {
+    "description": "Text for back button"
+  },
+  
+  "next": "Next",
+  "@next": {
+    "description": "Text for next button"
+  }
+}

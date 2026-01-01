@@ -1,0 +1,481 @@
+2025.12.29 14:20:24 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.107.1.
+2025.12.29 14:20:25 INFO  time: initialize in 0.21s
+2025.12.29 14:20:41 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2025.12.29 14:20:41 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2025.12.29 14:20:41 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.29 14:20:41 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.29 14:20:41 INFO  Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2025.12.29 14:20:41 INFO  Successfully validated 7 migrations (execution time 00:00.333s)
+2025.12.29 14:20:41 INFO  Successfully validated 7 migrations (execution time 00:00.569s)
+2025.12.29 14:20:41 INFO  Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2025.12.29 14:20:42 INFO  Current version of schema "PUBLIC": 7
+2025.12.29 14:20:42 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.29 14:20:42 INFO  Current version of schema "PUBLIC": << Empty Schema >>
+2025.12.29 14:20:42 INFO  Migrating schema "PUBLIC" to version "1 - Create tables"
+2025.12.29 14:20:43 INFO  Migrating schema "PUBLIC" to version "2 - Server discovery"
+2025.12.29 14:20:43 INFO  Migrating schema "PUBLIC" to version "3 - Jar symbols"
+2025.12.29 14:20:43 INFO  Migrating schema "PUBLIC" to version "4 - Fingerprints"
+2025.12.29 14:20:43 INFO  Migrating schema "PUBLIC" to version "5 - Jar type hierarchy"
+2025.12.29 14:20:44 INFO  Migrating schema "PUBLIC" to version "6 - Delete indices"
+2025.12.29 14:20:44 INFO  Migrating schema "PUBLIC" to version "7 - Toplevel members"
+2025.12.29 14:20:44 INFO  Successfully applied 7 migrations to schema "PUBLIC", now at version v7 (execution time 00:01.083s)
+2025.12.29 14:20:46 INFO  Attempting to connect to the build server...
+2025.12.29 14:20:46 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.29 14:20:47 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.29 14:21:02 INFO  BSP server: Starting compilation server
+2025.12.29 14:21:02 WARN  no build tool detected in workspace 'D:\Class\Amrita_Class\codes4\grampulse\grampulse2'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.12.29 14:21:02 WARN  Build server is not auto-connectable.
+2025.12.29 14:21:24 INFO  time: Connected to build server in 38s
+2025.12.29 14:21:24 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.29 14:21:26 INFO  time: Imported build in 1.57s
+2025.12.29 14:21:56 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.29 14:21:56 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.29 14:21:56 INFO  Successfully validated 1 migration (execution time 00:00.029s)
+2025.12.29 14:21:56 INFO  Current version of schema "PUBLIC": 1
+2025.12.29 14:21:56 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.29 14:22:02 INFO  time: indexed workspace in 36s
+Dec 29, 2025 2:23:56 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Dec 29, 2025 2:46:42 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2025.12.29 21:46:37 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.29 21:46:38 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.29 21:55:25 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.107.1.
+2025.12.29 21:55:26 INFO  time: initialize in 0.28s
+2025.12.29 21:55:55 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2025.12.29 21:55:55 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2025.12.29 21:55:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.29 21:55:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.29 21:55:55 INFO  Successfully validated 7 migrations (execution time 00:00.198s)
+2025.12.29 21:55:55 INFO  Successfully validated 7 migrations (execution time 00:00.202s)
+2025.12.29 21:55:55 INFO  Current version of schema "PUBLIC": 7
+2025.12.29 21:55:55 INFO  Current version of schema "PUBLIC": 7
+2025.12.29 21:55:55 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.29 21:55:55 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.29 21:55:58 INFO  Attempting to connect to the build server...
+2025.12.29 21:55:58 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.29 21:55:59 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.29 21:56:05 WARN  no build tool detected in workspace 'D:\Class\Amrita_Class\codes4\grampulse\grampulse2'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.12.29 21:56:05 WARN  Build server is not auto-connectable.
+2025.12.29 21:56:31 INFO  BSP server: Starting compilation server
+2025.12.29 21:57:00 ERROR Timeout waiting for 'build/initialize' response
+2025.12.29 21:57:00 WARN  Retrying connection to the build server scala-cli
+2025.12.29 21:57:00 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.29 21:57:00 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.29 21:57:21 INFO  time: Connected to build server in 1m23s
+2025.12.29 21:57:21 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.29 21:57:23 INFO  time: Imported build in 1.82s
+2025.12.29 21:57:59 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.29 21:57:59 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.29 21:57:59 INFO  Successfully validated 1 migration (execution time 00:00.048s)
+2025.12.29 21:57:59 INFO  Current version of schema "PUBLIC": 1
+2025.12.29 21:57:59 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.29 21:58:05 INFO  time: indexed workspace in 41s
+Dec 30, 2025 11:26:58 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2025.12.30 16:59:37 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.107.1.
+2025.12.30 16:59:55 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2025.12.30 16:59:55 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2025.12.30 16:59:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 16:59:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 16:59:55 INFO  Successfully validated 7 migrations (execution time 00:00.409s)
+2025.12.30 16:59:55 INFO  Successfully validated 7 migrations (execution time 00:00.411s)
+2025.12.30 16:59:55 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 16:59:55 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 16:59:55 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 16:59:55 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 16:59:58 INFO  Attempting to connect to the build server...
+2025.12.30 16:59:58 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.30 16:59:59 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.30 17:00:05 WARN  no build tool detected in workspace 'D:\Class\Amrita_Class\codes4\grampulse\grampulse2'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.12.30 17:00:05 WARN  Build server is not auto-connectable.
+2025.12.30 17:00:07 INFO  BSP server: Starting compilation server
+2025.12.30 17:00:14 INFO  time: Connected to build server in 15s
+2025.12.30 17:00:14 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.30 17:00:14 INFO  time: Imported build in 0.88s
+2025.12.30 17:00:33 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.30 17:00:33 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 17:00:33 INFO  Successfully validated 1 migration (execution time 00:00.019s)
+2025.12.30 17:00:33 INFO  Current version of schema "PUBLIC": 1
+2025.12.30 17:00:33 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 17:00:35 INFO  time: indexed workspace in 20s
+Dec 30, 2025 5:15:05 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2025.12.30 19:35:59 INFO  logging to files D:\Class\Amrita_Class\codes4\s6\.metals\metals.log,D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals.log
+Dec 30, 2025 7:49:56 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Dec 30, 2025 7:49:56 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Dec 30, 2025 7:49:56 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2025.12.30 21:06:50 INFO  logging to files D:\Class\Amrita_Class\codes4\s6\.metals\metals.log,D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals.log,D:\Class\Amrita_Class\codes4\chinam2\.metals\metals.log
+2025.12.30 21:06:54 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\chinam2\.metals\metals (H2 2.4)
+2025.12.30 21:06:54 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:06:54 INFO  Successfully validated 7 migrations (execution time 00:00.017s)
+2025.12.30 21:06:54 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 21:06:54 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:06:54 INFO  Attempting to connect to the build server...
+2025.12.30 21:06:54 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.EXE, bsp, --json-options, D:\Class\Amrita_Class\codes4\chinam2\.scala-build\ide-options-v2.json, --json-launcher-options, D:\Class\Amrita_Class\codes4\chinam2\.scala-build\ide-launcher-options.json, --envs-file, D:\Class\Amrita_Class\codes4\chinam2\.scala-build\ide-envs.json, D:\Class\Amrita_Class\codes4\chinam2)
+2025.12.30 21:06:54 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\chinam2\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+Dec 30, 2025 9:06:55 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Dec 30, 2025 9:06:55 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Dec 30, 2025 9:06:55 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2025.12.30 21:07:00 INFO  time: Connected to build server in 5.63s
+2025.12.30 21:07:00 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.30 21:07:01 INFO  compiling chinam2_d5c0a6989e (2 java sources)
+2025.12.30 21:07:01 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.30 21:07:01 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:07:01 INFO  Successfully validated 1 migration (execution time 00:00.005s)
+2025.12.30 21:07:01 INFO  Current version of schema "PUBLIC": 1
+2025.12.30 21:07:01 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:07:01 INFO  time: indexed workspace in 2.23s
+2025.12.30 21:07:03 WARN  javac exited with exit code 1
+2025.12.30 21:07:03 INFO  time: compiled chinam2_d5c0a6989e in 1.95s
+2025.12.30 21:07:03 INFO  compiling chinam2_d5c0a6989e (2 java sources)
+Dec 30, 2025 9:07:03 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleNotification
+WARNING: Notification threw an exception: {
+  "jsonrpc": "2.0",
+  "method": "workspace/didChangeWatchedFiles",
+  "params": {
+    "changes": [
+      {
+        "uri": "file:///d%3A/Class/Amrita_Class/codes4/chinam2/.scala-build/.bloop/chinam2_d5c0a6989e/bloop-internal-classes/main-aTM02UFoQou9TjiicTiyHw%3D%3D/META-INF/semanticdb/Frontend/build",
+        "type": 1
+      }
+    ]
+  }
+}
+java.lang.IllegalStateException: An unexpected exception occurred while executing jsonrpc method public abstract java.util.concurrent.CompletableFuture scala.meta.metals.lsp.WorkspaceService.didChangeWatchedFiles(org.eclipse.lsp4j.DidChangeWatchedFilesParams)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:73)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.notify(GenericEndpoint.java:160)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleNotification(RemoteEndpoint.java:231)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1575)
+Caused by: java.nio.file.NoSuchFileException: d:\Class\Amrita_Class\codes4\chinam2\.scala-build\.bloop\chinam2_d5c0a6989e\bloop-internal-classes\main-aTM02UFoQou9TjiicTiyHw==\META-INF\semanticdb\Frontend\build
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:85)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108)
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.newByteChannel(WindowsFileSystemProvider.java:234)
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:380)
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:432)
+	at java.base/java.nio.file.Files.readAllBytes(Files.java:3292)
+	at scala.meta.internal.io.PlatformFileIO$.slurp(PlatformFileIO.scala:42)
+	at scala.meta.internal.io.FileIO$.slurp(FileIO.scala:18)
+	at scala.meta.internal.metals.MetalsLspService.$anonfun$onChange$1(MetalsLspService.scala:906)
+	at scala.collection.immutable.List.map(List.scala:236)
+	at scala.collection.immutable.List.map(List.scala:79)
+	at scala.meta.internal.metals.MetalsLspService.onChange(MetalsLspService.scala:905)
+	at scala.meta.internal.metals.ProjectMetalsLspService.onChange(ProjectMetalsLspService.scala:331)
+	at scala.meta.internal.metals.MetalsLspService.didChangeWatchedFiles(MetalsLspService.scala:891)
+	at scala.meta.internal.metals.WorkspaceLspService.$anonfun$didChangeWatchedFiles$3(WorkspaceLspService.scala:686)
+	at scala.collection.StrictOptimizedIterableOps.map(StrictOptimizedIterableOps.scala:100)
+	at scala.collection.StrictOptimizedIterableOps.map$(StrictOptimizedIterableOps.scala:87)
+	at scala.collection.immutable.HashMap.map(HashMap.scala:39)
+	at scala.meta.internal.metals.WorkspaceLspService.didChangeWatchedFiles(WorkspaceLspService.scala:685)
+	at scala.meta.metals.lsp.DelegatingScalaService.didChangeWatchedFiles(DelegatingScalaService.scala:61)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+	... 11 more
+
+2025.12.30 21:07:04 WARN  javac exited with exit code 1
+2025.12.30 21:07:04 INFO  time: compiled chinam2_d5c0a6989e in 1.04s
+Dec 30, 2025 9:07:04 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleNotification
+WARNING: Notification threw an exception: {
+  "jsonrpc": "2.0",
+  "method": "workspace/didChangeWatchedFiles",
+  "params": {
+    "changes": [
+      {
+        "uri": "file:///d%3A/Class/Amrita_Class/codes4/chinam2/.scala-build/.bloop/chinam2_d5c0a6989e/bloop-internal-classes/main-wwYzUFCZQHCh7yza0cyQHA%3D%3D/META-INF/semanticdb/Frontend/build",
+        "type": 1
+      }
+    ]
+  }
+}
+java.lang.IllegalStateException: An unexpected exception occurred while executing jsonrpc method public abstract java.util.concurrent.CompletableFuture scala.meta.metals.lsp.WorkspaceService.didChangeWatchedFiles(org.eclipse.lsp4j.DidChangeWatchedFilesParams)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:73)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.notify(GenericEndpoint.java:160)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleNotification(RemoteEndpoint.java:231)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:185)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:114)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1575)
+Caused by: java.nio.file.NoSuchFileException: d:\Class\Amrita_Class\codes4\chinam2\.scala-build\.bloop\chinam2_d5c0a6989e\bloop-internal-classes\main-wwYzUFCZQHCh7yza0cyQHA==\META-INF\semanticdb\Frontend\build
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:85)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108)
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.newByteChannel(WindowsFileSystemProvider.java:234)
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:380)
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:432)
+	at java.base/java.nio.file.Files.readAllBytes(Files.java:3292)
+	at scala.meta.internal.io.PlatformFileIO$.slurp(PlatformFileIO.scala:42)
+	at scala.meta.internal.io.FileIO$.slurp(FileIO.scala:18)
+	at scala.meta.internal.metals.MetalsLspService.$anonfun$onChange$1(MetalsLspService.scala:906)
+	at scala.collection.immutable.List.map(List.scala:236)
+	at scala.collection.immutable.List.map(List.scala:79)
+	at scala.meta.internal.metals.MetalsLspService.onChange(MetalsLspService.scala:905)
+	at scala.meta.internal.metals.ProjectMetalsLspService.onChange(ProjectMetalsLspService.scala:331)
+	at scala.meta.internal.metals.MetalsLspService.didChangeWatchedFiles(MetalsLspService.scala:891)
+	at scala.meta.internal.metals.WorkspaceLspService.$anonfun$didChangeWatchedFiles$3(WorkspaceLspService.scala:686)
+	at scala.collection.StrictOptimizedIterableOps.map(StrictOptimizedIterableOps.scala:100)
+	at scala.collection.StrictOptimizedIterableOps.map$(StrictOptimizedIterableOps.scala:87)
+	at scala.collection.immutable.HashMap.map(HashMap.scala:39)
+	at scala.meta.internal.metals.WorkspaceLspService.didChangeWatchedFiles(WorkspaceLspService.scala:685)
+	at scala.meta.metals.lsp.DelegatingScalaService.didChangeWatchedFiles(DelegatingScalaService.scala:61)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint.lambda$recursiveFindRpcMethods$0(GenericEndpoint.java:65)
+	... 11 more
+
+2025.12.30 21:10:28 INFO  Shut down connection with build server.
+2025.12.30 21:10:28 INFO  Shut down connection with build server.
+2025.12.30 21:10:28 INFO  logging to files D:\Class\Amrita_Class\codes4\s6\.metals\metals.log,D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals.log
+2025.12.30 21:10:28 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2025.12.30 21:10:28 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:10:28 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2025.12.30 21:10:28 INFO  Successfully validated 7 migrations (execution time 00:00.004s)
+2025.12.30 21:10:28 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:10:28 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 21:10:28 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:10:28 INFO  Successfully validated 7 migrations (execution time 00:00.004s)
+2025.12.30 21:10:28 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 21:10:28 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:10:28 INFO  Attempting to connect to the build server...
+2025.12.30 21:10:28 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.30 21:10:28 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.30 21:10:29 WARN  no build tool detected in workspace 'D:\Class\Amrita_Class\codes4\grampulse\grampulse2'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.12.30 21:10:29 WARN  Build server is not auto-connectable.
+2025.12.30 21:10:29 INFO  time: Connected to build server in 1.07s
+2025.12.30 21:10:29 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.30 21:10:35 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.30 21:10:35 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:10:35 INFO  Successfully validated 1 migration (execution time 00:00.009s)
+2025.12.30 21:10:35 INFO  Current version of schema "PUBLIC": 1
+2025.12.30 21:10:35 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:10:35 INFO  time: indexed workspace in 5.67s
+2025.12.30 21:13:27 INFO  Shutting down server
+2025.12.30 21:13:27 INFO  shutting down Metals
+2025.12.30 21:13:27 INFO  Shut down connection with build server.
+2025.12.30 21:13:27 INFO  Exiting server
+2025.12.30 21:22:49 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.107.1.
+2025.12.30 21:22:55 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2025.12.30 21:22:55 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2025.12.30 21:22:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:22:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:22:55 INFO  Successfully validated 7 migrations (execution time 00:00.096s)
+2025.12.30 21:22:55 INFO  Successfully validated 7 migrations (execution time 00:00.096s)
+2025.12.30 21:22:55 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 21:22:55 INFO  Current version of schema "PUBLIC": 7
+2025.12.30 21:22:55 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:22:55 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:22:56 INFO  Attempting to connect to the build server...
+2025.12.30 21:22:56 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.30 21:22:56 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.30 21:22:58 INFO  time: Connected to build server in 1.84s
+2025.12.30 21:22:58 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.30 21:22:58 INFO  time: Imported build in 0.26s
+2025.12.30 21:23:00 WARN  no build tool detected in workspace 'D:\Class\Amrita_Class\codes4\grampulse\grampulse2'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.12.30 21:23:00 WARN  Build server is not auto-connectable.
+2025.12.30 21:23:06 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.30 21:23:06 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.30 21:23:06 INFO  Successfully validated 1 migration (execution time 00:00.041s)
+2025.12.30 21:23:06 INFO  Current version of schema "PUBLIC": 1
+2025.12.30 21:23:06 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.30 21:23:08 INFO  time: indexed workspace in 9.7s
+Dec 30, 2025 11:01:55 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2025.12.31 04:02:37 INFO  Shutting down server
+2025.12.31 04:02:37 INFO  shutting down Metals
+2025.12.31 04:02:37 INFO  Shut down connection with build server.
+2025.12.31 04:02:37 INFO  Exiting server
+2025.12.31 10:47:48 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.107.1.
+2025.12.31 10:47:51 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2025.12.31 10:47:51 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2025.12.31 10:47:51 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.31 10:47:51 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.31 10:47:51 INFO  Successfully validated 7 migrations (execution time 00:00.063s)
+2025.12.31 10:47:51 INFO  Successfully validated 7 migrations (execution time 00:00.064s)
+2025.12.31 10:47:51 INFO  Current version of schema "PUBLIC": 7
+2025.12.31 10:47:51 INFO  Current version of schema "PUBLIC": 7
+2025.12.31 10:47:51 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.31 10:47:51 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.31 10:47:51 INFO  Attempting to connect to the build server...
+2025.12.31 10:47:51 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2025.12.31 10:47:51 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2025.12.31 10:47:53 WARN  no build tool detected in workspace 'D:\Class\Amrita_Class\codes4\grampulse\grampulse2'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.12.31 10:47:53 WARN  Build server is not auto-connectable.
+2025.12.31 10:47:55 INFO  time: Connected to build server in 4s
+2025.12.31 10:47:55 INFO  Connected to Build server: scala-cli v1.10.1
+2025.12.31 10:47:55 INFO  time: Imported build in 0.23s
+2025.12.31 10:48:05 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2025.12.31 10:48:05 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2025.12.31 10:48:05 INFO  Successfully validated 1 migration (execution time 00:00.011s)
+2025.12.31 10:48:05 INFO  Current version of schema "PUBLIC": 1
+2025.12.31 10:48:05 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2025.12.31 10:48:06 INFO  time: indexed workspace in 10s
+2025.12.31 10:48:14 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:14 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:15 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:26 INFO  time: code lens generation in 12s
+2025.12.31 10:48:44 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:44 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/bda_10.scala
+2025.12.31 10:48:47 INFO  BSP server: os.PathError$LastOnEmptyPath: empty path has no last segment
+2025.12.31 10:48:47 INFO  BSP server: 	at os.PathError$LastOnEmptyPath$.apply(Path.scala:276)
+2025.12.31 10:48:47 INFO  BSP server: 	at os.BasePathImpl.last$$anonfun$1(Path.scala:258)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.Option.getOrElse(Option.scala:201)
+2025.12.31 10:48:47 INFO  BSP server: 	at os.BasePathImpl.last(Path.scala:258)
+2025.12.31 10:48:47 INFO  BSP server: 	at os.BasePathImpl.last$(Path.scala:238)
+2025.12.31 10:48:47 INFO  BSP server: 	at os.RelPath.last(Path.scala:314)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.build.bsp.BloopSession.isScalaFile$1(BloopSession.scala:40)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.build.bsp.BloopSession.$anonfun$1(BloopSession.scala:42)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.build.bsp.BloopSession.registerWatchInputs$$anonfun$1$$anonfun$1(BloopSession.scala:48)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.runtime.function.JProcedure1.apply(JProcedure1.java:15)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.build.Build$$anon$2.onNext(Build.scala:1286)
+2025.12.31 10:48:47 INFO  BSP server: 	at scala.build.Build$$anon$2.onNext(Build.scala:1285)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.Observers.onNext(Observers.java:31)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.SymlinkFollowingPathWatcher$1.onNext(SymlinkFollowingPathWatcher.java:58)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.SymlinkFollowingPathWatcher$1.onNext(SymlinkFollowingPathWatcher.java:36)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.Observers.onNext(Observers.java:31)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.NioPathWatcher.runCallbacks(NioPathWatcher.java:462)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.NioPathWatcher.handleEvent(NioPathWatcher.java:486)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.NioPathWatcher.access$300(NioPathWatcher.java:35)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.NioPathWatcher$2.accept(NioPathWatcher.java:108)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.NioPathWatcher$2.accept(NioPathWatcher.java:102)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.swoval.files.NioPathWatcherService$2.run(NioPathWatcherService.java:95)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.oracle.svm.core.thread.PlatformThreads.threadStartRoutine(PlatformThreads.java:775)
+2025.12.31 10:48:47 INFO  BSP server: 	at com.oracle.svm.core.windows.WindowsPlatformThreads.osThreadStartRoutine(WindowsPlatformThreads.java:178)
+2025.12.31 10:48:48 INFO  time: compiled s6_d5c0a6989e-639afe3125 in 23ms
+2025.12.31 10:48:48 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:48 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/bda_10.scala
+2025.12.31 10:48:51 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:51 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:51 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala
+2025.12.31 10:48:51 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+Dec 31, 2025 10:48:51 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 18
+2025.12.31 10:48:51 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:51 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:51 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:52 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:52 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:52 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:54 INFO  time: code lens generation in 2.9s
+2025.12.31 10:48:54 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:54 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:54 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:56 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:57 INFO  BSP server: os.PathError$LastOnEmptyPath: empty path has no last segment
+2025.12.31 10:48:57 INFO  BSP server: 	at os.PathError$LastOnEmptyPath$.apply(Path.scala:276)
+2025.12.31 10:48:57 INFO  BSP server: 	at os.BasePathImpl.last$$anonfun$1(Path.scala:258)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.Option.getOrElse(Option.scala:201)
+2025.12.31 10:48:57 INFO  BSP server: 	at os.BasePathImpl.last(Path.scala:258)
+2025.12.31 10:48:57 INFO  BSP server: 	at os.BasePathImpl.last$(Path.scala:238)
+2025.12.31 10:48:57 INFO  BSP server: 	at os.RelPath.last(Path.scala:314)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.build.bsp.BloopSession.isScalaFile$1(BloopSession.scala:40)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.build.bsp.BloopSession.$anonfun$1(BloopSession.scala:42)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.build.bsp.BloopSession.registerWatchInputs$$anonfun$1$$anonfun$1(BloopSession.scala:48)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.runtime.function.JProcedure1.apply(JProcedure1.java:15)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.build.Build$$anon$2.onNext(Build.scala:1286)
+2025.12.31 10:48:57 INFO  BSP server: 	at scala.build.Build$$anon$2.onNext(Build.scala:1285)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.Observers.onNext(Observers.java:31)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.SymlinkFollowingPathWatcher$1.onNext(SymlinkFollowingPathWatcher.java:58)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.SymlinkFollowingPathWatcher$1.onNext(SymlinkFollowingPathWatcher.java:36)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.Observers.onNext(Observers.java:31)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.NioPathWatcher.runCallbacks(NioPathWatcher.java:462)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.NioPathWatcher.handleEvent(NioPathWatcher.java:486)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.NioPathWatcher.access$300(NioPathWatcher.java:35)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.NioPathWatcher$2.accept(NioPathWatcher.java:108)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.NioPathWatcher$2.accept(NioPathWatcher.java:102)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.swoval.files.NioPathWatcherService$2.run(NioPathWatcherService.java:95)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.oracle.svm.core.thread.PlatformThreads.threadStartRoutine(PlatformThreads.java:775)
+2025.12.31 10:48:57 INFO  BSP server: 	at com.oracle.svm.core.windows.WindowsPlatformThreads.osThreadStartRoutine(WindowsPlatformThreads.java:178)
+Dec 31, 2025 10:48:57 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 33
+2025.12.31 10:48:57 INFO  no build target found for d:\Class\Amrita_Class\codes4\s6\lab8_bigdata2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:59 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\bda_10.scala
+2025.12.31 10:48:59 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:48:59 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/bda_10.scala
+2025.12.31 10:49:07 INFO  no build target found for d:\Class\Amrita_Class\codes4\s6\bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:07 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:07 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:07 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/lab8_bda_10.scala
+2025.12.31 10:49:19 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:19 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:22 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:23 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:49:23 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala
+2025.12.31 10:49:23 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:32 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:33 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:34 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/lab8_bda2.scala
+2025.12.31 10:51:38 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:38 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:38 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:39 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala
+2025.12.31 10:51:39 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:57 INFO  no build target found for d:\Class\Amrita_Class\codes4\s6\lab8_bda_10.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:51:57 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:21 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:21 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:21 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/lab8_bda3.scala
+2025.12.31 10:52:22 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:22 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:22 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:23 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:23 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala
+2025.12.31 10:52:23 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 WARN  Could not find semantic tokens for: file:///D:/Class/Amrita_Class/codes4/s6/lab8_bda4.scala
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:52:52 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala
+2025.12.31 10:52:52 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:53:29 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:53:29 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala
+2025.12.31 10:53:29 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:56:01 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:56:01 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:56:01 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:57:49 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:57:50 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala
+2025.12.31 10:57:50 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:59:00 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:59:00 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:59:02 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 10:59:02 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala
+2025.12.31 10:59:02 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:00:49 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:00:49 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala
+2025.12.31 11:00:49 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:04:28 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:04:28 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+Dec 31, 2025 11:04:28 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 176
+2025.12.31 11:04:28 WARN  no build target for: D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala
+2025.12.31 11:04:35 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:20:21 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda1.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:20:21 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda2.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:20:21 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda3.scala. Using presentation compiler with project's scala-library version: 3.7.4
+2025.12.31 11:20:21 INFO  no build target found for D:\Class\Amrita_Class\codes4\s6\lab8_bda4.scala. Using presentation compiler with project's scala-library version: 3.7.4
