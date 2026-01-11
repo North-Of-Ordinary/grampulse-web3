@@ -90,6 +90,13 @@ class Web3Config {
   static bool get web3Debug =>
       dotenv.env['WEB3_DEBUG']?.toLowerCase() == 'true';
   
+  /// API key for backend attestation service
+  static String get apiKey =>
+      dotenv.env['ATTESTATION_API_KEY'] ?? '';
+
+  /// Singleton instance for dependency injection
+  static Web3Config get instance => Web3Config._();
+
   /// Print current configuration (for debugging)
   static void printConfig() {
     if (!web3Debug) return;
