@@ -225,6 +225,14 @@ class IssueModel {
   final String? assignedDepartment;
   final String? assignedOfficer;
   final DateTime? expectedResolutionDate;
+  
+  // Web3 Attestation fields
+  final String? attestationUid;
+  final String? attestationTxHash;
+  final String? attestationExplorerUrl;
+  final String? proofIpfsCid;
+  final String? proofIpfsUrl;
+  final DateTime? attestedAt;
 
   const IssueModel({
     required this.id,
@@ -243,7 +251,17 @@ class IssueModel {
     this.assignedDepartment,
     this.assignedOfficer,
     this.expectedResolutionDate,
+    // Web3 fields
+    this.attestationUid,
+    this.attestationTxHash,
+    this.attestationExplorerUrl,
+    this.proofIpfsCid,
+    this.proofIpfsUrl,
+    this.attestedAt,
   });
+
+  /// Check if this issue has been attested on-chain
+  bool get isAttested => attestationUid != null && attestationUid!.isNotEmpty;
 
   IssueModel copyWith({
     String? id,
@@ -262,6 +280,13 @@ class IssueModel {
     String? assignedDepartment,
     String? assignedOfficer,
     DateTime? expectedResolutionDate,
+    // Web3 fields
+    String? attestationUid,
+    String? attestationTxHash,
+    String? attestationExplorerUrl,
+    String? proofIpfsCid,
+    String? proofIpfsUrl,
+    DateTime? attestedAt,
   }) {
     return IssueModel(
       id: id ?? this.id,
@@ -280,6 +305,13 @@ class IssueModel {
       assignedDepartment: assignedDepartment ?? this.assignedDepartment,
       assignedOfficer: assignedOfficer ?? this.assignedOfficer,
       expectedResolutionDate: expectedResolutionDate ?? this.expectedResolutionDate,
+      // Web3 fields
+      attestationUid: attestationUid ?? this.attestationUid,
+      attestationTxHash: attestationTxHash ?? this.attestationTxHash,
+      attestationExplorerUrl: attestationExplorerUrl ?? this.attestationExplorerUrl,
+      proofIpfsCid: proofIpfsCid ?? this.proofIpfsCid,
+      proofIpfsUrl: proofIpfsUrl ?? this.proofIpfsUrl,
+      attestedAt: attestedAt ?? this.attestedAt,
     );
   }
 }
