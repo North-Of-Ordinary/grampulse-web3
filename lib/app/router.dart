@@ -57,6 +57,14 @@ import 'package:grampulse/features/admin/presentation/screens/system_configurati
 import 'package:grampulse/features/admin/presentation/screens/analytics_reports_screen.dart';
 import 'package:grampulse/features/auth/domain/services/auth_service.dart' as domain_auth;
 
+// PHASE 5: Web3 Governance & Transparency imports
+import 'package:grampulse/features/dashboard/presentation/screens/transparency_dashboard_screen.dart';
+import 'package:grampulse/features/dashboard/presentation/bloc/dashboard_bloc.dart';
+import 'package:grampulse/features/governance/presentation/screens/governance_screen.dart';
+import 'package:grampulse/features/governance/presentation/bloc/governance_bloc.dart';
+import 'package:grampulse/features/reputation/presentation/screens/leaderboard_screen.dart';
+import 'package:grampulse/features/reputation/presentation/bloc/reputation_bloc.dart';
+
 // No transition for instant tab switching within shell routes
 Page<T> buildPageWithNoTransition<T>({
   required GoRouterState state,
@@ -485,6 +493,32 @@ final appRouter = GoRouter(
           child: AttestationVerificationScreen(initialUid: uid),
         );
       },
+    ),
+    
+    // PHASE 5: Web3 Transparency & Governance routes
+    GoRoute(
+      path: '/transparency-dashboard',
+      name: 'transparency_dashboard',
+      builder: (context, state) => BlocProvider(
+        create: (_) => DashboardBloc()..add(LoadDashboard()),
+        child: const TransparencyDashboardScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/governance',
+      name: 'governance',
+      builder: (context, state) => BlocProvider(
+        create: (_) => GovernanceBloc()..add(LoadGovernanceParams()),
+        child: const GovernanceScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/leaderboard',
+      name: 'leaderboard',
+      builder: (context, state) => BlocProvider(
+        create: (_) => ReputationBloc()..add(const LoadLeaderboard()),
+        child: const LeaderboardScreen(),
+      ),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

@@ -19,9 +19,17 @@ const rateLimit = require('express-rate-limit');
 const { config, validateConfig } = require('./config');
 const easService = require('./services/easService');
 const ipfsService = require('./services/ipfsService');
+const governanceService = require('./services/governanceService');
+const reputationService = require('./services/reputationService');
+const dashboardService = require('./services/dashboardService');
+const batchAttestationService = require('./services/batchAttestationService');
 const attestRoutes = require('./routes/attest');
 const verifyRoutes = require('./routes/verify');
 const ipfsRoutes = require('./routes/ipfs');
+const governanceRoutes = require('./routes/governance');
+const reputationRoutes = require('./routes/reputation');
+const dashboardRoutes = require('./routes/dashboard');
+const batchRoutes = require('./routes/batch');
 const { 
   logRequest, 
   errorHandler, 
@@ -133,22 +141,62 @@ app.use('/ipfs', ipfsRoutes);
 // Verification routes (public)
 app.use('/verify', verifyRoutes);
 
+// Governance routes (DAO)
+app.use('/governance', governanceRoutes);
+
+// Reputation routes
+app.use('/reputation', reputationRoutes);
+
+// Dashboard routes (public transparency)
+app.use('/dashboard', dashboardRoutes);
+
+// Batch attestation routes
+app.use('/batch', batchRoutes);
+
 // API info endpoint
 app.get('/', (req, res) => {
   res.json({
     name: 'GramPulse Attestation Service',
-    version: '1.0.0',
-    description: 'Blockchain attestation service for verifiable civic actions',
+    version: '2.0.0',
+    description: 'Blockchain attestation service for verifiable civic actions with DAO governance',
     endpoints: {
       health: 'GET /health',
       attest: {
         resolution: 'POST /attest/resolution (requires API key)',
-        reputation: 'POST /attest/reputation (coming soon)',
-        vsi: 'POST /attest/vsi (coming soon)',
       },
       verify: {
         byUid: 'GET /verify/:uid (public)',
         health: 'GET /verify/health (public)',
+      },
+      ipfs: {
+        upload: 'POST /ipfs/upload (requires API key)',
+        proofPackage: 'POST /ipfs/proof-package (requires API key)',
+      },
+      governance: {
+        createProposal: 'POST /governance/proposal (requires API key)',
+        vote: 'POST /governance/vote (requires API key)',
+        getProposal: 'GET /governance/proposal/:id (public)',
+        params: 'GET /governance/params (public)',
+      },
+      reputation: {
+        addPoints: 'POST /reputation/points (requires API key)',
+        getScore: 'GET /reputation/score/:address (public)',
+        awardBadge: 'POST /reputation/badge (requires API key)',
+        getBadges: 'GET /reputation/badges/:address (public)',
+        leaderboard: 'GET /reputation/leaderboard (public)',
+      },
+      dashboard: {
+        overview: 'GET /dashboard/overview (public)',
+        categories: 'GET /dashboard/categories (public)',
+        panchayats: 'GET /dashboard/panchayats (public)',
+        trend: 'GET /dashboard/trend (public)',
+        stats: 'GET /dashboard/stats (public)',
+      },
+      batch: {
+        attest: 'POST /batch/attest (requires API key)',
+        revoke: 'POST /batch/revoke (requires API key)',
+        fullWorkflow: 'POST /batch/full-workflow (requires API key)',
+        schema: 'GET /batch/schema (public)',
       },
     },
     documentation: 'https://github.com/naveen-astra/grampulse-icsrf',
@@ -180,19 +228,54 @@ const startServer = async () => {
       logger.warn('IPFS Service not available:', ipfsError.message);
     }
 
+    // Initialize Governance service (optional - requires Governor contract)
+    logger.info('Initializing Governance Service...');
+    try {
+      await governanceService.initialize();
+    } catch (govError) {
+      logger.warn('Governance Service not available:', govError.message);
+    }
+
+    // Initialize Reputation service
+    logger.info('Initializing Reputation Service...');
+    try {
+      await reputationService.initialize();
+    } catch (repError) {
+      logger.warn('Reputation Service not available:', repError.message);
+    }
+
+    // Initialize Dashboard service
+    logger.info('Initializing Dashboard Service...');
+    try {
+      await dashboardService.initialize();
+    } catch (dashError) {
+      logger.warn('Dashboard Service not available:', dashError.message);
+    }
+
+    // Initialize Batch Attestation service
+    logger.info('Initializing Batch Attestation Service...');
+    try {
+      await batchAttestationService.initialize();
+    } catch (batchError) {
+      logger.warn('Batch Attestation Service not available:', batchError.message);
+    }
+
     // Start the server
     const server = app.listen(config.port, () => {
       logger.info(`
 ╔══════════════════════════════════════════════════════════════╗
-║           GramPulse Attestation Service Started              ║
+║        GramPulse Attestation Service v2.0 Started            ║
 ╠══════════════════════════════════════════════════════════════╣
-║  Port:     ${String(config.port).padEnd(48)}║
-║  Network:  ${config.network.padEnd(48)}║
-║  Mode:     ${config.nodeEnv.padEnd(48)}║
-║  IPFS:     ${(ipfsService.isReady() ? 'Enabled' : 'Disabled').padEnd(48)}║
+║  Port:       ${String(config.port).padEnd(46)}║
+║  Network:    ${config.network.padEnd(46)}║
+║  Mode:       ${config.nodeEnv.padEnd(46)}║
+║  IPFS:       ${(ipfsService.isReady() ? 'Enabled' : 'Disabled').padEnd(46)}║
+║  Governance: ${(governanceService.initialized ? 'Enabled' : 'Disabled').padEnd(46)}║
+║  Reputation: ${(reputationService.initialized ? 'Enabled' : 'Disabled').padEnd(46)}║
+║  Dashboard:  ${(dashboardService.initialized ? 'Enabled' : 'Disabled').padEnd(46)}║
 ╚══════════════════════════════════════════════════════════════╝
       `);
-      logger.info('Ready to receive attestation requests');
+      logger.info('Ready to receive requests');
     });
 
     // Graceful shutdown
