@@ -77,6 +77,15 @@ GramPulse is a role-based civic engagement platform that streamlines rural gover
 | File Upload | Multer |
 | Validation | Express Validator |
 
+### Web3 / Blockchain
+| Component | Technology |
+|-----------|-----------|
+| Network | Optimism (OP Stack) |
+| Attestations | Ethereum Attestation Service (EAS) |
+| Storage | IPFS (Pinata) |
+| SDK | web3dart, ethers.js |
+| Backend Middleware | Node.js + EAS SDK |
+
 ## Project Structure
 
 ```
@@ -119,6 +128,22 @@ lib/
 │       ├── domain/                    # Business logic
 │       └── presentation/              # UI components
 └── l10n/                              # Localization files
+
+backend/                               # Attestation middleware (Node.js)
+├── src/
+│   ├── index.js                       # Express server entry
+│   ├── config/                        # Backend configuration
+│   ├── middleware/                    # Auth, validation
+│   ├── routes/                        # API endpoints
+│   │   ├── attest.js                  # POST /attest/resolution
+│   │   ├── verify.js                  # GET /verify/:uid
+│   │   └── ipfs.js                    # IPFS uploads
+│   ├── services/
+│   │   ├── easService.js              # EAS SDK wrapper
+│   │   └── ipfsService.js             # Pinata IPFS
+│   └── utils/                         # Logging, helpers
+├── package.json
+└── README.md
 
 android/                               # Android-specific files
 ios/                                   # iOS-specific files
@@ -346,6 +371,62 @@ ENABLE_DEBUG_LOGGING=false
 - Update Flutter: `flutter upgrade`
 - Check Dart version compatibility
 
+## Web3 / Blockchain Integration
+
+GramPulse uses blockchain technology to create verifiable, tamper-proof records of grievance resolutions.
+
+### Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Flutter App    │────▶│  Attestation    │────▶│   Optimism      │
+│  (Firebase)     │     │  Backend        │     │   (EAS)         │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+        ▼                       ▼                       ▼
+   Offline-first          API Key Auth           On-chain record
+   No wallet needed       Rate limiting          Permanent, public
+```
+
+### Features
+
+- **On-chain Attestations**: Grievance resolutions recorded on Optimism L2
+- **IPFS Proof Storage**: Resolution proof photos/videos stored on IPFS
+- **Public Verification**: Anyone can verify resolution authenticity
+- **No Wallet Required**: Villagers don't need crypto wallets
+- **Offline-First**: Web3 features can be disabled for offline use
+
+### Setup
+
+1. **Start the attestation backend:**
+   ```bash
+   cd backend
+   npm install
+   cp .env.example .env
+   # Edit .env with your credentials
+   npm run dev
+   ```
+
+2. **Configure Flutter environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with matching API key
+   ```
+
+3. **Required services:**
+   - Optimism RPC (Alchemy/Infura or public)
+   - Pinata account for IPFS
+   - Funded wallet for gas fees
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `WEB3_ENABLED` | Enable/disable Web3 features |
+| `ATTESTATION_SERVICE_URL` | Backend middleware URL |
+| `ATTESTATION_API_KEY` | API key for authentication |
+
+See `.env.example` for complete configuration.
 
 ## Support
 
@@ -357,4 +438,4 @@ Development Status: Active
 
 Latest Version: 1.0.0
 
-Last Updated: December 2025
+Last Updated: January 2026
