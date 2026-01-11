@@ -30,6 +30,10 @@ import 'package:grampulse/features/citizen/presentation/screens/my_reports_scree
 import 'package:grampulse/features/profile/presentation/screens/grok_profile_screen.dart';
 import 'package:grampulse/features/citizen/presentation/screens/report_issue_screen.dart';
 
+// Report/Attestation imports
+import 'package:grampulse/features/report/presentation/bloc/attestation_bloc.dart';
+import 'package:grampulse/features/report/presentation/screens/attestation_verification_screen.dart';
+
 // Volunteer imports
 import 'package:grampulse/features/volunteer/presentation/screens/volunteer_shell_screen.dart';
 import 'package:grampulse/features/volunteer/presentation/screens/volunteer_dashboard_screen.dart';
@@ -468,6 +472,19 @@ final appRouter = GoRouter(
           ),
         ),
       ],
+    ),
+    
+    // Shared routes (accessible from any authenticated role)
+    GoRoute(
+      path: '/verify-attestation',
+      name: 'verify_attestation',
+      builder: (context, state) {
+        final uid = state.uri.queryParameters['uid'];
+        return BlocProvider(
+          create: (_) => AttestationBloc(),
+          child: AttestationVerificationScreen(initialUid: uid),
+        );
+      },
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
