@@ -69,6 +69,10 @@ dependencies:
   fl_chart: ^1.0.0
   uuid: ^4.0.0
   typed_data: ^1.3.2
+  
+  # Web3 / Blockchain
+  web3dart: ^2.7.3
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +91,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
+    - .env
 
 # Flutter Launcher Icons Configuration
 flutter_launcher_icons:
