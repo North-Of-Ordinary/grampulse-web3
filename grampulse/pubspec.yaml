@@ -1,0 +1,116 @@
+name: grampulse
+description: "Rural Citizen Grievance Management System"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+    
+  # State Management
+  flutter_bloc: ^8.1.3
+  bloc: ^8.1.2
+  equatable: ^2.0.5
+  
+  # Navigation
+  go_router: ^12.1.3
+  
+  # Database
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  floor: ^1.4.2
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  
+  # Network
+  dio: ^5.3.3
+  http: ^1.5.0
+  connectivity_plus: ^5.0.1
+  cached_network_image: ^3.3.0
+  url_launcher: ^6.1.14
+  
+  # Maps
+  flutter_map: ^6.0.1
+  latlong2: ^0.9.0
+  geolocator: ^14.0.2
+  geocoding: ^2.1.1
+  
+  # Media
+  camera: ^0.10.5+5
+  image_picker: ^1.0.4
+  path_provider: ^2.1.1
+  # image_cropper: ^5.0.1  # Temporarily commenting out due to dependency conflicts
+  flutter_image_compress: ^2.1.0
+  
+  # Voice & Accessibility
+  flutter_tts: ^3.8.5
+  record: ^4.4.4
+  # speech_to_text: ^6.3.0  # Temporarily disabled due to Android compilation issues
+  
+  # Security & Storage
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.5.3
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_analytics: ^10.7.4
+  firebase_crashlytics: ^3.4.8
+  
+  # UI Components
+  flutter_svg: ^2.0.9
+  shimmer: ^3.0.0
+  lottie: ^2.7.0
+  intl: ^0.20.2
+  fl_chart: ^1.0.0
+  uuid: ^4.0.0
+  typed_data: ^1.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  hive_generator: ^2.0.1
+  floor_generator: ^1.4.2
+  build_runner: ^2.4.6
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.6
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+
+# Flutter Launcher Icons Configuration
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+  windows:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+  macos:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+
+# Flutter Native Splash Configuration
+flutter_native_splash:
+  color: "#1a1a1a"
+  image: "assets/icons/screen_logo.png"
+  android: true
+  ios: true
+  web: true
+  android_12:
+    color: "#1a1a1a"
+    image: "assets/icons/screen_logo.png"
