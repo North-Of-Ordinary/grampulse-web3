@@ -87,6 +87,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     Emitter<DashboardState> emit,
   ) async {
     emit(DashboardLoading());
+    
+    // Debug: Print the URL being used
+    print('DashboardBloc: Loading dashboard from ${_dashboardService.debugBaseUrl}');
 
     try {
       final stats = await _dashboardService.getAggregateStats();
@@ -96,7 +99,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         stats: stats,
         recentAttestations: recent,
       ));
-    } catch (e) {
+    } catch (e, stack) {
+      print('DashboardBloc ERROR: $e');
+      print('DashboardBloc STACK: $stack');
       emit(DashboardError(e.toString()));
     }
   }
