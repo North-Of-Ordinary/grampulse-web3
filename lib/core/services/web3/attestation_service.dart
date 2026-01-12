@@ -6,7 +6,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../config/web3_config.dart';
+import '../../config/web3_config.dart';
 import 'ipfs_service.dart';
 
 /// Result of an attestation operation
@@ -139,10 +139,9 @@ class AttestationService {
   /// Get singleton instance
   static AttestationService get instance {
     if (_instance == null) {
-      final config = Web3Config.instance;
       _instance = AttestationService._(
-        baseUrl: config.attestationServiceUrl,
-        apiKey: config.apiKey,
+        baseUrl: Web3Config.attestationServiceUrl,
+        apiKey: Web3Config.apiKey,
       );
     }
     return _instance!;

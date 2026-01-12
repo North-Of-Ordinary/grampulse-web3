@@ -9,7 +9,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import '../config/web3_config.dart';
+import '../../config/web3_config.dart';
 
 /// Result of an IPFS upload
 class IPFSUploadResult {
@@ -128,10 +128,9 @@ class IPFSService {
   /// Get singleton instance
   static IPFSService get instance {
     if (_instance == null) {
-      final config = Web3Config.instance;
       _instance = IPFSService._(
-        baseUrl: config.attestationServiceUrl,
-        apiKey: config.apiKey,
+        baseUrl: Web3Config.attestationServiceUrl,
+        apiKey: Web3Config.apiKey,
       );
     }
     return _instance!;

@@ -6,7 +6,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import 'web3_config.dart';
+import '../../config/web3_config.dart';
 
 /// Proposal state enum
 enum ProposalState {
@@ -215,20 +215,17 @@ class VoteResult {
 
 /// Governance Service for DAO operations
 class GovernanceService {
-  final Web3Config _config;
   final http.Client _client;
   
   GovernanceService({
-    Web3Config? config,
     http.Client? client,
-  }) : _config = config ?? Web3Config.fromEnvironment(),
-       _client = client ?? http.Client();
+  }) : _client = client ?? http.Client();
 
-  String get _baseUrl => _config.backendUrl;
+  String get _baseUrl => Web3Config.attestationServiceUrl;
   
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
-    'x-api-key': _config.backendApiKey,
+    if (Web3Config.apiKey.isNotEmpty) 'x-api-key': Web3Config.apiKey,
   };
 
   /// Create a new proposal
