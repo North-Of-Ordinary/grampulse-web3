@@ -192,11 +192,15 @@ class ReputationBloc extends Bloc<ReputationEvent, ReputationState> {
     Emitter<ReputationState> emit,
   ) async {
     emit(ReputationLoading());
+    print('ReputationBloc: Loading leaderboard from ${_reputationService.debugBaseUrl}');
 
     try {
       final entries = await _reputationService.getLeaderboard(limit: event.limit);
+      print('ReputationBloc: Loaded ${entries.length} entries');
       emit(LeaderboardLoaded(entries));
-    } catch (e) {
+    } catch (e, stack) {
+      print('ReputationBloc ERROR: $e');
+      print('ReputationBloc STACK: $stack');
       emit(ReputationError(e.toString()));
     }
   }
