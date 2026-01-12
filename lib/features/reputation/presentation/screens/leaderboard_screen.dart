@@ -15,10 +15,7 @@ class LeaderboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ReputationBloc()..add(LoadLeaderboard()),
-      child: const _LeaderboardView(),
-    );
+    return const _LeaderboardView();
   }
 }
 
@@ -41,7 +38,7 @@ class _LeaderboardView extends StatelessWidget {
         ),
         body: BlocBuilder<ReputationBloc, ReputationState>(
           builder: (context, state) {
-            if (state is ReputationLoading) {
+            if (state is ReputationLoading || state is ReputationInitial) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -115,12 +112,23 @@ class _RankingsTab extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Card(
-      color: Colors.amber.withOpacity(0.1),
+      color: Theme.of(context).primaryColor.withOpacity(0.08),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Icon(Icons.emoji_events, size: 48, color: Colors.amber),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.leaderboard,
+                size: 40,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               'Top Performers',
@@ -136,7 +144,49 @@ class _RankingsTab extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildFilterButton(context, 'All Time', true),
+                _buildFilterButton(context, 'This Month', false),
+                _buildFilterButton(context, 'This Week', false),
+              ],
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(BuildContext context, String label, bool isSelected) {
+    return TextButton(
+      onPressed: () {
+        // Reload leaderboard with filter
+        context.read<ReputationBloc>().add(LoadLeaderboard());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Showing $label rankings'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      },
+      style: TextButton.styleFrom(
+        backgroundColor: isSelected 
+            ? Theme.of(context).primaryColor.withOpacity(0.15)
+            : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isSelected 
+              ? Theme.of(context).primaryColor 
+              : Colors.grey[600],
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
       ),
     );
@@ -179,8 +229,15 @@ class _RankingsTab extends StatelessWidget {
   }
 }
 
-class _BadgesTab extends StatelessWidget {
+class _BadgesTab extends StatefulWidget {
   const _BadgesTab();
+
+  @override
+  State<_BadgesTab> createState() => _BadgesTabState();
+}
+
+class _BadgesTabState extends State<_BadgesTab> {
+  String _selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +247,9 @@ class _BadgesTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildBadgeIntro(context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
+          _buildFilterChips(context),
+          const SizedBox(height: 20),
           Text(
             'Available Badges',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -201,6 +260,144 @@ class _BadgesTab extends StatelessWidget {
           _buildBadgeGrid(context),
           const SizedBox(height: 24),
           _buildPointsInfo(context),
+          const SizedBox(height: 16),
+          _buildActionButtons(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChips(BuildContext context) {
+    final filters = ['All', 'Earned', 'Locked', 'Milestone'];
+    
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.map((filter) {
+          final isSelected = _selectedFilter == filter;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              label: Text(filter),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  _selectedFilter = filter;
+                });
+              },
+              selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+              checkmarkColor: Theme.of(context).primaryColor,
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              // Refresh badges
+              context.read<ReputationBloc>().add(LoadLeaderboard());
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Refreshing badge data...'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Refresh Badges'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => _showMyProgressDialog(context),
+            icon: const Icon(Icons.analytics),
+            label: const Text('View My Progress'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showMyProgressDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.analytics, color: Theme.of(context).primaryColor),
+            const SizedBox(width: 12),
+            const Text('My Progress'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildProgressItem(context, 'Total Points', '150', Icons.star, Colors.amber),
+            const Divider(),
+            _buildProgressItem(context, 'Badges Earned', '2/10', Icons.military_tech, Colors.purple),
+            const Divider(),
+            _buildProgressItem(context, 'Issues Resolved', '45', Icons.check_circle, Colors.green),
+            const Divider(),
+            _buildProgressItem(context, 'Current Rank', '#12', Icons.leaderboard, Colors.blue),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Navigate to rankings tab
+              DefaultTabController.of(context).animateTo(0);
+            },
+            child: const Text('View Rankings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressItem(BuildContext context, String label, String value, IconData icon, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(label),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -208,7 +405,7 @@ class _BadgesTab extends StatelessWidget {
 
   Widget _buildBadgeIntro(BuildContext context) {
     return Card(
-      color: Colors.purple.withOpacity(0.1),
+      color: Colors.deepPurple.withOpacity(0.08),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
@@ -216,10 +413,10 @@ class _BadgesTab extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.2),
+                color: Colors.deepPurple.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.military_tech, size: 36, color: Colors.purple),
+              child: const Icon(Icons.verified, size: 36, color: Colors.deepPurple),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -227,14 +424,14 @@ class _BadgesTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Soulbound Badges',
+                    'Achievement Badges',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Non-transferable NFT badges earned through achievements',
+                    'Blockchain-verified credentials earned through performance',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
