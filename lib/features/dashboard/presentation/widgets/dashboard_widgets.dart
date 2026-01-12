@@ -1,7 +1,7 @@
 /// Dashboard Widgets - UI Components for Transparency Dashboard
 
 import 'package:flutter/material.dart';
-import '../../../core/services/web3/dashboard_service.dart';
+import 'package:grampulse/core/services/web3/dashboard_service.dart';
 
 /// Stat Card Widget
 class StatCard extends StatelessWidget {
