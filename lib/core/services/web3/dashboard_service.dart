@@ -6,7 +6,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import 'web3_config.dart';
+import '../../config/web3_config.dart';
 
 /// Dashboard overview model
 class DashboardOverview {
@@ -32,10 +32,10 @@ class DashboardOverview {
     final summary = json['summary'] ?? json;
     return DashboardOverview(
       totalAttestations: summary['totalAttestations'] ?? 0,
-      totalResolutions: summary['totalResolutions'] ?? 0,
-      averageResolutionTimeHours: (summary['averageResolutionTimeHours'] ?? 0).toDouble(),
+      totalResolutions: summary['totalResolutions'] ?? summary['activePanchayats'] ?? 0,
+      averageResolutionTimeHours: (summary['averageResolutionTimeHours'] ?? summary['averageResolutionTime'] ?? 0).toDouble(),
       categoriesTracked: summary['categoriesTracked'] ?? 0,
-      panchayatsActive: summary['panchayatsActive'] ?? 0,
+      panchayatsActive: summary['panchayatsActive'] ?? summary['activePanchayats'] ?? 0,
       lastUpdated: json['lastUpdated'] != null 
           ? DateTime.fromMillisecondsSinceEpoch(json['lastUpdated']) 
           : null,
@@ -250,28 +250,31 @@ class AggregateStats {
 
 /// Dashboard Service
 class DashboardService {
-  final Web3Config _config;
   final http.Client _client;
+  static const Duration _timeout = Duration(seconds: 15);
   
   DashboardService({
-    Web3Config? config,
     http.Client? client,
-  }) : _config = config ?? Web3Config.fromEnvironment(),
-       _client = client ?? http.Client();
+  }) : _client = client ?? http.Client();
 
-  String get _baseUrl => _config.backendUrl;
+  String get _baseUrl => Web3Config.attestationServiceUrl;
+  
+  // Debug getter to expose the base URL
+  String get debugBaseUrl => _baseUrl;
   
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
+    if (Web3Config.apiKey.isNotEmpty) 'x-api-key': Web3Config.apiKey,
   };
 
   /// Get dashboard overview
   Future<DashboardOverview> getOverview() async {
     try {
+      debugPrint('DashboardService: Getting overview from $_baseUrl/dashboard/overview');
       final response = await _client.get(
         Uri.parse('$_baseUrl/dashboard/overview'),
         headers: _headers,
-      );
+      ).timeout(_timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -352,10 +355,11 @@ class DashboardService {
   /// Get recent attestations
   Future<List<RecentAttestation>> getRecentAttestations({int limit = 10}) async {
     try {
+      debugPrint('DashboardService: Getting recent from $_baseUrl/dashboard/recent?limit=$limit');
       final response = await _client.get(
         Uri.parse('$_baseUrl/dashboard/recent?limit=$limit'),
         headers: _headers,
-      );
+      ).timeout(_timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -365,6 +369,7 @@ class DashboardService {
         throw DashboardException('Failed to get recent attestations');
       }
     } catch (e) {
+      debugPrint('DashboardService getRecentAttestations ERROR: $e');
       if (e is DashboardException) rethrow;
       throw DashboardException('Network error: $e');
     }
@@ -373,18 +378,21 @@ class DashboardService {
   /// Get aggregate statistics
   Future<AggregateStats> getAggregateStats() async {
     try {
+      debugPrint('DashboardService: Getting stats from $_baseUrl/dashboard/stats');
       final response = await _client.get(
         Uri.parse('$_baseUrl/dashboard/stats'),
         headers: _headers,
-      );
+      ).timeout(_timeout);
 
+      debugPrint('DashboardService: Got response ${response.statusCode}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return AggregateStats.fromJson(data['data']);
       } else {
-        throw DashboardException('Failed to get aggregate stats');
+        throw DashboardException('Failed to get aggregate stats: ${response.statusCode}');
       }
     } catch (e) {
+      debugPrint('DashboardService ERROR: $e');
       if (e is DashboardException) rethrow;
       throw DashboardException('Network error: $e');
     }
