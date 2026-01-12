@@ -103,6 +103,12 @@ class _ProfileContent extends StatelessWidget {
 
             const SizedBox(height: 24),
 
+            // Web3 Features Section
+            _buildSectionHeader(context, 'Web3 & Blockchain'),
+            _buildWeb3Section(context, colorScheme, isDark),
+
+            const SizedBox(height: 24),
+
             // Support Section
             _buildSectionHeader(context, 'Support'),
             _buildSupportSection(context, colorScheme, isDark, user.role),
@@ -345,6 +351,104 @@ class _ProfileContent extends StatelessWidget {
                   behavior: SnackBarBehavior.floating,
                 ),
               );
+            },
+            showDivider: false,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeb3Section(
+      BuildContext context, ColorScheme colorScheme, bool isDark) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? DarkSurfaces.level2
+            : colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? DarkSurfaces.borderMedium : colorScheme.outlineVariant.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          _ProfileActionTile(
+            icon: Icons.dashboard_outlined,
+            title: 'Transparency Dashboard',
+            subtitle: 'View public metrics & statistics',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'NEW',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+              ],
+            ),
+            onTap: () {
+              context.push('/transparency-dashboard');
+            },
+            showDivider: true,
+          ),
+          _ProfileActionTile(
+            icon: Icons.how_to_vote_outlined,
+            title: 'Governance & Voting',
+            subtitle: 'Participate in DAO decisions',
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            onTap: () {
+              context.push('/governance');
+            },
+            showDivider: true,
+          ),
+          _ProfileActionTile(
+            icon: Icons.leaderboard_outlined,
+            title: 'Leaderboard & Badges',
+            subtitle: 'View top performers & achievements',
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            onTap: () {
+              context.push('/leaderboard');
+            },
+            showDivider: true,
+          ),
+          _ProfileActionTile(
+            icon: Icons.verified_outlined,
+            title: 'Verify Attestation',
+            subtitle: 'Check blockchain proof',
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            onTap: () {
+              context.push('/verify-attestation');
             },
             showDivider: false,
           ),
@@ -673,6 +777,7 @@ class _ProfileListTile extends StatelessWidget {
 class _ProfileActionTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String? subtitle;
   final Widget trailing;
   final VoidCallback? onTap;
   final bool showDivider;
@@ -680,6 +785,7 @@ class _ProfileActionTile extends StatelessWidget {
   const _ProfileActionTile({
     required this.icon,
     required this.title,
+    this.subtitle,
     required this.trailing,
     this.onTap,
     required this.showDivider,
@@ -715,13 +821,29 @@ class _ProfileActionTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 trailing,

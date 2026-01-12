@@ -30,6 +30,10 @@ import 'package:grampulse/features/citizen/presentation/screens/my_reports_scree
 import 'package:grampulse/features/profile/presentation/screens/grok_profile_screen.dart';
 import 'package:grampulse/features/citizen/presentation/screens/report_issue_screen.dart';
 
+// Report/Attestation imports
+import 'package:grampulse/features/report/presentation/bloc/attestation_bloc.dart';
+import 'package:grampulse/features/report/presentation/screens/attestation_verification_screen.dart';
+
 // Volunteer imports
 import 'package:grampulse/features/volunteer/presentation/screens/volunteer_shell_screen.dart';
 import 'package:grampulse/features/volunteer/presentation/screens/volunteer_dashboard_screen.dart';
@@ -52,6 +56,14 @@ import 'package:grampulse/features/admin/presentation/screens/fund_allocation_sc
 import 'package:grampulse/features/admin/presentation/screens/system_configuration_screen.dart';
 import 'package:grampulse/features/admin/presentation/screens/analytics_reports_screen.dart';
 import 'package:grampulse/features/auth/domain/services/auth_service.dart' as domain_auth;
+
+// PHASE 5: Web3 Governance & Transparency imports
+import 'package:grampulse/features/dashboard/presentation/screens/transparency_dashboard_screen.dart';
+import 'package:grampulse/features/dashboard/presentation/bloc/dashboard_bloc.dart' as web3_dashboard;
+import 'package:grampulse/features/governance/presentation/screens/governance_screen.dart';
+import 'package:grampulse/features/governance/presentation/bloc/governance_bloc.dart';
+import 'package:grampulse/features/reputation/presentation/screens/leaderboard_screen.dart';
+import 'package:grampulse/features/reputation/presentation/bloc/reputation_bloc.dart';
 
 // No transition for instant tab switching within shell routes
 Page<T> buildPageWithNoTransition<T>({
@@ -468,6 +480,45 @@ final appRouter = GoRouter(
           ),
         ),
       ],
+    ),
+    
+    // Shared routes (accessible from any authenticated role)
+    GoRoute(
+      path: '/verify-attestation',
+      name: 'verify_attestation',
+      builder: (context, state) {
+        final uid = state.uri.queryParameters['uid'];
+        return BlocProvider<AttestationBloc>(
+          create: (context) => AttestationBloc(),
+          child: AttestationVerificationScreen(initialUid: uid),
+        );
+      },
+    ),
+    
+    // PHASE 5: Web3 Transparency & Governance routes
+    GoRoute(
+      path: '/transparency-dashboard',
+      name: 'transparency_dashboard',
+      builder: (context, state) => BlocProvider(
+        create: (_) => web3_dashboard.DashboardBloc()..add(web3_dashboard.LoadDashboard()),
+        child: const TransparencyDashboardScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/governance',
+      name: 'governance',
+      builder: (context, state) => BlocProvider(
+        create: (_) => GovernanceBloc()..add(LoadGovernanceParams()),
+        child: const GovernanceScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/leaderboard',
+      name: 'leaderboard',
+      builder: (context, state) => BlocProvider(
+        create: (_) => ReputationBloc()..add(const LoadLeaderboard()),
+        child: const LeaderboardScreen(),
+      ),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
