@@ -6,7 +6,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import 'web3_config.dart';
+import '../../config/web3_config.dart';
 
 /// Badge type enum matching backend
 enum BadgeType {
@@ -56,28 +56,55 @@ enum BadgeType {
     }
   }
 
-  String get emoji {
+  /// Icon code point for Material Icons (use with IconData)
+  int get iconCode {
     switch (this) {
       case BadgeType.quickResolver:
-        return '⚡';
+        return 0xe8e8; // bolt
       case BadgeType.communityHero:
-        return '🦸';
+        return 0xe7fd; // people
       case BadgeType.consistencyStar:
-        return '⭐';
+        return 0xe838; // star
       case BadgeType.firstResponder:
-        return '🚀';
+        return 0xe566; // local_fire_department
       case BadgeType.milestone100:
-        return '💯';
+        return 0xe8e5; // verified
       case BadgeType.milestone500:
-        return '🏆';
+        return 0xe80e; // workspace_premium
       case BadgeType.milestone1000:
-        return '👑';
+        return 0xea23; // emoji_events
       case BadgeType.topPerformer:
-        return '🥇';
+        return 0xeabc; // military_tech
       case BadgeType.innovationAward:
-        return '💡';
+        return 0xe90f; // lightbulb
       case BadgeType.citizenFavorite:
-        return '❤️';
+        return 0xe87d; // favorite
+    }
+  }
+
+  /// Badge color
+  int get colorValue {
+    switch (this) {
+      case BadgeType.quickResolver:
+        return 0xFFFF9800; // Orange
+      case BadgeType.communityHero:
+        return 0xFF2196F3; // Blue
+      case BadgeType.consistencyStar:
+        return 0xFFFFC107; // Amber
+      case BadgeType.firstResponder:
+        return 0xFFF44336; // Red
+      case BadgeType.milestone100:
+        return 0xFF4CAF50; // Green
+      case BadgeType.milestone500:
+        return 0xFF9C27B0; // Purple
+      case BadgeType.milestone1000:
+        return 0xFFFFD700; // Gold
+      case BadgeType.topPerformer:
+        return 0xFFE91E63; // Pink
+      case BadgeType.innovationAward:
+        return 0xFF00BCD4; // Cyan
+      case BadgeType.citizenFavorite:
+        return 0xFFE91E63; // Pink
     }
   }
 }
@@ -266,20 +293,21 @@ class LeaderboardEntry {
 
 /// Reputation Service
 class ReputationService {
-  final Web3Config _config;
   final http.Client _client;
+  static const Duration _timeout = Duration(seconds: 15);
   
   ReputationService({
-    Web3Config? config,
     http.Client? client,
-  }) : _config = config ?? Web3Config.fromEnvironment(),
-       _client = client ?? http.Client();
+  }) : _client = client ?? http.Client();
 
-  String get _baseUrl => _config.backendUrl;
+  String get _baseUrl => Web3Config.attestationServiceUrl;
+  
+  // Debug getter
+  String get debugBaseUrl => _baseUrl;
   
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
-    'x-api-key': _config.backendApiKey,
+    if (Web3Config.apiKey.isNotEmpty) 'x-api-key': Web3Config.apiKey,
   };
 
   Map<String, String> get _publicHeaders => {
@@ -289,10 +317,11 @@ class ReputationService {
   /// Get reputation score for an address
   Future<ReputationScore> getReputationScore(String address) async {
     try {
+      debugPrint('ReputationService: Getting score from $_baseUrl/reputation/score/$address');
       final response = await _client.get(
         Uri.parse('$_baseUrl/reputation/score/$address'),
         headers: _publicHeaders,
-      );
+      ).timeout(_timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -430,11 +459,13 @@ class ReputationService {
   /// Get leaderboard (public)
   Future<List<LeaderboardEntry>> getLeaderboard({int limit = 10}) async {
     try {
+      debugPrint('ReputationService: Getting leaderboard from $_baseUrl/reputation/leaderboard?limit=$limit');
       final response = await _client.get(
         Uri.parse('$_baseUrl/reputation/leaderboard?limit=$limit'),
         headers: _publicHeaders,
-      );
+      ).timeout(_timeout);
 
+      debugPrint('ReputationService: Got response ${response.statusCode}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final leaderboard = data['data']['leaderboard'] as List<dynamic>? ?? [];
@@ -442,9 +473,10 @@ class ReputationService {
           LeaderboardEntry.fromJson(e.value, e.key)
         ).toList();
       } else {
-        throw ReputationException('Failed to get leaderboard');
+        throw ReputationException('Failed to get leaderboard: ${response.statusCode}');
       }
     } catch (e) {
+      debugPrint('ReputationService getLeaderboard ERROR: $e');
       if (e is ReputationException) rethrow;
       throw ReputationException('Network error: $e');
     }
