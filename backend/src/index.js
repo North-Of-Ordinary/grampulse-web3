@@ -260,13 +260,14 @@ const startServer = async () => {
       logger.warn('Batch Attestation Service not available:', batchError.message);
     }
 
-    // Start the server
-    const server = app.listen(config.port, () => {
+    // Start the server - bind to 0.0.0.0 to allow connections from other devices
+    const server = app.listen(config.port, '0.0.0.0', () => {
       logger.info(`
 ╔══════════════════════════════════════════════════════════════╗
 ║        GramPulse Attestation Service v2.0 Started            ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  Port:       ${String(config.port).padEnd(46)}║
+║  Host:       ${'0.0.0.0 (all interfaces)'.padEnd(46)}║
 ║  Network:    ${config.network.padEnd(46)}║
 ║  Mode:       ${config.nodeEnv.padEnd(46)}║
 ║  IPFS:       ${(ipfsService.isReady() ? 'Enabled' : 'Disabled').padEnd(46)}║
