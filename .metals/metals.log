@@ -852,3 +852,52 @@ INFO: Unsupported notification method: $/setTrace
 2026.01.11 15:07:43 INFO  Current version of schema "PUBLIC": 1
 2026.01.11 15:07:43 INFO  Schema "PUBLIC" is up to date. No migration necessary.
 2026.01.11 15:07:43 INFO  time: indexed workspace in 3.01s
+2026.01.11 15:29:41 INFO  logging to files D:\Class\Amrita_Class\codes4\s6\.metals\metals.log,D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals.log
+2026.01.11 15:30:47 INFO  Shut down connection with build server.
+2026.01.11 15:30:47 INFO  logging to files D:\Class\Amrita_Class\codes4\s6\.metals\metals.log,D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals.log
+2026.01.11 15:30:47 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2026.01.11 15:30:47 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.11 15:30:47 INFO  Successfully validated 7 migrations (execution time 00:00.005s)
+2026.01.11 15:30:47 INFO  Current version of schema "PUBLIC": 7
+2026.01.11 15:30:47 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.11 15:30:47 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2026.01.11 15:30:47 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.11 15:30:47 INFO  Successfully validated 7 migrations (execution time 00:00.003s)
+2026.01.11 15:30:47 INFO  Current version of schema "PUBLIC": 7
+2026.01.11 15:30:47 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.11 15:30:47 INFO  Attempting to connect to the build server...
+2026.01.11 15:30:47 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2026.01.11 15:30:47 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2026.01.11 15:30:47 INFO  time: Connected to build server in 0.93s
+2026.01.11 15:30:48 INFO  Connected to Build server: scala-cli v1.10.1
+2026.01.11 15:30:50 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2026.01.11 15:30:50 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.11 15:30:50 INFO  Successfully validated 1 migration (execution time 00:00.004s)
+2026.01.11 15:30:50 INFO  Current version of schema "PUBLIC": 1
+2026.01.11 15:30:50 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.11 15:30:50 INFO  time: indexed workspace in 1.89s
+2026.01.12 09:49:40 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.108.0.
+2026.01.12 09:49:40 INFO  time: initialize in 0.32s
+2026.01.12 09:49:59 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2026.01.12 09:49:59 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2026.01.12 09:49:59 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.12 09:49:59 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.12 09:49:59 INFO  Successfully validated 7 migrations (execution time 00:00.356s)
+2026.01.12 09:49:59 INFO  Successfully validated 7 migrations (execution time 00:00.353s)
+2026.01.12 09:49:59 INFO  Current version of schema "PUBLIC": 7
+2026.01.12 09:49:59 INFO  Current version of schema "PUBLIC": 7
+2026.01.12 09:49:59 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.12 09:49:59 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.12 09:50:02 INFO  Attempting to connect to the build server...
+2026.01.12 09:50:02 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2026.01.12 09:50:03 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2026.01.12 09:50:17 INFO  BSP server: Starting compilation server
+2026.01.12 09:50:36 INFO  time: Connected to build server in 34s
+2026.01.12 09:50:36 INFO  Connected to Build server: scala-cli v1.10.1
+2026.01.12 09:50:38 INFO  time: Imported build in 1.34s
+2026.01.12 09:50:59 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2026.01.12 09:50:59 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.12 09:50:59 INFO  Successfully validated 1 migration (execution time 00:00.019s)
+2026.01.12 09:50:59 INFO  Current version of schema "PUBLIC": 1
+2026.01.12 09:50:59 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.12 09:51:01 INFO  time: indexed workspace in 23s
