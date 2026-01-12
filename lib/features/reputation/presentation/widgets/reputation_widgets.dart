@@ -56,25 +56,25 @@ class LeaderboardEntryCard extends StatelessWidget {
 
     switch (entry.rank) {
       case 1:
-        color = Colors.amber[700]!;
-        content = const Icon(Icons.emoji_events, color: Colors.white, size: 24);
+        color = const Color(0xFFFFD700); // Gold
+        content = const Icon(Icons.workspace_premium, color: Colors.white, size: 24);
         break;
       case 2:
-        color = Colors.grey[400]!;
-        content = const Icon(Icons.emoji_events, color: Colors.white, size: 24);
+        color = const Color(0xFFC0C0C0); // Silver
+        content = const Icon(Icons.workspace_premium, color: Colors.white, size: 24);
         break;
       case 3:
-        color = Colors.brown[300]!;
-        content = const Icon(Icons.emoji_events, color: Colors.white, size: 24);
+        color = const Color(0xFFCD7F32); // Bronze
+        content = const Icon(Icons.workspace_premium, color: Colors.white, size: 24);
         break;
       default:
-        color = Colors.blue;
+        color = Colors.blueGrey;
         content = Text(
           '#${entry.rank}',
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 14,
           ),
         );
     }
@@ -85,6 +85,13 @@ class LeaderboardEntryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Center(child: content),
     );
@@ -147,43 +154,135 @@ class BadgeCard extends StatelessWidget {
   final BadgeType badgeType;
   final bool earned;
   final DateTime? earnedAt;
+  final VoidCallback? onTap;
 
   const BadgeCard({
     super.key,
     required this.badgeType,
     this.earned = false,
     this.earnedAt,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final badgeColor = Color(badgeType.colorValue);
+    
     return Card(
-      color: earned ? Colors.green.withOpacity(0.05) : null,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      color: earned ? badgeColor.withOpacity(0.08) : Colors.grey.withOpacity(0.05),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap ?? () => _showBadgeDetails(context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: earned ? badgeColor.withOpacity(0.15) : Colors.grey.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  IconData(badgeType.iconCode, fontFamily: 'MaterialIcons'),
+                  size: 28,
+                  color: earned ? badgeColor : Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                badgeType.displayName,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: earned ? null : Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (earned && earnedAt != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  _formatDate(earnedAt!),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[600],
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+              if (!earned) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Locked',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[500],
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showBadgeDetails(BuildContext context) {
+    final badgeColor = Color(badgeType.colorValue);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: badgeColor.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                IconData(badgeType.iconCode, fontFamily: 'MaterialIcons'),
+                color: badgeColor,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(badgeType.displayName),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              badgeType.emoji,
-              style: TextStyle(
-                fontSize: 36,
-                color: earned ? null : Colors.grey,
-              ),
+              _getBadgeDescription(badgeType),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 8),
-            Text(
-              badgeType.displayName,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: earned ? null : Colors.grey,
-              ),
-              textAlign: TextAlign.center,
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(
+                  earned ? Icons.check_circle : Icons.lock,
+                  color: earned ? Colors.green : Colors.grey,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  earned ? 'Badge Earned' : 'Not Yet Earned',
+                  style: TextStyle(
+                    color: earned ? Colors.green : Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
             if (earned && earnedAt != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
-                'Earned ${_formatDate(earnedAt!)}',
+                'Earned on ${_formatDate(earnedAt!)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -191,8 +290,39 @@ class BadgeCard extends StatelessWidget {
             ],
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
+  }
+
+  String _getBadgeDescription(BadgeType type) {
+    switch (type) {
+      case BadgeType.quickResolver:
+        return 'Awarded for resolving issues within 24 hours consistently.';
+      case BadgeType.communityHero:
+        return 'Recognized for outstanding community service and engagement.';
+      case BadgeType.consistencyStar:
+        return 'Maintained consistent performance over extended periods.';
+      case BadgeType.firstResponder:
+        return 'Among the first to respond to citizen reports regularly.';
+      case BadgeType.milestone100:
+        return 'Successfully resolved 100 community issues.';
+      case BadgeType.milestone500:
+        return 'Successfully resolved 500 community issues.';
+      case BadgeType.milestone1000:
+        return 'Successfully resolved 1000 community issues.';
+      case BadgeType.topPerformer:
+        return 'Ranked in the top performers for the month.';
+      case BadgeType.innovationAward:
+        return 'Implemented innovative solutions to complex problems.';
+      case BadgeType.citizenFavorite:
+        return 'Consistently received positive feedback from citizens.';
+    }
   }
 
   String _formatDate(DateTime dt) {
@@ -485,9 +615,9 @@ class ReputationTierWidget extends StatelessWidget {
   IconData _getTierIcon(String tier) {
     switch (tier) {
       case 'Legendary':
-        return Icons.emoji_events;
-      case 'Master':
         return Icons.workspace_premium;
+      case 'Master':
+        return Icons.military_tech;
       case 'Expert':
         return Icons.verified;
       case 'Skilled':
