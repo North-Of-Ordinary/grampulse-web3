@@ -10,7 +10,7 @@
 
 const { EAS, SchemaEncoder, ZERO_BYTES32 } = require('@ethereum-attestation-service/eas-sdk');
 const { ethers } = require('ethers');
-const config = require('../config');
+const { config } = require('../config');
 const logger = require('../utils/logger');
 
 class BatchAttestationService {

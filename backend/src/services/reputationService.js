@@ -9,7 +9,7 @@
  */
 
 const { ethers } = require('ethers');
-const config = require('../config');
+const { config } = require('../config');
 const logger = require('../utils/logger');
 
 // Reputation Token ABI (ERC-5192 Soulbound compatible)
