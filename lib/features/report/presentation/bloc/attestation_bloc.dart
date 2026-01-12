@@ -15,7 +15,7 @@ class AttestationBloc extends Bloc<AttestationEvent, AttestationState> {
   AttestationBloc({
     AttestationService? attestationService,
   })  : _attestationService = attestationService ?? AttestationService.instance,
-        _isEnabled = Web3Config.instance.web3Enabled,
+        _isEnabled = Web3Config.web3Enabled,
         super(const AttestationInitial()) {
     on<CreateResolutionAttestation>(_onCreateResolutionAttestation);
     on<VerifyAttestation>(_onVerifyAttestation);

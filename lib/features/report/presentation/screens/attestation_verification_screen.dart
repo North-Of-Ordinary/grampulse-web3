@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grampulse/features/report/presentation/bloc/attestation_bloc.dart';
 import 'package:grampulse/features/report/presentation/bloc/attestation_event.dart';
 import 'package:grampulse/features/report/presentation/bloc/attestation_state.dart';
-import 'package:grampulse/features/report/presentation/widgets/attestation_widgets.dart';
 
 class AttestationVerificationScreen extends StatefulWidget {
   final String? initialUid;
@@ -62,11 +61,24 @@ class _AttestationVerificationScreenState
         title: const Text('Verify Attestation'),
         centerTitle: true,
       ),
-      body: BlocBuilder<AttestationBloc, AttestationState>(
-        builder: (context, state) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+      body: SafeArea(
+        child: BlocConsumer<AttestationBloc, AttestationState>(
+          listener: (context, state) {
+            // Show snackbar for errors if needed
+            if (state is AttestationError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.orange,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Header
@@ -179,6 +191,7 @@ class _AttestationVerificationScreenState
             ),
           );
         },
+        ),
       ),
     );
   }
