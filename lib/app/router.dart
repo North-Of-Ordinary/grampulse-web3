@@ -59,7 +59,7 @@ import 'package:grampulse/features/auth/domain/services/auth_service.dart' as do
 
 // PHASE 5: Web3 Governance & Transparency imports
 import 'package:grampulse/features/dashboard/presentation/screens/transparency_dashboard_screen.dart';
-import 'package:grampulse/features/dashboard/presentation/bloc/dashboard_bloc.dart';
+import 'package:grampulse/features/dashboard/presentation/bloc/dashboard_bloc.dart' as web3_dashboard;
 import 'package:grampulse/features/governance/presentation/screens/governance_screen.dart';
 import 'package:grampulse/features/governance/presentation/bloc/governance_bloc.dart';
 import 'package:grampulse/features/reputation/presentation/screens/leaderboard_screen.dart';
@@ -488,8 +488,8 @@ final appRouter = GoRouter(
       name: 'verify_attestation',
       builder: (context, state) {
         final uid = state.uri.queryParameters['uid'];
-        return BlocProvider(
-          create: (_) => AttestationBloc(),
+        return BlocProvider<AttestationBloc>(
+          create: (context) => AttestationBloc(),
           child: AttestationVerificationScreen(initialUid: uid),
         );
       },
@@ -500,7 +500,7 @@ final appRouter = GoRouter(
       path: '/transparency-dashboard',
       name: 'transparency_dashboard',
       builder: (context, state) => BlocProvider(
-        create: (_) => DashboardBloc()..add(LoadDashboard()),
+        create: (_) => web3_dashboard.DashboardBloc()..add(web3_dashboard.LoadDashboard()),
         child: const TransparencyDashboardScreen(),
       ),
     ),
