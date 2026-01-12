@@ -18,10 +18,7 @@ class TransparencyDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DashboardBloc()..add(LoadDashboard()),
-      child: const _DashboardView(),
-    );
+    return const _DashboardView();
   }
 }
 
@@ -44,7 +41,7 @@ class _DashboardView extends StatelessWidget {
       ),
       body: BlocBuilder<DashboardBloc, DashboardState>(
         builder: (context, state) {
-          if (state is DashboardLoading) {
+          if (state is DashboardLoading || state is DashboardInitial) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
