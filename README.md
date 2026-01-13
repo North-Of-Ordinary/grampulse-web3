@@ -9,7 +9,9 @@ https://explorer-mezame.shardeum.org/address/0x5ff04cbCB3F80dfE59143e994f8e63009
 <img width="1881" height="856" alt="image" src="https://github.com/user-attachments/assets/690f128f-ae55-44d7-8528-a7b1c2436c17" />
 
 ## ThinkRoot Deployment url
-https://grampulse-az05rp.thinkroot.app/
+### 1. https://grampulse-az05rp.thinkroot.app/
+
+### 2. https://8001-152d4a20-8b8e-416f-b18d-9e9969fe9c68-q-dexg9cg4fqvsgz.thinkroot.app/
 
 https://github.com/user-attachments/assets/900c7733-7a28-4ab6-a5d8-b1aa5e4d592f
 
