@@ -4,6 +4,17 @@
 
 ---
 
+## Shardeum Smart Contract Url
+https://explorer-mezame.shardeum.org/address/0x5ff04cbCB3F80dfE59143e994f8e63009d7f2fA1?tab=txs
+<img width="1881" height="856" alt="image" src="https://github.com/user-attachments/assets/690f128f-ae55-44d7-8528-a7b1c2436c17" />
+
+## ThinkRoot Deployment url
+https://grampulse-az05rp.thinkroot.app/
+
+https://github.com/user-attachments/assets/900c7733-7a28-4ab6-a5d8-b1aa5e4d592f
+
+---
+
 ## Table of Contents
 
 - [System Architecture](#system-architecture)
