@@ -13,6 +13,8 @@ https://grampulse-az05rp.thinkroot.app/
 
 https://github.com/user-attachments/assets/900c7733-7a28-4ab6-a5d8-b1aa5e4d592f
 
+https://github.com/user-attachments/assets/11d28f56-b88c-455e-b036-c665c39bc4e2
+
 ---
 
 ## Table of Contents
@@ -575,10 +577,11 @@ class OfflineSyncService {
 | Blockchain Integration | `lib/core/services/shardeum_service.dart` | Web3 transaction handling |
 | Encryption | `lib/core/services/inco_encryption_service.dart` | FHE payload generation |
 
-#### **Screenshots**
-![Voice Input Screen](screenshots/voice_input.png)  
-![Complaint Submission](screenshots/complaint_submit.png)  
-![Blockchain Confirmation](screenshots/blockchain_confirm.png)
+#### **Screenrecords**
+
+https://github.com/user-attachments/assets/734add4e-c497-425c-8635-66b0fda08777
+
+https://github.com/user-attachments/assets/406e2912-2d08-4adb-9071-2b8e3b5c2bde
 
 ---
 
@@ -1074,15 +1077,18 @@ Personal data (voice recordings, photos) stored on:
 
 ---
 
-## Team
+## **Team**
 
-| Role | Name | Responsibilities | Contact |
-|------|------|-----------------|---------|
-| **Blockchain Lead** | [Your Name] | Smart contract development, Inco/Optimism/Shardeum integration | [GitHub](https://github.com/naveen-astra) |
-| **Mobile Developer** | [Name] | Flutter app, voice processing, offline-first architecture | [Email] |
-| **Backend Engineer** | [Name] | Node.js API, MongoDB, authentication, IPFS integration | [Email] |
-| **Frontend Developer** | [Name] | React dashboard, Web3 integration, data visualization | [Email] |
-| **Product/Research** | [Name] | User research, pilot coordination, government liaison | [Email] |
+| Name                  | Contact                                                                                   | GitHub                                                                                       |
+| --------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Naveen Babu M S**   | [nbknight23@gmail.com](mailto:nbknight23@gmail.com)                                       | [https://github.com/naveen-astra](https://github.com/naveen-astra)                           |
+| **Rahul B**           | [rahul.bv20@gmail.com](mailto:rahul.bv20@gmail.com)                                       | [https://github.com/Bat-hub-hash](https://github.com/Bat-hub-hash)                           |
+| **Vishal Seshadri B** | [vishalspl09@gmail.com](mailto:vishalspl09@gmail.com)                                     | [https://github.com/Vishalspl-0903](https://github.com/Vishalspl-0903)                       |
+| **Krish S**           | [subrakrish8@gmail.com](mailto:subrakrish8@gmail.com)                                     | [https://github.com/krish-subramoniam](https://github.com/krish-subramoniam)                 |
+| **Keerthivasan S V**  | [cb.sc.u4aie23037@cb.students.amrita.edu](mailto:cb.sc.u4aie23037@cb.students.amrita.edu) | [https://github.com/Keerthivasan-Venkitajalam](https://github.com/Keerthivasan-Venkitajalam) |
+
+**Institution:**
+Amrita Vishwa Vidyapeetham
 
 ---
 
