@@ -3,13 +3,13 @@
 GramPulse is a comprehensive mobile application designed to bridge the gap between rural citizens and government authorities. It provides a platform for citizens to report local issues, track resolution progress, and engage with community volunteers and government officials.
 
 
-## Shardeum Smart Contract Url
-https://explorer-mezame.shardeum.org/address/0x5ff04cbCB3F80dfE59143e994f8e63009d7f2fA1?tab=txs
+## Shardeum Smart Contract URL
+https://explorer-mezame.shardeum.org/address/0x5ff04cbCB3F80dfE59
 
-## ThinkRoot Deployment url
+## ThinkRoot Deployment URL
 https://grampulse-az05rp.thinkroot.app/
 
-
+https://github.com/user-attachments/assets/57fc7701-6912-4b48-b84c-7394160e968e
 
 ## Table of Contents
 
