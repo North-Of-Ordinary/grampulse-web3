@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 // Events
 abstract class VolunteerDashboardEvent extends Equatable {
@@ -114,6 +116,8 @@ class VerificationRequest {
 
 // BLoC
 class VolunteerDashboardBloc extends Bloc<VolunteerDashboardEvent, VolunteerDashboardState> {
+  final SupabaseService _supabase = SupabaseService();
+  
   VolunteerDashboardBloc() : super(const DashboardInitial()) {
     on<LoadDashboard>(_onLoadDashboard);
     on<RefreshDashboard>(_onRefreshDashboard);
@@ -125,67 +129,47 @@ class VolunteerDashboardBloc extends Bloc<VolunteerDashboardEvent, VolunteerDash
     emit(const DashboardLoading());
     
     try {
-      // Simulate API calls
-      await Future.delayed(const Duration(milliseconds: 800));
+      debugPrint('[VolunteerDashboardBloc] Loading from Supabase...');
       
-      // Mock data
-      const stats = VolunteerStats(
-        pendingVerifications: 12,
-        verifiedToday: 5,
-        responseRate: 87.5,
-        reputation: 245,
+      // Fetch real incidents from Supabase
+      final incidents = await _supabase.getAllIncidents();
+      final pendingIncidents = incidents.where((inc) => inc['status'] == 'submitted').toList();
+      
+      // Calculate stats from real data
+      final stats = VolunteerStats(
+        pendingVerifications: pendingIncidents.length,
+        verifiedToday: incidents.where((inc) => inc['status'] == 'in_progress').length,
+        responseRate: 0.0, // TODO: Calculate from real data
+        reputation: 0, // TODO: Get from user profile
       );
       
-      final verificationQueue = [
-        VerificationRequest(
-          id: '1',
-          title: 'Broken Street Light',
-          category: 'Infrastructure',
-          address: '123 Main St, Village Center',
-          distance: 0.8,
-          priority: 'High',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 2)),
-        ),
-        VerificationRequest(
-          id: '2',
-          title: 'Pothole on Road',
-          category: 'Road',
-          address: '456 Market Road',
-          distance: 1.2,
-          priority: 'Medium',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 4)),
-        ),
-        VerificationRequest(
-          id: '3',
-          title: 'Garbage Collection Issue',
-          category: 'Sanitation',
-          address: '789 Village Square',
-          distance: 2.1,
-          priority: 'Low',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 6)),
-        ),
-      ];
+      // Convert incidents to verification requests
+      final verificationQueue = pendingIncidents.take(5).map((inc) {
+        return VerificationRequest(
+          id: inc['id'] as String? ?? '',
+          title: inc['title'] as String? ?? '',
+          category: (inc['categories'] as Map<String, dynamic>?)?['name'] as String? ?? 'Other',
+          address: inc['location_address'] as String? ?? 'Unknown',
+          distance: 0.0, // TODO: Calculate from user location
+          priority: inc['priority'] as String? ?? 'medium',
+          reportedAt: DateTime.tryParse(inc['created_at'] as String? ?? '') ?? DateTime.now(),
+        );
+      }).toList();
       
-      final nearbyRequests = [
-        VerificationRequest(
-          id: '4',
-          title: 'Water Supply Problem',
-          category: 'Water',
-          address: '321 Community Center',
-          distance: 0.5,
-          priority: 'High',
-          reportedAt: DateTime.now().subtract(const Duration(minutes: 30)),
-        ),
-        VerificationRequest(
-          id: '5',
-          title: 'School Roof Leak',
-          category: 'Education',
-          address: 'Primary School, Sector 2',
-          distance: 1.5,
-          priority: 'Medium',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 1)),
-        ),
-      ];
+      // Get nearby requests (all pending for now)
+      final nearbyRequests = pendingIncidents.skip(5).take(5).map((inc) {
+        return VerificationRequest(
+          id: inc['id'] as String? ?? '',
+          title: inc['title'] as String? ?? '',
+          category: (inc['categories'] as Map<String, dynamic>?)?['name'] as String? ?? 'Other',
+          address: inc['location_address'] as String? ?? 'Unknown',
+          distance: 0.0,
+          priority: inc['priority'] as String? ?? 'medium',
+          reportedAt: DateTime.tryParse(inc['created_at'] as String? ?? '') ?? DateTime.now(),
+        );
+      }).toList();
+      
+      debugPrint('[VolunteerDashboardBloc] ✅ Loaded ${verificationQueue.length} verification requests');
       
       emit(DashboardLoaded(
         stats: stats,
@@ -193,6 +177,7 @@ class VolunteerDashboardBloc extends Bloc<VolunteerDashboardEvent, VolunteerDash
         nearbyRequests: nearbyRequests,
       ));
     } catch (e) {
+      debugPrint('[VolunteerDashboardBloc] ❌ Error: $e');
       emit(DashboardError(e.toString()));
     }
   }
@@ -202,18 +187,8 @@ class VolunteerDashboardBloc extends Bloc<VolunteerDashboardEvent, VolunteerDash
     final currentState = state;
     
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Re-emit with updated data (in real app, fetch fresh data)
-      if (currentState is DashboardLoaded) {
-        emit(DashboardLoaded(
-          stats: currentState.stats,
-          verificationQueue: currentState.verificationQueue,
-          nearbyRequests: currentState.nearbyRequests,
-        ));
-      } else {
-        add(const LoadDashboard());
-      }
+      // Re-fetch from Supabase
+      add(const LoadDashboard());
     } catch (e) {
       emit(DashboardError(e.toString()));
     }

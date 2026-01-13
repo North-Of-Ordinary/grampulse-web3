@@ -450,6 +450,41 @@ class _ProfileContent extends StatelessWidget {
             onTap: () {
               context.push('/verify-attestation');
             },
+            showDivider: true,
+          ),
+          _ProfileActionTile(
+            icon: Icons.receipt_long_outlined,
+            title: 'Live Transactions',
+            subtitle: 'View real Shardeum blockchain activity',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'LIVE',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+              ],
+            ),
+            onTap: () {
+              context.push('/shardeum/transactions');
+            },
             showDivider: false,
           ),
         ],

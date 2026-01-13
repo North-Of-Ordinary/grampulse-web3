@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -9,19 +10,74 @@ class InboxScreen extends StatefulWidget {
 
 class _InboxScreenState extends State<InboxScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
-  final List<_InboxItem> _notifications = [
-    _InboxItem(id: '1', type: 'alert', title: 'High Priority Issue Assigned', message: 'Water supply complaint in Sector 5 requires immediate attention', time: DateTime.now().subtract(const Duration(minutes: 10)), isRead: false),
-    _InboxItem(id: '2', type: 'update', title: 'Issue Status Updated', message: 'Road repair work in Main Market has been completed', time: DateTime.now().subtract(const Duration(hours: 1)), isRead: false),
-    _InboxItem(id: '3', type: 'message', title: 'Message from Admin', message: 'Please review the pending approvals before end of day', time: DateTime.now().subtract(const Duration(hours: 3)), isRead: true),
-    _InboxItem(id: '4', type: 'alert', title: 'Deadline Approaching', message: 'Street light repair deadline is tomorrow', time: DateTime.now().subtract(const Duration(hours: 5)), isRead: true),
-    _InboxItem(id: '5', type: 'update', title: 'New Assignment', message: 'Drainage issue in Ward 12 assigned to you', time: DateTime.now().subtract(const Duration(days: 1)), isRead: true),
-  ];
+  final SupabaseService _supabase = SupabaseService();
+  List<_InboxItem> _notifications = [];
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadNotifications();
+  }
+
+  Future<void> _loadNotifications() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      // Fetch incidents from Supabase and convert to notifications
+      final incidents = await _supabase.getAllIncidents();
+      
+      final notifications = incidents.map((inc) {
+        final status = inc['status'] as String? ?? 'new';
+        final priority = inc['severity'] as int? ?? 1;
+        
+        String type = 'update';
+        if (priority >= 3 || status == 'new' || status == 'submitted') {
+          type = 'alert';
+        } else if (status == 'resolved') {
+          type = 'message';
+        }
+        
+        String title;
+        if (status == 'new' || status == 'submitted') {
+          title = 'New Issue Reported';
+        } else if (status == 'in_progress') {
+          title = 'Issue In Progress';
+        } else if (status == 'resolved') {
+          title = 'Issue Resolved';
+        } else {
+          title = 'Issue Update';
+        }
+        
+        return _InboxItem(
+          id: inc['id'] as String? ?? '',
+          type: type,
+          title: title,
+          message: inc['title'] as String? ?? 'No description',
+          time: DateTime.tryParse(inc['created_at'] as String? ?? '') ?? DateTime.now(),
+          isRead: status == 'resolved' || status == 'closed',
+          incidentId: inc['id'] as String? ?? '',
+        );
+      }).toList();
+      
+      // Sort by time, newest first
+      notifications.sort((a, b) => b.time.compareTo(a.time));
+      
+      setState(() {
+        _notifications = notifications.take(20).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -46,6 +102,11 @@ class _InboxScreenState extends State<InboxScreen> with SingleTickerProviderStat
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadNotifications,
+            tooltip: 'Refresh',
+          ),
           IconButton(
             icon: Badge(
               label: Text('${_unreadItems.length}'),
@@ -75,14 +136,30 @@ class _InboxScreenState extends State<InboxScreen> with SingleTickerProviderStat
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildNotificationList(_notifications),
-          _buildNotificationList(_unreadItems),
-          _buildNotificationList(_alertItems),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: $_error', style: const TextStyle(color: Colors.red)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _loadNotifications, child: const Text('Retry')),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadNotifications,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildNotificationList(_notifications),
+                      _buildNotificationList(_unreadItems),
+                      _buildNotificationList(_alertItems),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -200,8 +277,9 @@ class _InboxItem {
   final String message;
   final DateTime time;
   bool isRead;
+  final String incidentId;
 
-  _InboxItem({required this.id, required this.type, required this.title, required this.message, required this.time, required this.isRead});
+  _InboxItem({required this.id, required this.type, required this.title, required this.message, required this.time, required this.isRead, required this.incidentId});
 }
 
 class _NotificationCard extends StatelessWidget {

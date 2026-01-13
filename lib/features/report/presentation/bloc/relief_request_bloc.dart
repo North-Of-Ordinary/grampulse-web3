@@ -113,22 +113,23 @@ class ReliefRequestBloc extends Bloc<ReliefRequestEvent, ReliefRequestState> {
         // Simulate API call to lookup bank
         await Future.delayed(const Duration(seconds: 1));
         
-        // Mock response based on first few characters
+        // IFSC code lookup - basic validation
+        // TODO: Integrate with RBI IFSC API for real bank lookup
         String bankName;
         String? branch;
         
         if (event.ifscCode.startsWith('SBI')) {
           bankName = 'State Bank of India';
-          branch = 'Main Branch';
+          branch = 'Branch';
         } else if (event.ifscCode.startsWith('HDFC')) {
           bankName = 'HDFC Bank';
-          branch = 'City Branch';
+          branch = 'Branch';
         } else if (event.ifscCode.startsWith('ICIC')) {
           bankName = 'ICICI Bank';
-          branch = 'Town Branch';
+          branch = 'Branch';
         } else {
-          bankName = 'Unknown Bank';
-          branch = 'Unknown Branch';
+          bankName = 'Bank (Verify IFSC)';
+          branch = 'Branch';
         }
         
         final updatedBankDetails = currentState.bankDetails.copyWith(

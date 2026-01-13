@@ -65,6 +65,15 @@ import 'package:grampulse/features/governance/presentation/bloc/governance_bloc.
 import 'package:grampulse/features/reputation/presentation/screens/leaderboard_screen.dart';
 import 'package:grampulse/features/reputation/presentation/bloc/reputation_bloc.dart';
 
+// PHASE 6: Shardeum Multi-Chain Integration
+import 'package:grampulse/shardeum/shardeum.dart';
+
+// Inco Economic Enablement
+import 'package:grampulse/inco/inco.dart';
+
+// Quadratic Voting
+import 'package:grampulse/features/voting/presentation/screens/voting_dashboard_screen.dart';
+
 // No transition for instant tab switching within shell routes
 Page<T> buildPageWithNoTransition<T>({
   required GoRouterState state,
@@ -519,6 +528,37 @@ final appRouter = GoRouter(
         create: (_) => ReputationBloc()..add(const LoadLeaderboard()),
         child: const LeaderboardScreen(),
       ),
+    ),
+    
+    // PHASE 6: Shardeum Multi-Chain Integration
+    GoRoute(
+      path: '/shardeum',
+      name: 'shardeum',
+      builder: (context, state) => const ShardeumScreen(),
+    ),
+    GoRoute(
+      path: '/shardeum/transactions',
+      name: 'shardeum_transactions',
+      builder: (context, state) => const TransactionLogScreen(),
+    ),
+    
+    // Inco Economic Enablement
+    GoRoute(
+      path: '/inco-enablement',
+      name: 'inco_enablement',
+      builder: (context, state) => const IncoEnablementScreen(),
+    ),
+    
+    // Quadratic Voting Dashboard
+    GoRoute(
+      path: '/voting',
+      name: 'voting_dashboard',
+      builder: (context, state) {
+        // Get userId from auth state
+        final authState = context.read<AuthBloc>().state;
+        final userId = authState is Authenticated ? authState.user.id : 'demo-user';
+        return VotingDashboardScreen(userId: userId);
+      },
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

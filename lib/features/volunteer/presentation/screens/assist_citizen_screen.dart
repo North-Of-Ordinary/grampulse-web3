@@ -1,7 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
-class AssistCitizenScreen extends StatelessWidget {
+class AssistCitizenScreen extends StatefulWidget {
   const AssistCitizenScreen({super.key});
+
+  @override
+  State<AssistCitizenScreen> createState() => _AssistCitizenScreenState();
+}
+
+class _AssistCitizenScreenState extends State<AssistCitizenScreen> {
+  final SupabaseService _supabase = SupabaseService();
+  List<Map<String, dynamic>> _assistanceRequests = [];
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAssistanceRequests();
+  }
+
+  Future<void> _loadAssistanceRequests() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      // Load incidents that need assistance (new or in_progress status)
+      final incidents = await _supabase.getAllIncidents();
+      setState(() {
+        _assistanceRequests = incidents
+            .where((i) => i['status'] == 'new' || i['status'] == 'submitted' || i['status'] == 'in_progress')
+            .take(10)
+            .toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _getTimeAgo(String? createdAt) {
+    if (createdAt == null) return 'Unknown';
+    try {
+      final date = DateTime.parse(createdAt);
+      final now = DateTime.now();
+      final diff = now.difference(date);
+      if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
+      if (diff.inHours < 24) return '${diff.inHours} hours ago';
+      if (diff.inDays < 7) return '${diff.inDays} days ago';
+      return '${(diff.inDays / 7).floor()} weeks ago';
+    } catch (_) {
+      return 'Unknown';
+    }
+  }
+
+  String _getUrgency(String? priority) {
+    switch (priority) {
+      case 'high':
+      case 'urgent':
+        return 'High';
+      case 'medium':
+        return 'Medium';
+      default:
+        return 'Low';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,27 +134,28 @@ class AssistCitizenScreen extends StatelessWidget {
             const Text('Recent Assistance Requests', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             
-            _AssistanceRequestCard(
-              citizenName: 'Ramesh Kumar',
-              requestType: 'Scheme Application',
-              description: 'Need help applying for PM-KISAN scheme',
-              timeAgo: '15 min ago',
-              urgency: 'High',
-            ),
-            _AssistanceRequestCard(
-              citizenName: 'Lakshmi Devi',
-              requestType: 'Document Verification',
-              description: 'Help with Aadhaar-PAN linking process',
-              timeAgo: '1 hour ago',
-              urgency: 'Medium',
-            ),
-            _AssistanceRequestCard(
-              citizenName: 'Village SHG Group',
-              requestType: 'SHG Support',
-              description: 'Need guidance on bank loan application',
-              timeAgo: '2 hours ago',
-              urgency: 'Low',
-            ),
+            if (_isLoading)
+              const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()))
+            else if (_error != null)
+              Center(
+                child: Column(
+                  children: [
+                    Text('Error: $_error', style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 8),
+                    ElevatedButton(onPressed: _loadAssistanceRequests, child: const Text('Retry')),
+                  ],
+                ),
+              )
+            else if (_assistanceRequests.isEmpty)
+              const Center(child: Padding(padding: EdgeInsets.all(32), child: Text('No assistance requests at this time', style: TextStyle(color: Colors.grey))))
+            else
+              ..._assistanceRequests.map((request) => _AssistanceRequestCard(
+                citizenName: request['reporter_name'] ?? 'Anonymous',
+                requestType: request['category_name'] ?? 'General',
+                description: request['title'] ?? 'No description',
+                timeAgo: _getTimeAgo(request['created_at']),
+                urgency: _getUrgency(request['priority']),
+              )),
             
             const SizedBox(height: 80),
           ],

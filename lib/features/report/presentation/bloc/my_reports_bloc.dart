@@ -1,14 +1,13 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import 'package:grampulse/features/report/domain/models/updated_report_models.dart';
 import 'package:grampulse/features/report/presentation/bloc/my_reports_event.dart';
 import 'package:grampulse/features/report/presentation/bloc/my_reports_state.dart';
 
 class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
-  // This would typically come from a repository
-  final List<IssueModel> _mockReports = [
-    // Placeholder for mock data
-  ];
+  final SupabaseService _supabase = SupabaseService();
 
   MyReportsBloc() : super(const ReportsInitial()) {
     on<LoadMyReports>(_onLoadMyReports);
@@ -21,11 +20,13 @@ class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
     emit(const ReportsLoading());
     
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      debugPrint('[MyReportsBloc] Loading reports from Supabase...');
       
-      // In a real app, this would be a repository call
-      final reports = _fetchReports();
+      // Get current user ID
+      final userId = _supabase.client.auth.currentUser?.id;
+      final reports = await _fetchReportsFromSupabase(userId: userId);
+      
+      debugPrint('[MyReportsBloc] ✅ Loaded ${reports.length} reports');
       
       if (reports.isEmpty) {
         emit(const ReportsEmpty());
@@ -33,6 +34,7 @@ class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
         emit(ReportsLoaded(reports: reports, hasMore: reports.length >= 10));
       }
     } catch (e) {
+      debugPrint('[MyReportsBloc] ❌ Error: $e');
       emit(ReportsError(e.toString()));
     }
   }
@@ -41,14 +43,14 @@ class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
     if (state is ReportsLoaded) {
       final currentState = state as ReportsLoaded;
       
-      emit(ReportsLoading());
+      emit(const ReportsLoading());
       
       try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 300));
-        
-        // Filter reports based on status
-        final filteredReports = _fetchReports(status: event.status);
+        final userId = _supabase.client.auth.currentUser?.id;
+        final filteredReports = await _fetchReportsFromSupabase(
+          userId: userId,
+          status: event.status == 'all' ? null : event.status,
+        );
         
         if (filteredReports.isEmpty) {
           emit(const ReportsEmpty());
@@ -69,23 +71,10 @@ class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
       final currentState = state as ReportsLoaded;
       
       try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 500));
-        
-        // In a real app, we'd use pagination parameters
-        final moreReports = _fetchMoreReports(currentState.reports.length);
-        
-        if (moreReports.isNotEmpty) {
-          emit(currentState.copyWith(
-            reports: [...currentState.reports, ...moreReports],
-            hasMore: moreReports.length >= 5, // Assuming page size of 5
-          ));
-        } else {
-          emit(currentState.copyWith(hasMore: false));
-        }
+        // For now, set hasMore to false since we load all at once
+        emit(currentState.copyWith(hasMore: false));
       } catch (e) {
-        // Keep existing reports but show error
-        // We could also add an error banner to the UI
+        // Keep existing reports
       }
     }
   }
@@ -95,11 +84,11 @@ class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
       final currentState = state as ReportsLoaded;
       
       try {
-        // Simulate API call
-        await Future.delayed(const Duration(seconds: 1));
-        
-        // In a real app, this would be a repository call with refresh parameter
-        final reports = _fetchReports(status: currentState.selectedStatus);
+        final userId = _supabase.client.auth.currentUser?.id;
+        final reports = await _fetchReportsFromSupabase(
+          userId: userId,
+          status: currentState.selectedStatus == 'all' ? null : currentState.selectedStatus,
+        );
         
         if (reports.isEmpty) {
           emit(const ReportsEmpty());
@@ -110,30 +99,46 @@ class MyReportsBloc extends Bloc<MyReportsEvent, MyReportsState> {
           ));
         }
       } catch (e) {
-        // Keep existing state but show error
-        // We could also add an error banner to the UI
+        // Keep existing state
       }
     } else {
       add(const LoadMyReports());
     }
   }
 
-  // Mock data methods (in a real app, these would be repository calls)
-  List<IssueModel> _fetchReports({String status = 'all'}) {
-    if (status == 'all') {
-      return _mockReports;
+  /// Fetch reports from Supabase
+  Future<List<IssueModel>> _fetchReportsFromSupabase({
+    String? userId,
+    String? status,
+  }) async {
+    List<Map<String, dynamic>> incidentsData;
+    
+    if (userId != null) {
+      incidentsData = await _supabase.getIncidentsByUser(userId);
     } else {
-      return _mockReports.where((report) => report.status == status).toList();
-    }
-  }
-
-  List<IssueModel> _fetchMoreReports(int offset) {
-    // Simulate pagination
-    if (offset >= _mockReports.length) {
-      return [];
+      incidentsData = await _supabase.getAllIncidents();
     }
     
-    final end = (offset + 5) > _mockReports.length ? _mockReports.length : offset + 5;
-    return _mockReports.sublist(offset, end);
+    // Filter by status if provided
+    if (status != null) {
+      incidentsData = incidentsData.where((inc) => inc['status'] == status).toList();
+    }
+    
+    return incidentsData.map((data) {
+      return IssueModel(
+        id: data['id'] as String? ?? '',
+        title: data['title'] as String? ?? '',
+        description: data['description'] as String? ?? '',
+        category: (data['categories'] as Map<String, dynamic>?)?['name'] as String? ?? 'Other',
+        status: data['status'] as String? ?? 'submitted',
+        createdAt: DateTime.tryParse(data['created_at'] as String? ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(data['updated_at'] as String? ?? ''),
+        location: data['location_address'] as String?,
+        latitude: (data['location_lat'] as num?)?.toDouble(),
+        longitude: (data['location_lng'] as num?)?.toDouble(),
+        mediaUrls: [],
+        severity: data['priority'] == 'high' ? 3 : (data['priority'] == 'medium' ? 2 : 1),
+      );
+    }).toList();
   }
 }

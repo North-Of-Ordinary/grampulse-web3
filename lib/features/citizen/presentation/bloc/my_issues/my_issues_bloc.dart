@@ -1,10 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import '../../../domain/models/issue_model.dart';
 part 'my_issues_event.dart';
 part 'my_issues_state.dart';
 
 class MyIssuesBloc extends Bloc<MyIssuesEvent, MyIssuesState> {
+  final SupabaseService _supabase = SupabaseService();
+  
   MyIssuesBloc() : super(MyIssuesInitial()) {
     on<LoadMyIssues>(_onLoadMyIssues);
     on<RefreshMyIssues>(_onRefreshMyIssues);
@@ -17,19 +21,20 @@ class MyIssuesBloc extends Bloc<MyIssuesEvent, MyIssuesState> {
   ) async {
     try {
       emit(MyIssuesLoading());
+      debugPrint('[MyIssuesBloc] Loading user issues from Supabase...');
       
-      // Here we would fetch data from repositories
-      // For now we'll use mock data
-      await Future.delayed(const Duration(milliseconds: 800));
+      // Get current user ID from Supabase auth or session
+      final userId = _supabase.client.auth.currentUser?.id;
+      final issues = await _fetchIssuesFromSupabase(userId: userId);
       
-      // Mock data for user's issues
-      final mockIssues = _getMockIssues();
+      debugPrint('[MyIssuesBloc] ✅ Loaded ${issues.length} issues');
       
       emit(MyIssuesLoaded(
-        reportedIssues: mockIssues.where((i) => i.reporterId == 'user123').toList(),
-        upvotedIssues: mockIssues.where((i) => i.id == '2').toList(),
+        reportedIssues: issues,
+        upvotedIssues: [], // TODO: Implement upvoted issues tracking
       ));
     } catch (error) {
+      debugPrint('[MyIssuesBloc] ❌ Error: $error');
       emit(MyIssuesError(message: error.toString()));
     }
   }
@@ -46,15 +51,12 @@ class MyIssuesBloc extends Bloc<MyIssuesEvent, MyIssuesState> {
           upvotedIssues: currentState.upvotedIssues,
         ));
         
-        // Here we would re-fetch data from repositories
-        await Future.delayed(const Duration(milliseconds: 800));
-        
-        // Mock data for user's issues
-        final mockIssues = _getMockIssues();
+        final userId = _supabase.client.auth.currentUser?.id;
+        final issues = await _fetchIssuesFromSupabase(userId: userId);
         
         emit(MyIssuesLoaded(
-          reportedIssues: mockIssues.where((i) => i.reporterId == 'user123').toList(),
-          upvotedIssues: mockIssues.where((i) => i.id == '2').toList(),
+          reportedIssues: issues,
+          upvotedIssues: [],
         ));
       }
     } catch (error) {
@@ -71,50 +73,25 @@ class MyIssuesBloc extends Bloc<MyIssuesEvent, MyIssuesState> {
       if (currentState is MyIssuesLoaded) {
         emit(MyIssuesLoading());
         
-        // Here we would apply filters to the data
-        await Future.delayed(const Duration(milliseconds: 500));
+        final userId = _supabase.client.auth.currentUser?.id;
+        var issues = await _fetchIssuesFromSupabase(userId: userId);
         
-        // Mock data for issues
-        final mockIssues = _getMockIssues();
-        
-        // Filter based on status and category if provided
-        final filteredReported = mockIssues
-            .where((i) => i.reporterId == 'user123')
-            .where((issue) {
-              if (event.statusFilter != null && 
-                  issue.status != event.statusFilter) {
-                return false;
-              }
-              
-              if (event.categoryFilter != null && 
-                  issue.category != event.categoryFilter) {
-                return false;
-              }
-              
-              return true;
-            })
-            .toList();
-            
-        final filteredUpvoted = mockIssues
-            .where((i) => i.id == '2')
-            .where((issue) {
-              if (event.statusFilter != null && 
-                  issue.status != event.statusFilter) {
-                return false;
-              }
-              
-              if (event.categoryFilter != null && 
-                  issue.category != event.categoryFilter) {
-                return false;
-              }
-              
-              return true;
-            })
-            .toList();
+        // Apply filters
+        issues = issues.where((issue) {
+          if (event.statusFilter != null && 
+              issue.status.toString() != event.statusFilter.toString()) {
+            return false;
+          }
+          if (event.categoryFilter != null && 
+              issue.category.toString() != event.categoryFilter.toString()) {
+            return false;
+          }
+          return true;
+        }).toList();
         
         emit(MyIssuesLoaded(
-          reportedIssues: filteredReported,
-          upvotedIssues: filteredUpvoted,
+          reportedIssues: issues,
+          upvotedIssues: [],
           activeFilters: {
             if (event.categoryFilter != null)
               'category': event.categoryFilter,
@@ -128,101 +105,75 @@ class MyIssuesBloc extends Bloc<MyIssuesEvent, MyIssuesState> {
     }
   }
   
-  // Helper to create mock issues
-  List<Issue> _getMockIssues() {
-    final now = DateTime.now();
+  /// Fetch real issues from Supabase
+  Future<List<Issue>> _fetchIssuesFromSupabase({String? userId}) async {
+    final incidentsData = userId != null 
+        ? await _supabase.getIncidentsByUser(userId)
+        : await _supabase.getAllIncidents();
     
-    return [
-      Issue(
-        id: '1',
-        title: 'Broken street light near community center',
-        description: 'The street light has been broken for over a week, making it unsafe at night.',
-        category: IssueCategory.electricity,
-        createdAt: now.subtract(const Duration(days: 3)),
-        updatedAt: now.subtract(const Duration(days: 2)),
-        status: IssueStatus.in_progress,
-        priority: IssuePriority.medium,
+    return incidentsData.map((data) {
+      final category = (data['categories'] as Map<String, dynamic>?)?['name'] as String? ?? 'Other';
+      final status = data['status'] as String? ?? 'submitted';
+      
+      return Issue(
+        id: data['id'] as String? ?? '',
+        title: data['title'] as String? ?? '',
+        description: data['description'] as String? ?? '',
+        category: _mapCategory(category),
+        createdAt: DateTime.tryParse(data['created_at'] as String? ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(data['updated_at'] as String? ?? '') ?? DateTime.now(),
+        status: _mapStatus(status),
+        priority: _mapPriority(data['priority'] as String?),
         location: GeoLocation(
-          latitude: 19.0760,
-          longitude: 72.8777,
-          address: 'Near Community Center, Main Road',
-          locality: 'Andheri',
-          adminArea: 'Mumbai',
-          pinCode: '400053',
+          latitude: (data['location_lat'] as num?)?.toDouble() ?? 0.0,
+          longitude: (data['location_lng'] as num?)?.toDouble() ?? 0.0,
+          address: data['location_address'] as String? ?? '',
+          locality: '',
+          adminArea: '',
+          pinCode: '',
         ),
-        reporterId: 'user123',
-        reporterName: 'Rahul Sharma',
-        mediaUrls: ['https://example.com/image1.jpg'],
-        upvotes: 5,
-        adminLevel: AdminLevel.panchayat,
-        assignedDepartment: 'Electricity Department',
-        isPublic: true,
-        updates: [
-          IssueUpdate(
-            id: 'update1',
-            timestamp: now.subtract(const Duration(days: 2)),
-            comment: 'Issue has been assigned to the electricity department',
-            previousStatus: IssueStatus.new_issue,
-            newStatus: IssueStatus.in_progress,
-            updatedBy: 'admin1',
-            updaterName: 'Admin User',
-            updaterRole: 'Panchayat Officer',
-            mediaUrls: [],
-          ),
-        ],
-      ),
-      Issue(
-        id: '4',
-        title: 'Pothole on Main Street',
-        description: 'Large pothole causing accidents and damage to vehicles.',
-        category: IssueCategory.roadDamage,
-        createdAt: now.subtract(const Duration(days: 10)),
-        updatedAt: now.subtract(const Duration(days: 8)),
-        status: IssueStatus.new_issue,
-        priority: IssuePriority.high,
-        location: GeoLocation(
-          latitude: 19.0770,
-          longitude: 72.8787,
-          address: 'Main Street, Near Bus Stop',
-          locality: 'Dadar',
-          adminArea: 'Mumbai',
-          pinCode: '400014',
-        ),
-        reporterId: 'user123',
-        reporterName: 'Rahul Sharma',
-        mediaUrls: ['https://example.com/image5.jpg'],
-        upvotes: 15,
-        adminLevel: AdminLevel.block,
-        assignedDepartment: 'Road Department',
-        isPublic: true,
-        updates: [],
-      ),
-      Issue(
-        id: '2',
-        title: 'Water supply issue in North Block',
-        description: 'We have been experiencing low water pressure for the past 3 days.',
-        category: IssueCategory.waterSupply,
-        createdAt: now.subtract(const Duration(days: 5)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-        status: IssueStatus.new_issue,
-        priority: IssuePriority.high,
-        location: GeoLocation(
-          latitude: 19.0760,
-          longitude: 72.8777,
-          address: 'North Block, Gandhi Road',
-          locality: 'Borivali',
-          adminArea: 'Mumbai',
-          pinCode: '400091',
-        ),
-        reporterId: 'user456',
-        reporterName: 'Priya Patel',
+        reporterId: data['user_id'] as String? ?? '',
+        reporterName: (data['users'] as Map<String, dynamic>?)?['name'] as String? ?? 'Anonymous',
         mediaUrls: [],
-        upvotes: 12,
-        adminLevel: AdminLevel.block,
-        assignedDepartment: 'Water Department',
-        isPublic: true,
+        upvotes: 0,
+        adminLevel: AdminLevel.panchayat,
+        assignedDepartment: (data['departments'] as Map<String, dynamic>?)?['name'] as String? ?? '',
+        isPublic: data['is_public'] as bool? ?? true,
         updates: [],
-      ),
-    ];
+      );
+    }).toList();
+  }
+  
+  IssueCategory _mapCategory(String category) {
+    switch (category.toLowerCase()) {
+      case 'electricity': return IssueCategory.electricity;
+      case 'water supply': return IssueCategory.waterSupply;
+      case 'roads': case 'road damage': return IssueCategory.roadDamage;
+      case 'sanitation': return IssueCategory.sanitation;
+      case 'health': case 'healthcare': return IssueCategory.healthcare;
+      case 'education': return IssueCategory.education;
+      case 'public property': return IssueCategory.publicProperty;
+      default: return IssueCategory.other;
+    }
+  }
+  
+  IssueStatus _mapStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'submitted': case 'new': return IssueStatus.new_issue;
+      case 'in_progress': return IssueStatus.in_progress;
+      case 'resolved': return IssueStatus.resolved;
+      case 'verified': return IssueStatus.verified;
+      case 'overdue': return IssueStatus.overdue;
+      default: return IssueStatus.new_issue;
+    }
+  }
+  
+  IssuePriority _mapPriority(String? priority) {
+    switch (priority?.toLowerCase()) {
+      case 'high': return IssuePriority.high;
+      case 'medium': return IssuePriority.medium;
+      case 'low': return IssuePriority.low;
+      default: return IssuePriority.medium;
+    }
   }
 }

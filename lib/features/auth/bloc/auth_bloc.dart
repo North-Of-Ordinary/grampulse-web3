@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import 'package:grampulse/features/auth/bloc/auth_event.dart';
 import 'package:grampulse/features/auth/bloc/auth_state.dart';
 import 'package:grampulse/features/auth/domain/services/auth_service.dart';
@@ -6,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService _authService;
+  final SupabaseService _supabase = SupabaseService();
 
   AuthBloc({AuthService? authService})
       : _authService = authService ?? AuthService(),
@@ -23,6 +26,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoading());
 
     try {
+      // Check Supabase auth first
+      final supabaseUser = _supabase.client.auth.currentUser;
+      
+      if (supabaseUser != null) {
+        // User is authenticated via Supabase
+        debugPrint('[AuthBloc] ✅ Supabase user found: ${supabaseUser.id}');
+        
+        final prefs = await SharedPreferences.getInstance();
+        final role = prefs.getString('user_role') ?? 'citizen';
+        final name = prefs.getString('user_name') ?? 'User';
+        
+        final user = User(
+          id: supabaseUser.id,
+          phoneNumber: supabaseUser.phone ?? '',
+          name: name,
+          role: role,
+          email: supabaseUser.email,
+        );
+        
+        emit(Authenticated(
+          user: user,
+          token: supabaseUser.id,
+          isProfileComplete: prefs.getBool('is_profile_complete') ?? false,
+        ));
+        return;
+      }
+      
+      // Fall back to local storage check
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
       final userId = prefs.getString('user_id');
@@ -54,6 +85,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const Unauthenticated());
       }
     } catch (e) {
+      debugPrint('[AuthBloc] ❌ Error checking auth: $e');
       emit(AuthError(message: 'Failed to check auth status: $e'));
     }
   }
@@ -65,32 +97,45 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoading());
 
     try {
-      // Simulate login - in real app, this would call API
+      debugPrint('[AuthBloc] Logging in with phone: ${event.phoneNumber}');
+      
       final prefs = await SharedPreferences.getInstance();
       
       // Use the pending role selected at entry, default to citizen if not set
       final pendingRole = prefs.getString('pending_user_role') ?? 'citizen';
       
-      await prefs.setString('auth_token', 'dummy_token');
-      await prefs.setString('user_id', '1');
+      // Get or create user in Supabase
+      final userData = await _supabase.getOrCreateUser(
+        event.phoneNumber,
+        name: 'User',
+      );
+      
+      final userId = userData['id'] as String;
+      final userName = userData['name'] as String? ?? 'User';
+      
+      await prefs.setString('auth_token', userId);
+      await prefs.setString('user_id', userId);
       await prefs.setString('phone_number', event.phoneNumber);
-      await prefs.setString('user_name', 'User');
+      await prefs.setString('user_name', userName);
       await prefs.setString('user_role', pendingRole);
       await prefs.setBool('is_profile_complete', false);
 
       final user = User(
-        id: '1',
+        id: userId,
         phoneNumber: event.phoneNumber,
-        name: 'User',
+        name: userName,
         role: pendingRole,
       );
 
+      debugPrint('[AuthBloc] ✅ Login successful: $userId');
+      
       emit(Authenticated(
         user: user,
-        token: 'dummy_token',
+        token: userId,
         isProfileComplete: false,
       ));
     } catch (e) {
+      debugPrint('[AuthBloc] ❌ Login failed: $e');
       emit(AuthError(message: 'Login failed: $e'));
     }
   }
@@ -100,6 +145,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
+      // Sign out from Supabase if authenticated
+      try {
+        await _supabase.client.auth.signOut();
+      } catch (_) {}
+      
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       emit(const Unauthenticated());

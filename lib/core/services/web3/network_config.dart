@@ -6,11 +6,14 @@ library;
 
 /// Supported blockchain networks for GramPulse
 enum Web3Network {
-  /// Optimism Mainnet - Production
+  /// Optimism Mainnet - Production (Canonical Trust Layer)
   optimismMainnet,
   
   /// Optimism Sepolia Testnet - Development/Testing
   optimismSepolia,
+  
+  /// Shardeum Sphinx Testnet - Scalable Event Layer (Optional)
+  shardeumSphinx,
   
   /// Local development network
   localhost,
@@ -60,6 +63,8 @@ class NetworkConfig {
         return _optimismMainnet;
       case Web3Network.optimismSepolia:
         return _optimismSepolia;
+      case Web3Network.shardeumSphinx:
+        return _shardeumSphinx;
       case Web3Network.localhost:
         return _localhost;
     }
@@ -89,6 +94,21 @@ class NetworkConfig {
     easSchemaRegistryAddress: '0x4200000000000000000000000000000000000020',
     isTestnet: true,
     currencySymbol: 'ETH',
+  );
+  
+  /// Shardeum Sphinx Testnet configuration
+  /// Role: High-throughput civic event layer (scalability)
+  /// NOTE: Shardeum is NOT for attestations - use Optimism for trust
+  static const NetworkConfig _shardeumSphinx = NetworkConfig(
+    name: 'Shardeum Sphinx',
+    chainId: 8082,
+    rpcUrl: 'https://atomium.shardeum.org',
+    explorerUrl: 'https://explorer-atomium.shardeum.org',
+    // Shardeum doesn't use EAS - these are placeholders
+    easContractAddress: '0x0000000000000000000000000000000000000000',
+    easSchemaRegistryAddress: '0x0000000000000000000000000000000000000000',
+    isTestnet: true,
+    currencySymbol: 'SHM',
   );
   
   /// Local development network configuration

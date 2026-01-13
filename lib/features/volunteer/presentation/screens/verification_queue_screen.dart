@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 enum Priority { high, medium, low }
 enum VerificationStatus { pending, inProgress, completed, cancelled }
@@ -29,6 +30,52 @@ class VerificationRequestItem {
     required this.citizenName,
     required this.status,
   });
+
+  factory VerificationRequestItem.fromSupabase(Map<String, dynamic> data) {
+    VerificationStatus mapStatus(String? status) {
+      switch (status) {
+        case 'new':
+        case 'submitted':
+          return VerificationStatus.pending;
+        case 'in_progress':
+        case 'verified':
+          return VerificationStatus.inProgress;
+        case 'resolved':
+        case 'closed':
+          return VerificationStatus.completed;
+        default:
+          return VerificationStatus.pending;
+      }
+    }
+
+    Priority mapPriority(int? severity) {
+      switch (severity) {
+        case 3:
+          return Priority.high;
+        case 2:
+          return Priority.medium;
+        default:
+          return Priority.low;
+      }
+    }
+
+    final categoryData = data['categories'] as Map<String, dynamic>?;
+    final reporterData = data['reporter'] as Map<String, dynamic>?;
+
+    return VerificationRequestItem(
+      id: data['id'] as String? ?? '',
+      title: data['title'] as String? ?? 'Untitled',
+      description: data['description'] as String? ?? '',
+      location: data['location_address'] as String? ?? data['address'] as String? ?? 'Unknown location',
+      priority: mapPriority(data['severity'] as int?),
+      category: categoryData?['name'] as String? ?? 'Other',
+      submittedAt: DateTime.tryParse(data['created_at'] as String? ?? '') ?? DateTime.now(),
+      estimatedTime: '30 min',
+      distance: '-- km',
+      citizenName: reporterData?['full_name'] as String? ?? 'Citizen',
+      status: mapStatus(data['status'] as String?),
+    );
+  }
 }
 
 class VerificationQueueScreen extends StatefulWidget {
@@ -42,78 +89,55 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
   late TabController _tabController;
   String _sortBy = 'priority';
   
-  final List<VerificationRequestItem> allRequests = [
-    VerificationRequestItem(
-      id: '1',
-      title: 'Road Repair Verification',
-      description: 'Pothole on Main Street needs verification before repair work begins',
-      location: 'Main Street, Sector 5',
-      priority: Priority.high,
-      category: 'Infrastructure',
-      submittedAt: DateTime.now().subtract(const Duration(minutes: 15)),
-      estimatedTime: '30 min',
-      distance: '0.8 km',
-      citizenName: 'Rajesh Kumar',
-      status: VerificationStatus.pending,
-    ),
-    VerificationRequestItem(
-      id: '2',
-      title: 'Water Supply Issue',
-      description: 'No water supply for 3 days in residential area',
-      location: 'Gandhi Nagar, Block A',
-      priority: Priority.medium,
-      category: 'Water Supply',
-      submittedAt: DateTime.now().subtract(const Duration(hours: 2)),
-      estimatedTime: '45 min',
-      distance: '1.2 km',
-      citizenName: 'Priya Sharma',
-      status: VerificationStatus.pending,
-    ),
-    VerificationRequestItem(
-      id: '3',
-      title: 'Street Light Malfunction',
-      description: 'Multiple street lights not working causing safety concerns',
-      location: 'Park Avenue, Sector 8',
-      priority: Priority.low,
-      category: 'Public Safety',
-      submittedAt: DateTime.now().subtract(const Duration(hours: 4)),
-      estimatedTime: '20 min',
-      distance: '2.1 km',
-      citizenName: 'Amit Patel',
-      status: VerificationStatus.inProgress,
-    ),
-    VerificationRequestItem(
-      id: '4',
-      title: 'Garbage Collection',
-      description: 'Garbage not collected for a week',
-      location: 'Sector 12, Near School',
-      priority: Priority.high,
-      category: 'Sanitation',
-      submittedAt: DateTime.now().subtract(const Duration(hours: 6)),
-      estimatedTime: '25 min',
-      distance: '0.5 km',
-      citizenName: 'Sunita Devi',
-      status: VerificationStatus.pending,
-    ),
-    VerificationRequestItem(
-      id: '5',
-      title: 'Drainage Blockage',
-      description: 'Storm drain blocked causing water logging',
-      location: 'Market Road',
-      priority: Priority.medium,
-      category: 'Drainage',
-      submittedAt: DateTime.now().subtract(const Duration(days: 1)),
-      estimatedTime: '40 min',
-      distance: '1.8 km',
-      citizenName: 'Mohan Lal',
-      status: VerificationStatus.completed,
-    ),
-  ];
+  final SupabaseService _supabase = SupabaseService();
+  List<VerificationRequestItem> allRequests = [];
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _loadRequests();
+  }
+
+  Future<void> _loadRequests() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      debugPrint('[VerificationQueueScreen] Loading incidents from Supabase...');
+      final incidents = await _supabase.getAllIncidents();
+      
+      setState(() {
+        allRequests = incidents.map((inc) => VerificationRequestItem.fromSupabase(inc)).toList();
+        _isLoading = false;
+      });
+      
+      debugPrint('[VerificationQueueScreen] ✅ Loaded ${allRequests.length} requests');
+    } catch (e) {
+      debugPrint('[VerificationQueueScreen] ❌ Error: $e');
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _updateStatus(String id, String newStatus) async {
+    try {
+      await _supabase.updateIncidentStatus(id, newStatus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to $newStatus')),
+      );
+      _loadRequests();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating status: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -145,7 +169,7 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => setState(() {}),
+            onPressed: _loadRequests,
           ),
         ],
         bottom: TabBar(
@@ -161,15 +185,30 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildRequestsList(_getFilteredRequests('all')),
-          _buildRequestsList(_getFilteredRequests('pending')),
-          _buildRequestsList(_getFilteredRequests('inProgress')),
-          _buildRequestsList(_getFilteredRequests('completed')),
-        ],
-      ),
+      body: _isLoading 
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, size: 64, color: Colors.red.shade400),
+                      const SizedBox(height: 16),
+                      Text('Error: $_error'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _loadRequests, child: const Text('Retry')),
+                    ],
+                  ),
+                )
+              : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildRequestsList(_getFilteredRequests('all')),
+                    _buildRequestsList(_getFilteredRequests('pending')),
+                    _buildRequestsList(_getFilteredRequests('inProgress')),
+                    _buildRequestsList(_getFilteredRequests('completed')),
+                  ],
+                ),
     );
   }
 
@@ -192,9 +231,6 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
       case 'priority':
         filtered.sort((a, b) => a.priority.index.compareTo(b.priority.index));
         break;
-      case 'distance':
-        filtered.sort((a, b) => double.parse(a.distance.split(' ')[0]).compareTo(double.parse(b.distance.split(' ')[0])));
-        break;
       case 'time':
         filtered.sort((a, b) => b.submittedAt.compareTo(a.submittedAt));
         break;
@@ -216,6 +252,8 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
                 Icon(Icons.inbox_outlined, size: 64, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                 const SizedBox(height: 16),
                 Text('No requests found', style: TextStyle(fontSize: 16, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+                const SizedBox(height: 8),
+                Text('Pull down to refresh', style: TextStyle(fontSize: 14, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500)),
               ],
             ),
           ),
@@ -223,12 +261,16 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: requests.length,
-      itemBuilder: (context, index) => _VerificationCard(
-        request: requests[index],
-        onVerify: () => _showVerificationDialog(requests[index]),
+    return RefreshIndicator(
+      onRefresh: _loadRequests,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: requests.length,
+        itemBuilder: (context, index) => _VerificationCard(
+          request: requests[index],
+          onVerify: () => _showVerificationDialog(requests[index]),
+          onUpdateStatus: _updateStatus,
+        ),
       ),
     );
   }
@@ -270,13 +312,27 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
                   Expanded(child: FilledButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Started verification: ${request.title}')));
+                      _updateStatus(request.id, 'in_progress');
                     },
                     icon: const Icon(Icons.play_arrow),
                     label: const Text('Start'),
                   )),
                 ],
               ),
+              const SizedBox(height: 12),
+              if (request.status == VerificationStatus.inProgress)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _updateStatus(request.id, 'verified');
+                    },
+                    icon: const Icon(Icons.check),
+                    label: const Text('Mark as Verified'),
+                    style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                  ),
+                ),
             ],
           ),
         ),
@@ -330,8 +386,9 @@ class _VerificationQueueScreenState extends State<VerificationQueueScreen> with 
 class _VerificationCard extends StatelessWidget {
   final VerificationRequestItem request;
   final VoidCallback onVerify;
+  final Function(String, String) onUpdateStatus;
 
-  const _VerificationCard({required this.request, required this.onVerify});
+  const _VerificationCard({required this.request, required this.onVerify, required this.onUpdateStatus});
 
   Color _getPriorityColor() {
     switch (request.priority) {

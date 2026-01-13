@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grampulse/core/config/app_config.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import 'package:grampulse/features/auth/bloc/auth_bloc.dart';
 import 'package:grampulse/features/auth/bloc/auth_event.dart' as auth_events;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -106,10 +107,18 @@ class _BypassButtonContent extends StatelessWidget {
       // Use the pending role selected on entry screen, fallback to passed testRole, then 'citizen'
       final selectedRole = prefs.getString('pending_user_role') ?? testRole;
       
+      // Create or get a real test user from Supabase with proper UUID
+      final supabase = SupabaseService();
+      const testPhone = '9999999999';
+      final userData = await supabase.getOrCreateUser(testPhone, name: 'Test User');
+      final realUserId = userData['id'] as String;
+      
+      debugPrint('[TestBypass] ✅ Got real user ID from Supabase: $realUserId');
+      
       await prefs.setString('auth_token', 'test_bypass_token_${DateTime.now().millisecondsSinceEpoch}');
-      await prefs.setString('user_id', 'test_user_001');
-      await prefs.setString('phone_number', '9999999999');
-      await prefs.setString('user_name', 'Test User');
+      await prefs.setString('user_id', realUserId);
+      await prefs.setString('phone_number', testPhone);
+      await prefs.setString('user_name', userData['name'] as String? ?? 'Test User');
       await prefs.setString('user_role', selectedRole);
       await prefs.setBool('is_profile_complete', true);
 

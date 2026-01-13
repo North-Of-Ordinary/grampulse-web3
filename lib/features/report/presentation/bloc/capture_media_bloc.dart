@@ -67,8 +67,10 @@ class CaptureMediaBloc extends Bloc<CaptureMediaEvent, CaptureMediaState> {
       String? locationError;
       
       try {
+        print('[CaptureMediaBloc] 📍 Fetching location on camera init...');
         position = await _getCurrentLocation();
         if (position != null) {
+          print('[CaptureMediaBloc] 📍 Reverse geocoding...');
           final placemarks = await placemarkFromCoordinates(
             position.latitude,
             position.longitude,
@@ -77,10 +79,12 @@ class CaptureMediaBloc extends Bloc<CaptureMediaEvent, CaptureMediaState> {
           if (placemarks.isNotEmpty) {
             final place = placemarks.first;
             address = _formatAddress(place);
+            print('[CaptureMediaBloc] ✅ Address: $address');
           }
         }
       } catch (e) {
-        locationError = 'Could not get location';
+        print('[CaptureMediaBloc] ❌ Location init error: $e');
+        locationError = e.toString().replaceAll('Exception: ', '');
       }
       
       // Emit ready state
@@ -285,10 +289,12 @@ class CaptureMediaBloc extends Bloc<CaptureMediaEvent, CaptureMediaState> {
       ));
       
       try {
+        print('[CaptureMediaBloc] 🔄 Refreshing location...');
         // Get current location
         final position = await _getCurrentLocation();
         if (position != null) {
           // Get address from coordinates
+          print('[CaptureMediaBloc] 📍 Reverse geocoding...');
           final placemarks = await placemarkFromCoordinates(
             position.latitude,
             position.longitude,
@@ -297,6 +303,7 @@ class CaptureMediaBloc extends Bloc<CaptureMediaEvent, CaptureMediaState> {
           if (placemarks.isNotEmpty) {
             final place = placemarks.first;
             final address = _formatAddress(place);
+            print('[CaptureMediaBloc] ✅ Got address: $address');
             
             // Update state with new location
             emit(currentState.copyWith(
@@ -314,8 +321,9 @@ class CaptureMediaBloc extends Bloc<CaptureMediaEvent, CaptureMediaState> {
           }
         }
       } catch (e) {
+        print('[CaptureMediaBloc] ❌ Refresh location error: $e');
         emit(currentState.copyWith(
-          locationError: 'Failed to get location'
+          locationError: e.toString().replaceAll('Exception: ', '')
         ));
       }
     }
@@ -362,27 +370,51 @@ class CaptureMediaBloc extends Bloc<CaptureMediaEvent, CaptureMediaState> {
 
   // Helper methods
   Future<Position?> _getCurrentLocation() async {
-    // Check if location service is enabled
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return null;
-    }
-
-    // Check location permissions
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
+    try {
+      // Check if location service is enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print('[CaptureMediaBloc] ❌ Location services disabled');
+        // Try to open location settings
+        await Geolocator.openLocationSettings();
+        // Re-check after user returns
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          throw Exception('Location services are disabled. Please enable GPS.');
+        }
       }
-    }
-    
-    if (permission == LocationPermission.deniedForever) {
-      return null;
-    }
 
-    // Get current position
-    return await Geolocator.getCurrentPosition();
+      // Check location permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      print('[CaptureMediaBloc] 📍 Current permission: $permission');
+      
+      if (permission == LocationPermission.denied) {
+        print('[CaptureMediaBloc] 📍 Requesting location permission...');
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permission denied. Please allow location access.');
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        print('[CaptureMediaBloc] ❌ Location permission permanently denied');
+        // Open app settings so user can manually enable
+        await Geolocator.openAppSettings();
+        throw Exception('Location permission permanently denied. Please enable in Settings.');
+      }
+
+      print('[CaptureMediaBloc] 📍 Getting current position...');
+      // Get current position with timeout
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 15),
+      );
+      print('[CaptureMediaBloc] ✅ Got position: ${position.latitude}, ${position.longitude}');
+      return position;
+    } catch (e) {
+      print('[CaptureMediaBloc] ❌ Location error: $e');
+      rethrow;
+    }
   }
 
   String _formatAddress(Placemark place) {

@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import 'package:grampulse/features/report/domain/models/updated_report_models.dart';
 import 'package:grampulse/features/report/presentation/bloc/report_details_event.dart';
 import 'package:grampulse/features/report/presentation/bloc/report_details_state.dart';
 
 class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   final IssueModel? initialIssue;
+  final SupabaseService _supabase = SupabaseService();
   
   ReportDetailsBloc({this.initialIssue}) : super(const DetailsInitial()) {
     on<LoadReportDetails>(_onLoadReportDetails);
@@ -253,34 +256,74 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     }
   }
 
-  // Mock data methods (in a real app, these would be repository calls)
+  // Repository methods using Supabase
   Future<IssueModel?> _fetchReportDetails(String reportId) async {
-    // This would be a repository call in a real app
-    return initialIssue;
+    try {
+      debugPrint('[ReportDetailsBloc] Fetching report $reportId from Supabase...');
+      final incidents = await _supabase.getAllIncidents();
+      final incident = incidents.firstWhere(
+        (inc) => inc['id'] == reportId,
+        orElse: () => <String, dynamic>{},
+      );
+      
+      if (incident.isEmpty) return initialIssue;
+      
+      return IssueModel(
+        id: incident['id'] as String? ?? '',
+        title: incident['title'] as String? ?? '',
+        description: incident['description'] as String? ?? '',
+        category: (incident['categories'] as Map<String, dynamic>?)?['name'] as String? ?? 'Other',
+        status: incident['status'] as String? ?? 'submitted',
+        createdAt: DateTime.tryParse(incident['created_at'] as String? ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(incident['updated_at'] as String? ?? ''),
+        location: incident['location_address'] as String?,
+        latitude: (incident['location_lat'] as num?)?.toDouble(),
+        longitude: (incident['location_lng'] as num?)?.toDouble(),
+        mediaUrls: [],
+        severity: incident['priority'] == 'high' ? 3 : (incident['priority'] == 'medium' ? 2 : 1),
+      );
+    } catch (e) {
+      debugPrint('[ReportDetailsBloc] ❌ Error fetching: $e');
+      return initialIssue;
+    }
   }
 
   Future<IssueModel?> _refreshReportDetails(String reportId) async {
-    // This would be a repository call in a real app
-    return initialIssue;
+    return _fetchReportDetails(reportId);
   }
 
   Future<bool> _confirmResolution(String reportId, int rating, String feedback) async {
-    // This would be a repository call in a real app
-    return true;
+    try {
+      await _supabase.updateIncidentStatus(reportId, 'resolved', notes: feedback);
+      return true;
+    } catch (e) {
+      debugPrint('[ReportDetailsBloc] ❌ Error confirming: $e');
+      return false;
+    }
   }
 
   Future<bool> _reopenIssue(String reportId, String reason) async {
-    // This would be a repository call in a real app
-    return true;
+    try {
+      await _supabase.updateIncidentStatus(reportId, 'in_progress', notes: reason);
+      return true;
+    } catch (e) {
+      debugPrint('[ReportDetailsBloc] ❌ Error reopening: $e');
+      return false;
+    }
   }
 
   Future<bool> _requestUpdate(String reportId, String message) async {
-    // This would be a repository call in a real app
+    // Add an update request to the incident
     return true;
   }
 
   Future<bool> _cancelReport(String reportId, String reason) async {
-    // This would be a repository call in a real app
-    return true;
+    try {
+      await _supabase.updateIncidentStatus(reportId, 'rejected', notes: reason);
+      return true;
+    } catch (e) {
+      debugPrint('[ReportDetailsBloc] ❌ Error cancelling: $e');
+      return false;
+    }
   }
 }

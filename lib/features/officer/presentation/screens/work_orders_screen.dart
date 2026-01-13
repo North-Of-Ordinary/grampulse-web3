@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/officer_dashboard_bloc.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 class WorkOrdersScreen extends StatefulWidget {
   const WorkOrdersScreen({super.key});
@@ -13,19 +12,107 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> with SingleTickerPr
   late TabController _tabController;
   String _selectedFilter = 'All';
   String _sortBy = 'Date';
-
-  final List<_WorkOrder> _workOrders = [
-    _WorkOrder(id: 'WO001', title: 'Road Repair - Main Street', description: 'Potholes near market area causing traffic issues', category: 'Infrastructure', priority: 'High', status: 'In Progress', location: 'Main Street, Sector 3', assignedTo: 'Contractor A', createdAt: DateTime.now().subtract(const Duration(days: 2)), deadline: DateTime.now().add(const Duration(days: 5))),
-    _WorkOrder(id: 'WO002', title: 'Street Light Installation', description: 'Install 10 new LED street lights in residential area', category: 'Electrical', priority: 'Medium', status: 'Pending', location: 'Block B, Housing Colony', assignedTo: null, createdAt: DateTime.now().subtract(const Duration(days: 1)), deadline: DateTime.now().add(const Duration(days: 7))),
-    _WorkOrder(id: 'WO003', title: 'Water Pipeline Leak', description: 'Major water leak causing water shortage in Ward 5', category: 'Water Supply', priority: 'High', status: 'In Progress', location: 'Ward 5, Near School', assignedTo: 'Water Dept', createdAt: DateTime.now().subtract(const Duration(hours: 12)), deadline: DateTime.now().add(const Duration(days: 1))),
-    _WorkOrder(id: 'WO004', title: 'Drainage Cleaning', description: 'Blocked drainage causing waterlogging during rains', category: 'Sanitation', priority: 'Medium', status: 'Pending', location: 'Market Area', assignedTo: null, createdAt: DateTime.now().subtract(const Duration(days: 3)), deadline: DateTime.now().add(const Duration(days: 10))),
-    _WorkOrder(id: 'WO005', title: 'Park Maintenance', description: 'Routine maintenance of community park', category: 'Public Spaces', priority: 'Low', status: 'Completed', location: 'Central Park', assignedTo: 'Garden Dept', createdAt: DateTime.now().subtract(const Duration(days: 7)), deadline: DateTime.now().subtract(const Duration(days: 1))),
-  ];
+  final SupabaseService _supabase = SupabaseService();
+  List<_WorkOrder> _workOrders = [];
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _loadWorkOrders();
+  }
+
+  Future<void> _loadWorkOrders() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final incidents = await _supabase.getAllIncidents();
+      
+      final orders = incidents.map((inc) {
+        final status = inc['status'] as String? ?? 'new';
+        String mappedStatus;
+        switch (status) {
+          case 'resolved':
+          case 'closed':
+            mappedStatus = 'Completed';
+            break;
+          case 'in_progress':
+          case 'verified':
+            mappedStatus = 'In Progress';
+            break;
+          default:
+            mappedStatus = 'Pending';
+        }
+        
+        final severity = inc['severity'] as int? ?? 1;
+        String priority;
+        switch (severity) {
+          case 3:
+            priority = 'High';
+            break;
+          case 2:
+            priority = 'Medium';
+            break;
+          default:
+            priority = 'Low';
+        }
+        
+        return _WorkOrder(
+          id: 'WO-${(inc['id'] as String? ?? '').substring(0, 8).toUpperCase()}',
+          incidentId: inc['id'] as String? ?? '',
+          title: inc['title'] as String? ?? 'Untitled',
+          description: inc['description'] as String? ?? '',
+          category: inc['category_name'] as String? ?? 'General',
+          priority: priority,
+          status: mappedStatus,
+          location: inc['location_address'] as String? ?? inc['location'] as String? ?? 'Unknown',
+          assignedTo: inc['assigned_officer_id'] as String?,
+          createdAt: DateTime.tryParse(inc['created_at'] as String? ?? '') ?? DateTime.now(),
+          deadline: DateTime.tryParse(inc['deadline'] as String? ?? '') ?? DateTime.now().add(const Duration(days: 7)),
+        );
+      }).toList();
+      
+      setState(() {
+        _workOrders = orders;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _updateOrderStatus(_WorkOrder order, String newStatus) async {
+    try {
+      String supabaseStatus;
+      switch (newStatus) {
+        case 'Completed':
+          supabaseStatus = 'resolved';
+          break;
+        case 'In Progress':
+          supabaseStatus = 'in_progress';
+          break;
+        default:
+          supabaseStatus = 'submitted';
+      }
+      
+      await _supabase.updateIncidentStatus(order.incidentId, supabaseStatus);
+      await _loadWorkOrders();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Status updated to $newStatus')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 
   @override
@@ -99,15 +186,31 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> with SingleTickerPr
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildOrderList(_getFilteredOrders('All')),
-          _buildOrderList(_getFilteredOrders('Pending')),
-          _buildOrderList(_getFilteredOrders('In Progress')),
-          _buildOrderList(_getFilteredOrders('Completed')),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: $_error', style: const TextStyle(color: Colors.red)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _loadWorkOrders, child: const Text('Retry')),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadWorkOrders,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildOrderList(_getFilteredOrders('All')),
+                      _buildOrderList(_getFilteredOrders('Pending')),
+                      _buildOrderList(_getFilteredOrders('In Progress')),
+                      _buildOrderList(_getFilteredOrders('Completed')),
+                    ],
+                  ),
+                ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateWorkOrderDialog(),
         icon: const Icon(Icons.add),
@@ -293,9 +396,11 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> with SingleTickerPr
             FilledButton(
               onPressed: () {
                 if (titleController.text.isNotEmpty) {
+                  final newId = 'WO-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
                   setState(() {
                     _workOrders.insert(0, _WorkOrder(
-                      id: 'WO00${_workOrders.length + 1}',
+                      id: newId,
+                      incidentId: '', // Local-only work order
                       title: titleController.text,
                       description: descController.text,
                       category: selectedCategory,
@@ -322,6 +427,7 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> with SingleTickerPr
 
 class _WorkOrder {
   final String id;
+  final String incidentId;
   final String title;
   final String description;
   final String category;
@@ -332,7 +438,7 @@ class _WorkOrder {
   final DateTime createdAt;
   final DateTime deadline;
 
-  _WorkOrder({required this.id, required this.title, required this.description, required this.category, required this.priority, required this.status, required this.location, this.assignedTo, required this.createdAt, required this.deadline});
+  _WorkOrder({required this.id, required this.incidentId, required this.title, required this.description, required this.category, required this.priority, required this.status, required this.location, this.assignedTo, required this.createdAt, required this.deadline});
 }
 
 class _WorkOrderCard extends StatelessWidget {

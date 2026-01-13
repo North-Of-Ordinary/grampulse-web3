@@ -92,7 +92,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
     }
   }
 
-  Future<void> _submitReport() async {
+  Future<void> _submitReport(BuildContext blocContext) async {
     if (!_formKey.currentState!.validate()) return;
     
     if (_selectedCategoryId == null) {
@@ -115,7 +115,12 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
       return;
     }
 
-    context.read<IncidentBloc>().add(
+    debugPrint('[ReportIssueScreen] 📤 Submitting report...');
+    debugPrint('[ReportIssueScreen] Title: ${_titleController.text.trim()}');
+    debugPrint('[ReportIssueScreen] Category: $_selectedCategoryId');
+    debugPrint('[ReportIssueScreen] Location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
+
+    blocContext.read<IncidentBloc>().add(
       CreateIncident(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
@@ -142,17 +147,12 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
         body: BlocConsumer<IncidentBloc, IncidentState>(
           listener: (context, state) {
             if (state is IncidentCreated) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('✅ Issue reported successfully!'),
-                  backgroundColor: Colors.green,
-                ),
+              // Show success dialog with blockchain info
+              _showSuccessDialog(
+                context,
+                state.blockchainTxHash,
+                state.blockNumber,
               );
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/citizen/home');
-              }
             } else if (state is IncidentError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -380,7 +380,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: isCreating ? null : _submitReport,
+                        onPressed: isCreating ? null : () => _submitReport(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue.shade600,
                           foregroundColor: Colors.white,
@@ -413,6 +413,154 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context, String? txHash, int? blockNumber) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.check, color: Colors.green.shade700, size: 28),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Report Submitted!',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Your grievance has been recorded successfully.',
+              style: TextStyle(fontSize: 15),
+            ),
+            if (blockNumber != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.link, color: Colors.blue.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Blockchain Verified',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Text('Block: ', style: TextStyle(fontWeight: FontWeight.w500)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '#$blockNumber',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green.shade800,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (txHash != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'TX: ${txHash.substring(0, 10)}...${txHash.substring(txHash.length - 8)}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ] else ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange.shade700, size: 18),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Blockchain logging unavailable. Report saved locally.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/citizen/home');
+              }
+            },
+            child: const Text('Done'),
+          ),
+          if (txHash != null)
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                // Navigate to transaction details
+                context.push('/shardeum/transactions');
+              },
+              icon: const Icon(Icons.receipt_long, size: 18),
+              label: const Text('View on Chain'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.shade600,
+                foregroundColor: Colors.white,
+              ),
+            ),
+        ],
       ),
     );
   }

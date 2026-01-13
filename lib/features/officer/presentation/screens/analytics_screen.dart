@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 class OfficerAnalyticsScreen extends StatefulWidget {
   const OfficerAnalyticsScreen({super.key});
@@ -10,11 +11,75 @@ class OfficerAnalyticsScreen extends StatefulWidget {
 class _OfficerAnalyticsScreenState extends State<OfficerAnalyticsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _selectedPeriod = 'This Month';
+  final SupabaseService _supabase = SupabaseService();
+  
+  bool _isLoading = true;
+  String? _error;
+  
+  // Analytics data
+  int _totalIssues = 0;
+  int _resolvedIssues = 0;
+  int _inProgressIssues = 0;
+  int _pendingIssues = 0;
+  List<Map<String, dynamic>> _weeklyData = [];
+  Map<String, int> _categoryData = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadAnalytics();
+  }
+
+  Future<void> _loadAnalytics() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final incidents = await _supabase.getAllIncidents();
+      final stats = await _supabase.getIncidentStatistics();
+      
+      // Calculate totals
+      _totalIssues = incidents.length;
+      _resolvedIssues = incidents.where((i) => i['status'] == 'resolved' || i['status'] == 'closed').length;
+      _inProgressIssues = incidents.where((i) => i['status'] == 'in_progress' || i['status'] == 'verified').length;
+      _pendingIssues = incidents.where((i) => i['status'] == 'new' || i['status'] == 'submitted').length;
+      
+      // Calculate weekly data
+      final now = DateTime.now();
+      final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      final weekCounts = <int>[0, 0, 0, 0, 0, 0, 0];
+      
+      for (final incident in incidents) {
+        try {
+          final createdAt = DateTime.parse(incident['created_at'] ?? '');
+          if (now.difference(createdAt).inDays < 7) {
+            final dayIndex = (createdAt.weekday - 1) % 7;
+            weekCounts[dayIndex]++;
+          }
+        } catch (_) {}
+      }
+      
+      _weeklyData = List.generate(7, (i) => {'day': weekDays[i], 'count': weekCounts[i]});
+      
+      // Calculate category breakdown
+      _categoryData = {};
+      for (final incident in incidents) {
+        final category = incident['category_name'] as String? ?? 'Other';
+        _categoryData[category] = (_categoryData[category] ?? 0) + 1;
+      }
+      
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -55,14 +120,26 @@ class _OfficerAnalyticsScreenState extends State<OfficerAnalyticsScreen> with Si
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildOverviewTab(),
-          _buildCategoriesTab(),
-          _buildPerformanceTab(),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: $_error', style: const TextStyle(color: Colors.red)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _loadAnalytics, child: const Text('Retry')),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadAnalytics,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [_buildOverviewTab(), _buildCategoriesTab(), _buildPerformanceTab()],
+                  ),
+                ),
     );
   }
 
@@ -92,10 +169,10 @@ class _OfficerAnalyticsScreenState extends State<OfficerAnalyticsScreen> with Si
             mainAxisSpacing: 12,
             childAspectRatio: 1.4,
             children: [
-              _MetricCard(title: 'Total Issues', value: '156', change: '+12%', isPositive: false, icon: Icons.assignment),
-              _MetricCard(title: 'Resolved', value: '128', change: '+18%', isPositive: true, icon: Icons.check_circle),
-              _MetricCard(title: 'Avg Resolution', value: '3.2 days', change: '-15%', isPositive: true, icon: Icons.timer),
-              _MetricCard(title: 'Satisfaction', value: '87%', change: '+5%', isPositive: true, icon: Icons.thumb_up),
+              _MetricCard(title: 'Total Issues', value: '$_totalIssues', change: '', isPositive: false, icon: Icons.assignment),
+              _MetricCard(title: 'Resolved', value: '$_resolvedIssues', change: _totalIssues > 0 ? '${((_resolvedIssues / _totalIssues) * 100).toInt()}%' : '0%', isPositive: true, icon: Icons.check_circle),
+              _MetricCard(title: 'In Progress', value: '$_inProgressIssues', change: 'Active', isPositive: true, icon: Icons.autorenew),
+              _MetricCard(title: 'Pending', value: '$_pendingIssues', change: 'New', isPositive: false, icon: Icons.pending_actions),
             ],
           ),
           const SizedBox(height: 24),
@@ -117,15 +194,11 @@ class _OfficerAnalyticsScreenState extends State<OfficerAnalyticsScreen> with Si
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _BarChartItem(height: 0.6, label: 'Mon', value: '18'),
-                      _BarChartItem(height: 0.8, label: 'Tue', value: '24'),
-                      _BarChartItem(height: 0.5, label: 'Wed', value: '15'),
-                      _BarChartItem(height: 0.9, label: 'Thu', value: '27'),
-                      _BarChartItem(height: 0.7, label: 'Fri', value: '21'),
-                      _BarChartItem(height: 0.4, label: 'Sat', value: '12'),
-                      _BarChartItem(height: 0.3, label: 'Sun', value: '9'),
-                    ],
+                    children: _weeklyData.map((data) {
+                      final maxCount = _weeklyData.map((d) => d['count'] as int).fold(1, (a, b) => a > b ? a : b);
+                      final height = maxCount > 0 ? (data['count'] as int) / maxCount : 0.0;
+                      return _BarChartItem(height: height.toDouble(), label: data['day'] as String, value: '${data['count']}');
+                    }).toList(),
                   ),
                 ),
               ],
@@ -145,11 +218,11 @@ class _OfficerAnalyticsScreenState extends State<OfficerAnalyticsScreen> with Si
             ),
             child: Column(
               children: [
-                _StatusDistributionRow(label: 'Resolved', value: 128, total: 156, color: Colors.green),
+                _StatusDistributionRow(label: 'Resolved', value: _resolvedIssues, total: _totalIssues > 0 ? _totalIssues : 1, color: Colors.green),
                 const SizedBox(height: 12),
-                _StatusDistributionRow(label: 'In Progress', value: 18, total: 156, color: Colors.grey),
+                _StatusDistributionRow(label: 'In Progress', value: _inProgressIssues, total: _totalIssues > 0 ? _totalIssues : 1, color: Colors.grey),
                 const SizedBox(height: 12),
-                _StatusDistributionRow(label: 'Pending', value: 10, total: 156, color: Colors.orange),
+                _StatusDistributionRow(label: 'Pending', value: _pendingIssues, total: _totalIssues > 0 ? _totalIssues : 1, color: Colors.orange),
               ],
             ),
           ),
@@ -160,14 +233,23 @@ class _OfficerAnalyticsScreenState extends State<OfficerAnalyticsScreen> with Si
 
   Widget _buildCategoriesTab() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final categories = [
-      _CategoryData(name: 'Infrastructure', count: 45, percentage: 29, trend: '+8%', color: Colors.blue),
-      _CategoryData(name: 'Water Supply', count: 38, percentage: 24, trend: '+12%', color: Colors.cyan),
-      _CategoryData(name: 'Sanitation', count: 28, percentage: 18, trend: '-5%', color: Colors.green),
-      _CategoryData(name: 'Electrical', count: 22, percentage: 14, trend: '+3%', color: Colors.orange),
-      _CategoryData(name: 'Public Spaces', count: 15, percentage: 10, trend: '0%', color: Colors.purple),
-      _CategoryData(name: 'Others', count: 8, percentage: 5, trend: '-2%', color: Colors.grey),
-    ];
+    final colors = [Colors.blue, Colors.cyan, Colors.green, Colors.orange, Colors.purple, Colors.grey];
+    final total = _categoryData.values.fold(0, (a, b) => a + b);
+    
+    final categories = _categoryData.entries.map((entry) {
+      final colorIndex = _categoryData.keys.toList().indexOf(entry.key) % colors.length;
+      final percentage = total > 0 ? ((entry.value / total) * 100).toInt() : 0;
+      return _CategoryData(
+        name: entry.key,
+        count: entry.value,
+        percentage: percentage,
+        trend: '',
+        color: colors[colorIndex],
+      );
+    }).toList();
+    
+    // Sort by count descending
+    categories.sort((a, b) => b.count.compareTo(a.count));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),

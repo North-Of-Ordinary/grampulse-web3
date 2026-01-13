@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import 'package:grampulse/features/map/domain/models/category_model.dart';
 import 'package:grampulse/features/map/domain/models/issue_model.dart';
 import 'package:grampulse/features/map/presentation/bloc/nearby_map_event.dart';
@@ -9,6 +11,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter/material.dart';
 
 class NearbyMapBloc extends Bloc<NearbyMapEvent, NearbyMapState> {
+  final SupabaseService _supabase = SupabaseService();
+  
   NearbyMapBloc() : super(MapInitial()) {
     on<LoadMap>(_onLoadMap);
     on<FilterByCategory>(_onFilterByCategory);
@@ -35,14 +39,17 @@ class NearbyMapBloc extends Bloc<NearbyMapEvent, NearbyMapState> {
         userLocation = LatLng(position.latitude, position.longitude);
       }
       
-      // Fetch issues from repository (mocked for now)
-      final issues = await _fetchMockIssues(userLocation);
+      // Fetch issues from Supabase
+      debugPrint('[NearbyMapBloc] Loading issues from Supabase...');
+      final issues = await _fetchIssuesFromSupabase();
+      debugPrint('[NearbyMapBloc] ✅ Loaded ${issues.length} issues');
       
       emit(MapLoaded(
         issues: issues,
         userLocation: userLocation,
       ));
     } catch (e) {
+      debugPrint('[NearbyMapBloc] ❌ Error: $e');
       emit(MapError(e.toString()));
     }
   }
@@ -150,106 +157,60 @@ class NearbyMapBloc extends Bloc<NearbyMapEvent, NearbyMapState> {
     return await Geolocator.getCurrentPosition();
   }
 
-  // Mock data for development
-  Future<List<IssueModel>> _fetchMockIssues(LatLng userLocation) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 800));
+  /// Fetch real issues from Supabase
+  Future<List<IssueModel>> _fetchIssuesFromSupabase() async {
+    final incidentsData = await _supabase.getAllIncidents();
+    final categoriesData = await _supabase.getCategories();
     
-    // Generate mock categories
-    final categories = _getMockCategories();
-    
-    // Generate mock issues around the user location
-    final issues = <IssueModel>[];
-    
-    // Create 15 mock issues with varying distances from user location
-    for (int i = 0; i < 15; i++) {
-      // Randomize location a bit around the user
-      final latOffset = (i % 5 - 2) * 0.002;
-      final lngOffset = (i ~/ 3 - 1) * 0.003;
-      
-      // Alternate between categories
-      final category = categories[i % categories.length];
-      
-      // Alternate between statuses
-      final statuses = ['new', 'in_progress', 'resolved', 'rejected'];
-      final status = statuses[i % statuses.length];
-      
-      // Create the issue
-      issues.add(IssueModel(
-        id: 'issue_$i',
-        title: 'Issue ${i + 1}: ${category.name} Problem',
-        description: 'This is a mock ${category.name} issue for testing the map view.',
-        category: category,
-        status: status,
-        createdAt: DateTime.now().subtract(Duration(days: i, hours: i * 2)),
-        latitude: userLocation.latitude + latOffset,
-        longitude: userLocation.longitude + lngOffset,
-        address: 'Mock Address ${i + 1}, Test City',
-        media: i % 3 == 0 ? _getMockMedia() : [],
-        severity: 1 + (i % 3),
-        reporterId: 'user_${100 + i}',
-      ));
+    // Build category map for quick lookup
+    final categoryMap = <String, CategoryModel>{};
+    for (final cat in categoriesData) {
+      final catId = cat['id'] as String;
+      categoryMap[catId] = CategoryModel(
+        id: catId,
+        name: cat['name'] as String? ?? 'Other',
+        iconCode: cat['icon'] as String? ?? '0xe8b6',
+        color: _getCategoryColor(cat['name'] as String? ?? 'Other'),
+      );
     }
     
-    return issues;
-  }
-
-  List<CategoryModel> _getMockCategories() {
-    return [
-      CategoryModel(
-        id: 'roads',
-        name: 'Roads',
-        iconCode: '0xe3e7', // directions_car
-        color: Colors.brown,
-      ),
-      CategoryModel(
-        id: 'water',
-        name: 'Water',
-        iconCode: '0xe798', // water_drop
-        color: Colors.blue,
-      ),
-      CategoryModel(
-        id: 'power',
-        name: 'Power',
-        iconCode: '0xe63c', // power
-        color: Colors.amber,
-      ),
-      CategoryModel(
-        id: 'sanitation',
-        name: 'Sanitation',
-        iconCode: '0xe308', // cleaning_services
-        color: Colors.green,
-      ),
-      CategoryModel(
-        id: 'safety',
-        name: 'Safety',
-        iconCode: '0xe3ae', // health_and_safety
-        color: Colors.red,
-      ),
-      CategoryModel(
-        id: 'others',
-        name: 'Others',
-        iconCode: '0xe8b6', // more_horiz
+    return incidentsData.map((data) {
+      final categoryId = data['category_id'] as String? ?? '';
+      final category = categoryMap[categoryId] ?? CategoryModel(
+        id: 'other',
+        name: 'Other',
+        iconCode: '0xe8b6',
         color: Colors.purple,
-      ),
-    ];
+      );
+      
+      return IssueModel(
+        id: data['id'] as String? ?? '',
+        title: data['title'] as String? ?? '',
+        description: data['description'] as String? ?? '',
+        category: category,
+        status: data['status'] as String? ?? 'submitted',
+        createdAt: DateTime.tryParse(data['created_at'] as String? ?? '') ?? DateTime.now(),
+        latitude: (data['location_lat'] as num?)?.toDouble() ?? 0.0,
+        longitude: (data['location_lng'] as num?)?.toDouble() ?? 0.0,
+        address: data['location_address'] as String? ?? '',
+        media: [],
+        severity: data['priority'] == 'high' ? 3 : (data['priority'] == 'medium' ? 2 : 1),
+        reporterId: data['user_id'] as String? ?? '',
+      );
+    }).toList();
   }
-
-  List<MediaModel> _getMockMedia() {
-    // In a real app, these would be actual image URLs or paths
-    return [
-      MediaModel(
-        id: 'media_1',
-        url: 'https://via.placeholder.com/800x600.png',
-        thumbnailUrl: 'https://via.placeholder.com/150x150.png',
-        type: MediaType.image,
-      ),
-      MediaModel(
-        id: 'media_2',
-        url: 'https://via.placeholder.com/800x600.png?text=Issue+Photo+2',
-        thumbnailUrl: 'https://via.placeholder.com/150x150.png?text=Thumb+2',
-        type: MediaType.image,
-      ),
-    ];
+  
+  Color _getCategoryColor(String categoryName) {
+    switch (categoryName.toLowerCase()) {
+      case 'roads': return Colors.brown;
+      case 'water supply': return Colors.blue;
+      case 'electricity': return Colors.amber;
+      case 'sanitation': return Colors.green;
+      case 'public safety': return Colors.red;
+      case 'health': return Colors.pink;
+      case 'education': return Colors.indigo;
+      case 'agriculture': return Colors.lightGreen;
+      default: return Colors.purple;
+    }
   }
 }

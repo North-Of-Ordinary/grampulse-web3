@@ -901,3 +901,57 @@ INFO: Unsupported notification method: $/setTrace
 2026.01.12 09:50:59 INFO  Current version of schema "PUBLIC": 1
 2026.01.12 09:50:59 INFO  Schema "PUBLIC" is up to date. No migration necessary.
 2026.01.12 09:51:01 INFO  time: indexed workspace in 23s
+2026.01.12 20:47:57 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.108.0.
+2026.01.12 20:48:03 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2026.01.12 20:48:03 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2026.01.12 20:48:03 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.12 20:48:03 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.12 20:48:03 INFO  Successfully validated 7 migrations (execution time 00:00.043s)
+2026.01.12 20:48:03 INFO  Successfully validated 7 migrations (execution time 00:00.043s)
+2026.01.12 20:48:03 INFO  Current version of schema "PUBLIC": 7
+2026.01.12 20:48:03 INFO  Current version of schema "PUBLIC": 7
+2026.01.12 20:48:03 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.12 20:48:03 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.12 20:48:03 INFO  Attempting to connect to the build server...
+2026.01.12 20:48:03 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2026.01.12 20:48:03 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2026.01.12 20:48:06 INFO  BSP server: Starting compilation server
+2026.01.12 20:48:11 INFO  time: Connected to build server in 7.35s
+2026.01.12 20:48:11 INFO  Connected to Build server: scala-cli v1.10.1
+2026.01.12 20:48:11 INFO  time: Imported build in 0.25s
+2026.01.12 20:48:18 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2026.01.12 20:48:18 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.12 20:48:18 INFO  Successfully validated 1 migration (execution time 00:00.003s)
+2026.01.12 20:48:18 INFO  Current version of schema "PUBLIC": 1
+2026.01.12 20:48:18 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.12 20:48:18 INFO  time: indexed workspace in 7.92s
+2026.01.13 00:29:45 INFO  Started: Metals version 1.6.4 in folders 'D:\Class\Amrita_Class\codes4\s6, D:\Class\Amrita_Class\codes4\grampulse\grampulse2' for client Visual Studio Code 1.108.0.
+2026.01.13 00:29:52 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\s6\.metals\metals (H2 2.4)
+2026.01.13 00:29:52 INFO  Database: jdbc:h2:file:D:\Class\Amrita_Class\codes4\grampulse\grampulse2\.metals\metals (H2 2.4)
+2026.01.13 00:29:52 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.13 00:29:52 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.13 00:29:52 INFO  Successfully validated 7 migrations (execution time 00:00.030s)
+2026.01.13 00:29:52 INFO  Successfully validated 7 migrations (execution time 00:00.030s)
+2026.01.13 00:29:52 INFO  Current version of schema "PUBLIC": 7
+2026.01.13 00:29:52 INFO  Current version of schema "PUBLIC": 7
+2026.01.13 00:29:52 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.13 00:29:52 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.13 00:29:52 INFO  Attempting to connect to the build server...
+2026.01.13 00:29:52 INFO  Running BSP server List(C:\Program Files\scala-cli-x86_64-pc-win32\scala-cli.exe, bsp, --json-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-options-v2.json, --json-launcher-options, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-launcher-options.json, --envs-file, d:\Class\Amrita_Class\codes4\s6\.scala-build\ide-envs.json, d:\Class\Amrita_Class\codes4\s6\bigdata2.scala)
+2026.01.13 00:29:52 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\Class\Amrita_Class\codes4\s6\.metals\bsp.trace.json or C:\Users\NAVEEN\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2026.01.13 00:29:55 INFO  BSP server: Starting compilation server
+2026.01.13 00:30:00 INFO  time: Connected to build server in 7.38s
+2026.01.13 00:30:00 INFO  Connected to Build server: scala-cli v1.10.1
+2026.01.13 00:30:00 INFO  time: Imported build in 0.21s
+2026.01.13 00:30:07 INFO  Database: jdbc:h2:file:C:\Users\NAVEEN\AppData\Roaming\metals\data\metals (H2 2.4)
+2026.01.13 00:30:07 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.13 00:30:07 INFO  Successfully validated 1 migration (execution time 00:00.003s)
+2026.01.13 00:30:07 INFO  Current version of schema "PUBLIC": 1
+2026.01.13 00:30:07 INFO  Schema "PUBLIC" is up to date. No migration necessary.
+2026.01.13 00:30:07 INFO  time: indexed workspace in 7.42s
+Jan 13, 2026 1:24:35 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Jan 13, 2026 1:24:43 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Jan 13, 2026 1:24:53 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace

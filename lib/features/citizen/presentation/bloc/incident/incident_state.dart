@@ -56,9 +56,15 @@ class IncidentCreating extends IncidentState {}
 
 class IncidentCreated extends IncidentState {
   final Incident incident;
+  final String? blockchainTxHash;
+  final int? blockNumber;
 
-  const IncidentCreated(this.incident);
+  const IncidentCreated(
+    this.incident, {
+    this.blockchainTxHash,
+    this.blockNumber,
+  });
 
   @override
-  List<Object?> get props => [incident];
+  List<Object?> get props => [incident, blockchainTxHash, blockNumber];
 }

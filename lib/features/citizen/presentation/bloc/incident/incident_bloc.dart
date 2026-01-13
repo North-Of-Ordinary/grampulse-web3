@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grampulse/features/citizen/domain/repositories/incident_repository.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/incident/incident_event.dart';
 import 'package:grampulse/features/citizen/presentation/bloc/incident/incident_state.dart';
+import 'package:grampulse/shardeum/shardeum_transaction_service.dart';
+import 'package:flutter/foundation.dart';
 
 class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
   final IncidentRepository _repository;
@@ -125,7 +127,52 @@ class IncidentBloc extends Bloc<IncidentEvent, IncidentState> {
         isAnonymous: event.isAnonymous,
       );
 
-      emit(IncidentCreated(incident));
+      // Log to Shardeum blockchain for transparency
+      String? txHash;
+      int? blockNumber;
+      
+      try {
+        final shardeumService = ShardeumTransactionService();
+        final initialized = await shardeumService.initialize();
+        
+        if (initialized && shardeumService.isReady) {
+          debugPrint('[IncidentBloc] 📤 Logging incident to Shardeum...');
+          
+          final result = await shardeumService.logCivicEvent(
+            eventType: 'GRIEVANCE_SUBMITTED',
+            villageId: 'VILLAGE_001', // TODO: Get from user profile
+            grievanceId: incident.id,
+            metadata: {
+              'title': event.title,
+              'category': event.categoryId,
+              'severity': event.severity,
+              'latitude': event.latitude,
+              'longitude': event.longitude,
+              'isAnonymous': event.isAnonymous,
+              'timestamp': DateTime.now().toIso8601String(),
+            },
+          );
+          
+          if (result.success) {
+            txHash = result.txHash;
+            blockNumber = result.blockNumber;
+            debugPrint('[IncidentBloc] ✅ Blockchain TX: $txHash (Block: $blockNumber)');
+          } else {
+            debugPrint('[IncidentBloc] ⚠️ Blockchain log failed: ${result.errorMessage}');
+          }
+        } else {
+          debugPrint('[IncidentBloc] ⚠️ Shardeum not initialized - skipping blockchain log');
+        }
+      } catch (e) {
+        debugPrint('[IncidentBloc] ⚠️ Blockchain logging error: $e');
+        // Don't fail the incident creation if blockchain logging fails
+      }
+
+      emit(IncidentCreated(
+        incident,
+        blockchainTxHash: txHash,
+        blockNumber: blockNumber,
+      ));
       
       // Refresh incidents after creating
       add(LoadMyIncidents());

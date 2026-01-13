@@ -1,168 +1,110 @@
-import 'package:grampulse/core/config/app_config.dart';
-import 'package:grampulse/core/services/api_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 import 'package:grampulse/features/citizen/domain/models/incident_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Incident Repository - Uses Supabase for all data operations (NO MOCKS)
 class IncidentRepository {
-  final ApiService _apiService = ApiService();
+  final SupabaseService _supabase = SupabaseService();
 
-  /// Check if we're in test bypass mode (mock auth token present)
-  Future<bool> _isTestBypassMode() async {
-    if (!AppConfig.showAuthBypass) return false;
+  /// UUID regex pattern for validation
+  static final _uuidRegex = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+  );
+
+  /// Check if a string is a valid UUID
+  bool _isValidUuid(String? id) {
+    if (id == null) return false;
+    return _uuidRegex.hasMatch(id);
+  }
+
+  /// Get current user ID from SharedPreferences
+  Future<String?> _getCurrentUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-    return token != null && token.startsWith('test_bypass_token_');
+    final userId = prefs.getString('user_id');
+    
+    // Validate that user_id is a proper UUID
+    if (userId != null && !_isValidUuid(userId)) {
+      debugPrint('[IncidentRepository] ⚠️ Invalid UUID format: $userId, clearing...');
+      await prefs.remove('user_id');
+      return null;
+    }
+    
+    return userId;
   }
 
-  /// Mock categories for testing
-  List<IncidentCategory> _getMockCategories() {
-    return [
-      IncidentCategory(id: '1', name: 'Road & Infrastructure', description: 'Potholes, damaged roads, broken streetlights', icon: 'road'),
-      IncidentCategory(id: '2', name: 'Water & Sanitation', description: 'Water supply issues, drainage problems', icon: 'water'),
-      IncidentCategory(id: '3', name: 'Electricity', description: 'Power outages, damaged electrical infrastructure', icon: 'electric'),
-      IncidentCategory(id: '4', name: 'Waste Management', description: 'Garbage collection, illegal dumping', icon: 'trash'),
-      IncidentCategory(id: '5', name: 'Public Safety', description: 'Safety hazards, security concerns', icon: 'shield'),
-    ];
-  }
-
-  /// Mock incidents for testing
-  List<Incident> _getMockIncidents() {
-    final mockUser = IncidentUser(id: 'test_user_001', name: 'Test User', phone: '9999999999');
-    return [
-      Incident(
-        id: 'mock_1',
-        title: 'Large Pothole on Main Road',
-        description: 'A large pothole has formed near the market area causing traffic issues.',
-        categoryId: '1',
-        user: mockUser,
-        status: 'NEW',
-        severity: 2,
-        location: IncidentLocation(latitude: 12.9716, longitude: 77.5946, address: 'Main Road, Near Market'),
-        isAnonymous: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Incident(
-        id: 'mock_2',
-        title: 'Street Light Not Working',
-        description: 'The street light near the school has been out for a week.',
-        categoryId: '3',
-        user: mockUser,
-        status: 'IN_PROGRESS',
-        severity: 1,
-        location: IncidentLocation(latitude: 12.9720, longitude: 77.5950, address: 'School Road'),
-        isAnonymous: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      Incident(
-        id: 'mock_3',
-        title: 'Garbage Not Collected',
-        description: 'Garbage has not been collected from our area for 3 days.',
-        categoryId: '4',
-        user: mockUser,
-        status: 'RESOLVED',
-        severity: 2,
-        location: IncidentLocation(latitude: 12.9710, longitude: 77.5940, address: 'Residential Area Block A'),
-        isAnonymous: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-    ];
-  }
-
-  /// Mock statistics for testing
-  IncidentStatistics _getMockStatistics() {
-    return IncidentStatistics(
-      newIncidents: 1,
-      inProgress: 1,
-      resolved: 1,
-      myIncidents: 3,
-    );
-  }
-
+  /// Get all incident categories from Supabase
   Future<List<IncidentCategory>> getCategories() async {
-    // Return mock data in test bypass mode
-    if (await _isTestBypassMode()) {
-      return _getMockCategories();
-    }
-
     try {
-      final response = await _apiService.getCategories();
-      if (response.success && response.data != null) {
-        return (response.data as List)
-            .map((json) => IncidentCategory.fromJson(json))
-            .toList();
-      }
-      throw Exception(response.message);
+      final data = await _supabase.getCategories();
+      debugPrint('[IncidentRepository] ✅ Loaded ${data.length} categories from Supabase');
+      return data.map((json) => IncidentCategory(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        description: json['description'] as String? ?? '',
+        icon: json['icon'] as String? ?? 'category',
+      )).toList();
     } catch (e) {
-      throw Exception('Failed to load categories: $e');
+      debugPrint('[IncidentRepository] ❌ getCategories error: $e');
+      rethrow;
     }
   }
 
+  /// Get incidents created by the current user
   Future<List<Incident>> getMyIncidents() async {
-    // Return mock data in test bypass mode
-    if (await _isTestBypassMode()) {
-      return _getMockIncidents();
-    }
-
     try {
-      final response = await _apiService.getMyIncidents();
-      if (response.success && response.data != null) {
-        return (response.data as List)
-            .map((json) => Incident.fromJson(json))
-            .toList();
+      final userId = await _getCurrentUserId();
+      if (userId == null) {
+        debugPrint('[IncidentRepository] ⚠️ No user ID found, returning all incidents');
+        final data = await _supabase.getAllIncidents();
+        return data.map((json) => _mapToIncident(json)).toList();
       }
-      throw Exception(response.message);
+
+      final data = await _supabase.getMyIncidents(userId);
+      debugPrint('[IncidentRepository] ✅ Loaded ${data.length} user incidents from Supabase');
+      return data.map((json) => _mapToIncident(json)).toList();
     } catch (e) {
-      throw Exception('Failed to load my incidents: $e');
+      debugPrint('[IncidentRepository] ❌ getMyIncidents error: $e');
+      rethrow;
     }
   }
 
+  /// Get all incidents (for nearby view)
   Future<List<Incident>> getNearbyIncidents({
-    double? latitude,  // Made optional
-    double? longitude, // Made optional
+    double? latitude,
+    double? longitude,
     double radius = 5000,
   }) async {
-    // Return mock data in test bypass mode
-    if (await _isTestBypassMode()) {
-      return _getMockIncidents();
-    }
-
     try {
-      final response = await _apiService.getNearbyIncidents(
-        latitude: latitude,
-        longitude: longitude,
-        radius: radius,
-      );
-      if (response.success && response.data != null) {
-        return (response.data as List)
-            .map((json) => Incident.fromJson(json))
-            .toList();
-      }
-      throw Exception(response.message);
+      final data = await _supabase.getAllIncidents();
+      debugPrint('[IncidentRepository] ✅ Loaded ${data.length} nearby incidents from Supabase');
+      return data.map((json) => _mapToIncident(json)).toList();
     } catch (e) {
-      throw Exception('Failed to load nearby incidents: $e');
+      debugPrint('[IncidentRepository] ❌ getNearbyIncidents error: $e');
+      rethrow;
     }
   }
 
+  /// Get incident statistics
   Future<IncidentStatistics> getStatistics() async {
-    // Return mock data in test bypass mode
-    if (await _isTestBypassMode()) {
-      return _getMockStatistics();
-    }
-
     try {
-      final response = await _apiService.getIncidentStatistics();
-      if (response.success && response.data != null) {
-        return IncidentStatistics.fromJson(response.data as Map<String, dynamic>);
-      }
-      throw Exception(response.message);
+      final userId = await _getCurrentUserId();
+      final stats = await _supabase.getIncidentStatistics(reporterId: userId);
+      
+      debugPrint('[IncidentRepository] ✅ Stats from Supabase: $stats');
+      return IncidentStatistics(
+        newIncidents: stats['new'] ?? 0,
+        inProgress: stats['in_progress'] ?? 0,
+        resolved: stats['resolved'] ?? 0,
+        myIncidents: stats['total'] ?? 0,
+      );
     } catch (e) {
-      throw Exception('Failed to load statistics: $e');
+      debugPrint('[IncidentRepository] ❌ getStatistics error: $e');
+      rethrow;
     }
   }
 
+  /// Create a new incident
   Future<Incident> createIncident({
     required String title,
     required String description,
@@ -174,27 +116,101 @@ class IncidentRepository {
     bool isAnonymous = false,
   }) async {
     try {
-      final location = {
-        'latitude': latitude,
-        'longitude': longitude,
-        if (address != null) 'address': address,
-      };
+      // Get or create user
+      final prefs = await SharedPreferences.getInstance();
+      var userId = prefs.getString('user_id');
+      final phone = prefs.getString('phone') ?? '+911234567890';
+      final name = prefs.getString('user_name');
 
-      final response = await _apiService.createIncident(
+      if (userId == null) {
+        // Create user in Supabase if not exists
+        debugPrint('[IncidentRepository] Creating new user in Supabase...');
+        final user = await _supabase.getOrCreateUser(phone, name: name);
+        userId = user['id'] as String;
+        await prefs.setString('user_id', userId);
+      }
+
+      final data = await _supabase.createIncident(
         title: title,
         description: description,
         categoryId: categoryId,
-        location: location,
+        reporterId: userId,
+        latitude: latitude,
+        longitude: longitude,
+        address: address,
         severity: severity,
         isAnonymous: isAnonymous,
       );
 
-      if (response.success && response.data != null) {
-        return Incident.fromJson(response.data);
-      }
-      throw Exception(response.message);
+      debugPrint('[IncidentRepository] ✅ Created incident in Supabase: ${data['id']}');
+      return _mapToIncident(data);
     } catch (e) {
-      throw Exception('Failed to create incident: $e');
+      debugPrint('[IncidentRepository] ❌ createIncident error: $e');
+      rethrow;
+    }
+  }
+
+  /// Update incident status
+  Future<Incident> updateStatus(String incidentId, String status, {String? notes}) async {
+    try {
+      final userId = await _getCurrentUserId();
+      final data = await _supabase.updateIncidentStatus(
+        incidentId,
+        status,
+        notes: notes,
+        updatedBy: userId,
+      );
+      return _mapToIncident(data);
+    } catch (e) {
+      debugPrint('[IncidentRepository] ❌ updateStatus error: $e');
+      rethrow;
+    }
+  }
+
+  /// Map Supabase response to Incident model
+  Incident _mapToIncident(Map<String, dynamic> json) {
+    // Extract category info
+    final categoryData = json['categories'] as Map<String, dynamic>?;
+    
+    // Extract user info
+    final userData = json['users'] as Map<String, dynamic>?;
+    
+    return Incident(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      categoryId: json['category_id'] as String,
+      user: IncidentUser(
+        id: json['reporter_id'] as String? ?? '',
+        name: userData?['name'] as String? ?? 'Anonymous',
+        phone: userData?['phone'] as String? ?? '',
+      ),
+      status: _mapStatus(json['status'] as String?),
+      severity: json['severity'] as int? ?? 1,
+      location: IncidentLocation(
+        latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+        longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+        address: json['address'] as String?,
+      ),
+      isAnonymous: json['is_anonymous'] as bool? ?? false,
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? DateTime.now(),
+    );
+  }
+
+  /// Map database status to model status
+  String _mapStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'new':
+        return 'NEW';
+      case 'in_progress':
+        return 'IN_PROGRESS';
+      case 'resolved':
+        return 'RESOLVED';
+      case 'closed':
+        return 'CLOSED';
+      default:
+        return 'NEW';
     }
   }
 }

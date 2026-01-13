@@ -57,10 +57,8 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   shared_preferences: ^2.5.3
   
-  # Firebase
-  firebase_core: ^2.24.2
-  firebase_analytics: ^10.7.4
-  firebase_crashlytics: ^3.4.8
+  # Supabase
+  supabase_flutter: ^2.3.0
   
   # UI Components
   flutter_svg: ^2.0.9
@@ -74,6 +72,9 @@ dependencies:
   # Web3 / Blockchain
   web3dart: ^2.7.3
   flutter_dotenv: ^5.1.0
+  
+  # Cryptography
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:

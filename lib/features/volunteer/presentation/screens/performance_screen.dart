@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 class PerformanceMetric {
   final String title;
@@ -21,28 +22,99 @@ class PerformanceScreen extends StatefulWidget {
 class _PerformanceScreenState extends State<PerformanceScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String selectedPeriod = 'This Month';
+  final SupabaseService _supabase = SupabaseService();
   
-  final List<PerformanceMetric> metrics = [
-    PerformanceMetric(title: 'Verifications', value: '127', change: '+15%', isPositive: true, icon: Icons.verified, color: Colors.blue),
-    PerformanceMetric(title: 'Citizens Helped', value: '89', change: '+23%', isPositive: true, icon: Icons.people_outline, color: Colors.green),
-    PerformanceMetric(title: 'Average Rating', value: '4.8', change: '+0.3', isPositive: true, icon: Icons.star_outline, color: Colors.orange),
-    PerformanceMetric(title: 'Response Time', value: '12 min', change: '-5 min', isPositive: true, icon: Icons.timer_outlined, color: Colors.purple),
-  ];
-
-  final List<Map<String, dynamic>> weeklyData = [
-    {'day': 'Mon', 'count': 12},
-    {'day': 'Tue', 'count': 19},
-    {'day': 'Wed', 'count': 15},
-    {'day': 'Thu', 'count': 25},
-    {'day': 'Fri', 'count': 22},
-    {'day': 'Sat', 'count': 18},
-    {'day': 'Sun', 'count': 14},
-  ];
+  List<PerformanceMetric> metrics = [];
+  List<Map<String, dynamic>> weeklyData = [];
+  List<Map<String, dynamic>> recentActivities = [];
+  Map<String, int> categoryBreakdown = {};
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadPerformanceData();
+  }
+
+  Future<void> _loadPerformanceData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final incidents = await _supabase.getAllIncidents();
+      final stats = await _supabase.getIncidentStatistics();
+
+      // Calculate metrics from real data
+      final totalVerified = incidents.where((i) => i['status'] == 'verified' || i['status'] == 'resolved').length;
+      final totalInProgress = incidents.where((i) => i['status'] == 'in_progress').length;
+      final totalNew = incidents.where((i) => i['status'] == 'new' || i['status'] == 'submitted').length;
+      
+      // Calculate weekly data from incidents
+      final now = DateTime.now();
+      final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      final weekCounts = <int>[0, 0, 0, 0, 0, 0, 0];
+      
+      for (final incident in incidents) {
+        try {
+          final createdAt = DateTime.parse(incident['created_at'] ?? '');
+          if (now.difference(createdAt).inDays < 7) {
+            final dayIndex = (createdAt.weekday - 1) % 7;
+            weekCounts[dayIndex]++;
+          }
+        } catch (_) {}
+      }
+
+      // Calculate category breakdown
+      final catBreakdown = <String, int>{};
+      for (final incident in incidents) {
+        final category = incident['category_name'] ?? 'Other';
+        catBreakdown[category] = (catBreakdown[category] ?? 0) + 1;
+      }
+
+      // Get recent activities (last 5 resolved/verified incidents)
+      final recentList = incidents
+          .where((i) => i['status'] == 'verified' || i['status'] == 'resolved' || i['status'] == 'in_progress')
+          .take(5)
+          .toList();
+
+      setState(() {
+        metrics = [
+          PerformanceMetric(title: 'Verifications', value: '$totalVerified', change: '+${totalVerified > 0 ? ((totalVerified / (incidents.isEmpty ? 1 : incidents.length)) * 100).toInt() : 0}%', isPositive: true, icon: Icons.verified, color: Colors.blue),
+          PerformanceMetric(title: 'In Progress', value: '$totalInProgress', change: 'Active', isPositive: true, icon: Icons.pending_actions, color: Colors.orange),
+          PerformanceMetric(title: 'Pending', value: '$totalNew', change: 'New', isPositive: false, icon: Icons.hourglass_empty, color: Colors.red),
+          PerformanceMetric(title: 'Total Issues', value: '${incidents.length}', change: 'All time', isPositive: true, icon: Icons.assignment, color: Colors.purple),
+        ];
+        
+        weeklyData = List.generate(7, (i) => {'day': weekDays[i], 'count': weekCounts[i]});
+        recentActivities = recentList;
+        categoryBreakdown = catBreakdown;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _getTimeAgo(String? createdAt) {
+    if (createdAt == null) return 'Unknown';
+    try {
+      final date = DateTime.parse(createdAt);
+      final now = DateTime.now();
+      final diff = now.difference(date);
+      if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
+      if (diff.inHours < 24) return '${diff.inHours} hours ago';
+      if (diff.inDays < 7) return '${diff.inDays} days ago';
+      return 'Earlier';
+    } catch (_) {
+      return 'Unknown';
+    }
   }
 
   @override
@@ -92,10 +164,26 @@ class _PerformanceScreenState extends State<PerformanceScreen> with SingleTicker
       ),
       body: SafeArea(
         top: false,
-        child: TabBarView(
-          controller: _tabController,
-          children: [_buildOverviewTab(), _buildAnalyticsTab(), _buildRankingsTab()],
-        ),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Error: $_error', style: const TextStyle(color: Colors.red)),
+                        const SizedBox(height: 16),
+                        ElevatedButton(onPressed: _loadPerformanceData, child: const Text('Retry')),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadPerformanceData,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [_buildOverviewTab(), _buildAnalyticsTab(), _buildRankingsTab()],
+                    ),
+                  ),
       ),
     );
   }
@@ -157,10 +245,16 @@ class _PerformanceScreenState extends State<PerformanceScreen> with SingleTicker
           // Recent Activity
           Text('Recent Activity', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
           const SizedBox(height: 12),
-          _ActivityItem(title: 'Verified road repair issue', subtitle: 'Main Street, Sector 5', time: '10 min ago', icon: Icons.verified, color: Colors.green),
-          _ActivityItem(title: 'Helped citizen with scheme', subtitle: 'PM-KISAN application', time: '1 hour ago', icon: Icons.help, color: Colors.blue),
-          _ActivityItem(title: 'Completed training session', subtitle: 'Digital Literacy Workshop', time: '3 hours ago', icon: Icons.school, color: Colors.purple),
-          _ActivityItem(title: 'Verified water supply issue', subtitle: 'Gandhi Nagar, Block A', time: 'Yesterday', icon: Icons.verified, color: Colors.green),
+          if (recentActivities.isEmpty)
+            const Padding(padding: EdgeInsets.all(16), child: Text('No recent activity', style: TextStyle(color: Colors.grey)))
+          else
+            ...recentActivities.map((activity) => _ActivityItem(
+              title: activity['title'] ?? 'Activity',
+              subtitle: activity['location'] ?? activity['category_name'] ?? 'Unknown location',
+              time: _getTimeAgo(activity['created_at']),
+              icon: activity['status'] == 'verified' || activity['status'] == 'resolved' ? Icons.verified : Icons.pending,
+              color: activity['status'] == 'verified' || activity['status'] == 'resolved' ? Colors.green : Colors.orange,
+            )),
         ],
       ),
     );
@@ -177,11 +271,16 @@ class _PerformanceScreenState extends State<PerformanceScreen> with SingleTicker
           // Category Breakdown
           Text('Activity by Category', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
           const SizedBox(height: 16),
-          _CategoryBar(category: 'Infrastructure', percentage: 35, color: Colors.blue),
-          _CategoryBar(category: 'Water Supply', percentage: 25, color: Colors.cyan),
-          _CategoryBar(category: 'Sanitation', percentage: 20, color: Colors.green),
-          _CategoryBar(category: 'Public Safety', percentage: 12, color: Colors.orange),
-          _CategoryBar(category: 'Others', percentage: 8, color: Colors.grey),
+          if (categoryBreakdown.isEmpty)
+            const Padding(padding: EdgeInsets.all(16), child: Text('No category data available', style: TextStyle(color: Colors.grey)))
+          else
+            ...categoryBreakdown.entries.take(5).map((entry) {
+              final total = categoryBreakdown.values.fold(0, (a, b) => a + b);
+              final percentage = total > 0 ? ((entry.value / total) * 100).toInt() : 0;
+              final colors = [Colors.blue, Colors.cyan, Colors.green, Colors.orange, Colors.grey];
+              final colorIndex = categoryBreakdown.keys.toList().indexOf(entry.key) % colors.length;
+              return _CategoryBar(category: entry.key, percentage: percentage, color: colors[colorIndex]);
+            }),
           const SizedBox(height: 24),
           
           // Time Distribution

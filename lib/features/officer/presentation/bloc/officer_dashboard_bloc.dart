@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:grampulse/core/services/supabase_service.dart';
 
 // Events
 abstract class OfficerDashboardEvent extends Equatable {
@@ -102,6 +104,8 @@ class Issue {
 
 // BLoC
 class OfficerDashboardBloc extends Bloc<OfficerDashboardEvent, OfficerDashboardState> {
+  final SupabaseService _supabase = SupabaseService();
+  
   OfficerDashboardBloc() : super(const OfficerDashboardInitial()) {
     on<LoadOfficerDashboard>(_onLoadDashboard);
     on<RefreshOfficerDashboard>(_onRefreshDashboard);
@@ -112,83 +116,33 @@ class OfficerDashboardBloc extends Bloc<OfficerDashboardEvent, OfficerDashboardS
     emit(const OfficerDashboardLoading());
     
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
+      debugPrint('[OfficerDashboardBloc] Loading from Supabase...');
       
-      const stats = OfficerStats(
-        totalAssigned: 45,
-        pendingReview: 12,
-        inProgress: 8,
-        resolvedThisWeek: 15,
-        avgResolutionTime: 2.5,
+      // Fetch real incidents from Supabase
+      final incidents = await _supabase.getAllIncidents();
+      final incidentStats = await _supabase.getIncidentStatistics();
+      
+      // Calculate stats from real data
+      final stats = OfficerStats(
+        totalAssigned: incidents.length,
+        pendingReview: incidentStats['new'] ?? 0,
+        inProgress: incidentStats['in_progress'] ?? 0,
+        resolvedThisWeek: incidentStats['resolved'] ?? 0,
+        avgResolutionTime: 2.5, // TODO: Calculate from real data
       );
       
-      final pendingIssues = [
-        Issue(
-          id: '1',
-          title: 'Road Repair Required',
-          description: 'Large pothole causing traffic issues on Main Road near market area',
-          category: 'Infrastructure',
-          location: 'Main Road, Sector 5',
-          priority: 'High',
-          status: 'Pending Review',
-          reportedBy: 'Citizen Report',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 3)),
-          deadline: DateTime.now().add(const Duration(days: 2)),
-        ),
-        Issue(
-          id: '2',
-          title: 'Street Light Repair',
-          description: 'Multiple street lights not functioning in residential area',
-          category: 'Electricity',
-          location: 'Gandhi Nagar, Block B',
-          priority: 'Medium',
-          status: 'Pending Review',
-          reportedBy: 'Volunteer Verified',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 6)),
-          deadline: DateTime.now().add(const Duration(days: 5)),
-        ),
-        Issue(
-          id: '3',
-          title: 'Water Pipeline Leak',
-          description: 'Water leaking from main pipeline causing wastage',
-          category: 'Water Supply',
-          location: 'Near Primary School',
-          priority: 'High',
-          status: 'Pending Review',
-          reportedBy: 'Citizen Report',
-          reportedAt: DateTime.now().subtract(const Duration(hours: 8)),
-          deadline: DateTime.now().add(const Duration(days: 1)),
-        ),
-      ];
+      // Convert incidents to Issue objects
+      final pendingIssues = incidents
+          .where((inc) => inc['status'] == 'submitted' || inc['status'] == 'new')
+          .map((inc) => _mapIncidentToIssue(inc))
+          .toList();
       
-      final inProgressIssues = [
-        Issue(
-          id: '4',
-          title: 'Drainage Cleaning',
-          description: 'Blocked drainage causing waterlogging during rains',
-          category: 'Drainage',
-          location: 'Market Road',
-          priority: 'Medium',
-          status: 'In Progress',
-          reportedBy: 'Citizen Report',
-          reportedAt: DateTime.now().subtract(const Duration(days: 2)),
-          assignedTo: 'PWD Team A',
-          deadline: DateTime.now().add(const Duration(days: 3)),
-        ),
-        Issue(
-          id: '5',
-          title: 'Garbage Collection Setup',
-          description: 'Need additional garbage bins in new residential area',
-          category: 'Sanitation',
-          location: 'New Colony, Phase 2',
-          priority: 'Low',
-          status: 'In Progress',
-          reportedBy: 'SHG Request',
-          reportedAt: DateTime.now().subtract(const Duration(days: 3)),
-          assignedTo: 'Sanitation Dept',
-          deadline: DateTime.now().add(const Duration(days: 7)),
-        ),
-      ];
+      final inProgressIssues = incidents
+          .where((inc) => inc['status'] == 'in_progress')
+          .map((inc) => _mapIncidentToIssue(inc))
+          .toList();
+      
+      debugPrint('[OfficerDashboardBloc] ✅ Loaded ${pendingIssues.length} pending, ${inProgressIssues.length} in-progress');
       
       emit(OfficerDashboardLoaded(
         stats: stats,
@@ -196,29 +150,63 @@ class OfficerDashboardBloc extends Bloc<OfficerDashboardEvent, OfficerDashboardS
         inProgressIssues: inProgressIssues,
       ));
     } catch (e) {
+      debugPrint('[OfficerDashboardBloc] ❌ Error: $e');
       emit(OfficerDashboardError(e.toString()));
+    }
+  }
+  
+  Issue _mapIncidentToIssue(Map<String, dynamic> inc) {
+    return Issue(
+      id: inc['id'] as String? ?? '',
+      title: inc['title'] as String? ?? '',
+      description: inc['description'] as String? ?? '',
+      category: (inc['categories'] as Map<String, dynamic>?)?['name'] as String? ?? 'Other',
+      location: inc['location_address'] as String? ?? 'Unknown',
+      priority: _mapPriority(inc['severity'] as int?),
+      status: _mapStatus(inc['status'] as String?),
+      reportedBy: (inc['users'] as Map<String, dynamic>?)?['name'] as String? ?? 'Citizen Report',
+      reportedAt: DateTime.tryParse(inc['created_at'] as String? ?? '') ?? DateTime.now(),
+      assignedTo: inc['assigned_officer_id'] as String?,
+      deadline: inc['deadline'] != null 
+          ? DateTime.tryParse(inc['deadline'] as String) 
+          : DateTime.now().add(const Duration(days: 7)),
+    );
+  }
+  
+  String _mapPriority(int? severity) {
+    switch (severity) {
+      case 3: return 'High';
+      case 2: return 'Medium';
+      default: return 'Low';
+    }
+  }
+  
+  String _mapStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'submitted': case 'new': return 'Pending Review';
+      case 'in_progress': return 'In Progress';
+      case 'resolved': return 'Resolved';
+      default: return 'Pending Review';
     }
   }
 
   Future<void> _onRefreshDashboard(RefreshOfficerDashboard event, Emitter<OfficerDashboardState> emit) async {
-    if (state is OfficerDashboardLoaded) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      emit(state);
-    } else {
-      add(const LoadOfficerDashboard());
-    }
+    // Re-load from Supabase
+    add(const LoadOfficerDashboard());
   }
 
   Future<void> _onUpdateIssueStatus(UpdateIssueStatus event, Emitter<OfficerDashboardState> emit) async {
-    // Handle status update - in real app this would call API
-    if (state is OfficerDashboardLoaded) {
-      final currentState = state as OfficerDashboardLoaded;
-      // For demo, just re-emit same state
-      emit(OfficerDashboardLoaded(
-        stats: currentState.stats,
-        pendingIssues: currentState.pendingIssues,
-        inProgressIssues: currentState.inProgressIssues,
-      ));
+    try {
+      debugPrint('[OfficerDashboardBloc] Updating issue ${event.issueId} to ${event.newStatus}');
+      
+      // Update in Supabase
+      await _supabase.updateIncidentStatus(event.issueId, event.newStatus);
+      
+      // Reload dashboard
+      add(const LoadOfficerDashboard());
+    } catch (e) {
+      debugPrint('[OfficerDashboardBloc] ❌ Update error: $e');
+      emit(OfficerDashboardError('Failed to update issue: $e'));
     }
   }
 }

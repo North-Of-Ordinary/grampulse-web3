@@ -13,6 +13,10 @@ import 'package:grampulse/features/citizen/presentation/bloc/nearby_issues/nearb
 import 'package:grampulse/features/citizen/presentation/bloc/my_issues/my_issues_bloc.dart';
 import 'package:grampulse/features/citizen/presentation/widgets/issue_card.dart';
 import 'package:grampulse/features/citizen/presentation/widgets/map_preview.dart';
+import 'package:grampulse/features/auth/bloc/auth_bloc.dart';
+import 'package:grampulse/features/auth/bloc/auth_state.dart';
+import 'package:grampulse/core/services/quadratic_voting_service.dart';
+import 'dart:math' show sqrt;
 import 'package:grampulse/l10n/l10n.dart';
 
 class CitizenHomeScreen extends StatelessWidget {
@@ -44,6 +48,7 @@ class CitizenHomeScreen extends StatelessWidget {
                 _buildAppBar(context, state),
                 if (state is CitizenHomeLoaded) ...[
                   _buildLocationBar(context, state),
+                  _buildVotingSection(context, state),
                   _buildNearbyIssuesSection(context),
                   _buildMyIssuesSection(context),
                 ] else if (state is CitizenHomeLoading) ...[
@@ -103,6 +108,12 @@ class CitizenHomeScreen extends StatelessWidget {
         ],
       ),
       actions: [
+        // Quadratic Voting Button
+        IconButton(
+          icon: const Icon(Icons.how_to_vote),
+          tooltip: 'Vote on Issues',
+          onPressed: () => context.push('/voting'),
+        ),
         IconButton(
           icon: Icon(Icons.notifications_outlined),
           onPressed: () {
@@ -405,6 +416,317 @@ class CitizenHomeScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surface,
         selectedColor: Theme.of(context).colorScheme.primaryContainer,
         checkmarkColor: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildVotingSection(BuildContext context, CitizenHomeLoaded state) {
+    final authState = context.watch<AuthBloc>().state;
+    String? userId;
+    if (authState is Authenticated) {
+      userId = authState.user.id;
+    }
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.how_to_vote,
+                      color: Theme.of(context).primaryColor,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Quadratic Voting',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => context.push('/voting'),
+                  child: Text('View All'),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            
+            // User credits display
+            if (userId != null)
+              FutureBuilder<UserCredits>(
+                future: QuadraticVotingService().getUserCredits(userId),
+                builder: (context, snapshot) {
+                  return Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).primaryColor.withOpacity(0.1),
+                          Theme.of(context).primaryColor.withOpacity(0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet,
+                          color: Theme.of(context).primaryColor,
+                          size: 32,
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Your Voting Credits',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Text(
+                              snapshot.hasData ? '${snapshot.data!.balance} credits' : 'Loading...',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Icon(
+                          Icons.info_outline,
+                          color: Theme.of(context).primaryColor.withOpacity(0.6),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            
+            const SizedBox(height: AppSpacing.md),
+            
+            // Top voted issues
+            Text(
+              'Top Voted Issues',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            
+            FutureBuilder<List<IncidentWithVotes>>(
+              future: QuadraticVotingService().getIncidentsWithVotes(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                
+                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).dividerColor,
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.ballot_outlined,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'No issues to vote on yet',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                
+                final topIssues = snapshot.data!.take(3).toList();
+                
+                return Column(
+                  children: topIssues.map((incident) {
+                    final title = incident.title;
+                    final totalVotes = incident.voteStats.totalVotes;
+                    final voterCount = incident.voteStats.voterCount;
+                    final weightedVotes = incident.voteStats.totalVotes;
+                    
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: InkWell(
+                        onTap: () => context.push('/voting'),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: [
+                              // Vote indicator
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '$totalVotes',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'votes',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              
+                              // Issue info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.people_outline,
+                                          size: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$voterCount voters',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        const SizedBox(width: AppSpacing.sm),
+                                        Icon(
+                                          Icons.scale,
+                                          size: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Weight: $weightedVotes',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              
+                              // Vote button
+                              Icon(
+                                Icons.chevron_right,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+            
+            const SizedBox(height: AppSpacing.md),
+            
+            // Call to action
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).primaryColor.withOpacity(0.05),
+                    Theme.of(context).primaryColor.withOpacity(0.02),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      'Use quadratic voting to prioritize issues. Cost = Votes²',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: AppSpacing.lg),
+          ],
+        ),
       ),
     );
   }
