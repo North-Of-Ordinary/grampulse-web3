@@ -1,1077 +1,827 @@
-# GramPulse: Voice-First Rural Governance Infrastructure
+# GramPulse - Rural Grievance Management System
 
-**Live Deployment**: Samsung SM-A225F (Device ID: RZ8R80CE9VV)  
-**Project Classification**: Blockchain-Integrated Civic Engagement Platform  
-**Target Domain**: Panchayat-level governance in rural India
+GramPulse is a comprehensive mobile application designed to bridge the gap between rural citizens and government authorities. It provides a platform for citizens to report local issues, track resolution progress, and engage with community volunteers and government officials.
 
----
 
-## Executive Summary
+## Shardeum Smart Contract Url
+https://explorer-mezame.shardeum.org/address/0x5ff04cbCB3F80dfE59143e994f8e63009d7f2fA1?tab=txs
 
-GramPulse is a production-ready governance platform that addresses civic grievance management in rural India through:
+## ThinkRoot Deployment url
+https://grampulse-az05rp.thinkroot.app/
 
-1. Voice-first interface for low-literacy populations
-2. Blockchain-enforced Service Level Agreements (SLAs)
-3. Fully Homomorphic Encryption (FHE) for zero-retaliation privacy
-4. Quadratic voting for democratic issue prioritization
 
-**Problem Statement**: 68% of India's population (800+ million citizens) resides in rural areas where civic grievances remain unaddressed due to literacy barriers, fear of retaliation, and lack of government accountability mechanisms.
 
-**Solution**: Mobile application with voice input, real-time issue tracking, blockchain-based SLA enforcement, and encrypted voting system enabling intensity-based democratic prioritization.
+## Table of Contents
 
----
+- [Project Overview](#project-overview)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [Key Features](#key-features)
+- [Authentication Flow](#authentication-flow)
+- [Role-Based System](#role-based-system)
+- [State Management](#state-management)
+- [API Integration](#api-integration)
+- [Installation and Setup](#installation-and-setup)
+- [Running the Application](#running-the-application)
+- [Backend Integration](#backend-integration)
+- [Contributing](#contributing)
 
-## System Architecture
+## Project Overview
 
-### Layer 1: Citizen Interface (Flutter Mobile Application)
+GramPulse is a multi-role platform designed to streamline rural governance and citizen issue reporting. The application targets four primary user roles:
 
-- Voice-to-text complaint submission
-- Offline-first architecture with background synchronization
-- Real-time issue tracking with status updates
-- Quadratic voting interface
-- GPS-enabled location tagging
+1. **Citizens**: Report issues, track resolution progress, and engage with the community
+2. **Volunteers**: Verify reports, assist citizens, and coordinate with officials
+3. **Officers**: Receive, process, and resolve citizen reports
+4. **Administrators**: Oversee the system, manage users, and access analytics
 
-### Layer 2: Privacy Layer (Inco Network)
-
-- Fully Homomorphic Encryption (FHE) for vote confidentiality
-- Zero-knowledge proofs for vote validation
-- Confidential computing on encrypted data
-- Aggregated result decryption via threshold cryptography
-
-### Layer 3: Governance Layer (Optimism L2)
-
-- Smart contracts enforcing 72-hour SLA deadlines
-- Automated penalty triggers for breaches
-- State machine: New → Acknowledged → In Progress → Resolved
-- Immutable officer performance metrics
-
-### Layer 4: Storage Layer (Shardeum + Supabase)
-
-- Shardeum: Immutable grievance logs and voting records
-- Supabase: Real-time application state and user profiles
-- IPFS: Decentralized photo/video evidence storage
-- PostgreSQL: Relational data with row-level security
-
-### Layer 5: Administrative Interface (React Dashboard)
-
-- Officer complaint management queue
-- Real-time SLA countdown timers
-- Voting analytics and heatmaps
-- Volunteer credit allocation system
-
----
+The application uses a Flutter frontend with a Node.js/Express backend and MongoDB database.
 
 ## Technology Stack
 
-| Component | Implementation | Justification |
-|-----------|---------------|---------------|
-| Mobile Client | Flutter 3.7.0 | Cross-platform deployment, native performance |
-| Backend | Supabase (PostgreSQL) | Real-time subscriptions, managed infrastructure |
-| Privacy Layer | Inco Network (FHE) | Cryptographic vote confidentiality |
-| SLA Enforcement | Optimism Sepolia | Low-cost L2 transactions, EVM compatibility |
-| Data Storage | Shardeum Liberty 2.0 | Linear scalability, low transaction fees |
-| State Management | BLoC Pattern | Predictable state, separation of concerns |
-| Authentication | Supabase Auth (OTP) | Phone-based, low barrier to entry |
+### Frontend
+- **Flutter**: UI framework for cross-platform development
+- **Dart**: Programming language for Flutter
+- **BLoC Pattern**: State management architecture
+- **Go Router**: Navigation and routing
+- **HTTP/Dio**: API integration
+- **SharedPreferences**: Local storage for authentication tokens
+- **Hive**: Local database for offline support
+- **Flutter Map**: Map integration for location-based features
 
----
+### Backend
+- **Node.js**: JavaScript runtime
+- **Express**: Web framework
+- **MongoDB**: NoSQL database
+- **JWT**: Authentication
+- **Multer**: File uploads
+- **Express Validator**: Request validation
 
-## Proof of Implementation
+## Project Structure
 
-### A. Inco Network Integration (FHE Privacy)
-
-**Status**: Service Implementation Complete
-
-**Module**: `lib/features/voting/services/inco_voting_service.dart`
-
-**Implementation**:
-
-```dart
-class IncoVotingService {
-  Future<EncryptedVote> encryptVote({
-    required String incidentId,
-    required int votes,
-    required String userId,
-  }) async {
-    final encryptionKey = await _generateFheKey();
-    final encryptedVoteCount = await _fheEncrypt(
-      value: votes,
-      key: encryptionKey,
-    );
-    
-    return EncryptedVote(
-      incidentId: incidentId,
-      encryptedData: encryptedVoteCount,
-      proof: await _generateZkProof(votes),
-      timestamp: DateTime.now(),
-    );
-  }
-  
-  Future<int> aggregateEncryptedVotes(String incidentId) async {
-    final encryptedVotes = await _fetchEncryptedVotes(incidentId);
-    final aggregatedEncrypted = _fheAdd(encryptedVotes);
-    return await requestDecryption(aggregatedEncrypted);
-  }
-}
+```
+grampulse/
+├── android/                  # Android-specific files
+├── ios/                      # iOS-specific files
+├── lib/                      # Main Flutter code
+│   ├── app/                  # App-level configurations
+│   │   ├── app.dart          # Main app widget
+│   │   └── router.dart       # Routing configuration
+│   ├── core/                 # Core functionality
+│   │   ├── components/       # Reusable UI components
+│   │   ├── constants/        # App constants
+│   │   ├── presentation/     # Shared presentation logic
+│   │   ├── services/         # App services
+│   │   │   ├── api_service.dart     # HTTP client for API calls
+│   │   │   ├── auth_service.dart    # Authentication service
+│   │   │   └── report_service.dart  # Report management service
+│   │   ├── theme/            # App theming
+│   │   ├── utils/            # Utility functions
+│   │   └── widgets/          # Shared widgets
+│   ├── features/             # App features
+│   │   ├── auth/             # Authentication feature
+│   │   │   ├── bloc/         # Authentication state management
+│   │   │   │   └── auth_bloc.dart   # Auth BLoC
+│   │   │   ├── domain/       # Business logic
+│   │   │   └── presentation/ # UI components
+│   │   │       └── screens/  # Authentication screens
+│   │   ├── citizen/          # Citizen feature
+│   │   │   ├── domain/       # Business logic
+│   │   │   └── presentation/ # UI components
+│   │   │       ├── bloc/     # Citizen state management
+│   │   │       └── screens/  # Citizen screens
+│   │   ├── map/              # Map feature
+│   │   │   ├── domain/       # Business logic
+│   │   │   └── presentation/ # UI components
+│   │   ├── officer/          # Officer feature
+│   │   │   ├── blocs/        # Officer state management
+│   │   │   ├── data/         # Data sources
+│   │   │   ├── domain/       # Business logic
+│   │   │   ├── models/       # Data models
+│   │   │   └── presentation/ # UI components
+│   │   ├── report/           # Report feature
+│   │   │   ├── bloc/         # Report state management
+│   │   │   │   └── report_bloc.dart  # Report BLoC
+│   │   │   ├── domain/       # Business logic
+│   │   │   └── presentation/ # UI components
+│   │   └── volunteer/        # Volunteer feature
+│   │       ├── bloc/         # Volunteer state management
+│   │       ├── domain/       # Business logic
+│   │       ├── models/       # Data models
+│   │       ├── presentation/ # UI components
+│   │       ├── screens/      # Volunteer screens
+│   │       └── widgets/      # Volunteer-specific widgets
+│   ├── l10n/                 # Localization
+│   │   ├── arb/              # Translation files
+│   │   ├── app_localizations.dart
+│   │   └── l10n.dart
+│   ├── patches/              # Custom patches
+│   └── main.dart             # Entry point
+├── web/                      # Web-specific files
+├── pubspec.yaml              # Dependencies
+└── README.md                 # This file
 ```
 
-**Encrypted Payload Structure**:
+## Key Features
 
+### 1. Authentication System
+- Phone number-based authentication with OTP verification
+- JWT token-based session management
+- Profile setup with role selection
+- Secure token storage with SharedPreferences
+
+### 2. Issue Reporting
+- Multi-category issue reporting (Water, Electricity, Roads, etc.)
+- Location-based reporting with map integration
+- Image upload capability for visual evidence
+- Structured form with validation
+
+### 3. Report Tracking
+- Status updates on reported issues
+- Timeline view of resolution progress
+- Comment system for updates and clarifications
+- Push notifications for status changes
+
+### 4. Map Integration
+- Location-based issue visualization
+- Nearby issues discovery
+- Geographical clustering of reports
+- Interactive map with filters
+
+### 5. Role-Specific Dashboards
+- Citizen dashboard for personal reports
+- Volunteer dashboard for verification tasks
+- Officer dashboard for assigned cases
+- Admin dashboard for system oversight and analytics
+
+### 6. Multi-language Support
+- English, Hindi, Tamil, Malayalam, and Kannada languages
+- Dynamic language switching
+- Localized content throughout the app
+
+## Authentication Flow
+
+GramPulse implements a secure authentication flow:
+
+1. **Language Selection**: Users first select their preferred language
+2. **Phone Number Input**: Users enter their phone number
+3. **OTP Verification**: A 6-digit OTP is sent to the user's phone
+4. **OTP Validation**: User enters the OTP to verify identity
+5. **Profile Setup**: First-time users set up their profile (name, role, optional email)
+6. **Role Selection**: Users select their role (citizen, volunteer, officer)
+7. **Home Screen**: Users are directed to role-specific home screens
+
+The `AuthBloc` manages this entire flow, handling state transitions and API calls through the `AuthService`.
+
+### Key Authentication Files
+
+- `lib/core/services/auth_service.dart`: Handles authentication API calls
+- `lib/features/auth/bloc/auth_bloc.dart`: Manages authentication state
+- `lib/features/auth/presentation/screens/login_screen.dart`: Phone input UI
+- `lib/features/auth/presentation/screens/otp_verification_screen.dart`: OTP verification UI
+- `lib/features/auth/presentation/screens/profile_setup_screen.dart`: Profile setup UI
+
+## Role-Based System
+
+GramPulse implements a comprehensive role-based system that determines user access, UI, and functionality:
+
+### 1. Citizen
+- Report new issues
+- Track report status
+- Comment on reports
+- View nearby issues
+- Access community resources
+
+### 2. Volunteer
+- Verify citizen reports
+- Assist citizens with reporting
+- Coordinate with officials
+- Monitor community issues
+- Update report status
+
+### 3. Officer
+- Receive assigned reports
+- Update report status
+- Resolve issues
+- Communicate with citizens
+- Generate work orders
+
+### 4. Administrator
+- Manage users and roles
+- Assign reports to officers
+- Access system analytics
+- Configure system settings
+- Monitor overall performance
+
+The router (`lib/app/router.dart`) enforces role-based access control, preventing unauthorized access to role-specific routes.
+
+## State Management
+
+GramPulse uses the BLoC (Business Logic Component) pattern for state management:
+
+### 1. AuthBloc
+- Manages authentication state
+- Handles OTP requests and verification
+- Manages profile completion
+- Controls user sessions
+
+**Key files**:
+- `lib/features/auth/bloc/auth_bloc.dart`: Authentication state management
+- `lib/features/auth/bloc/auth_event.dart`: Authentication events
+- `lib/features/auth/bloc/auth_state.dart`: Authentication states
+
+### 2. ReportBloc
+- Manages report creation, updates, and deletion
+- Handles report filtering and searching
+- Manages comments and status updates
+- Controls report assignment
+
+**Key files**:
+- `lib/features/report/bloc/report_bloc.dart`: Report state management
+- `lib/features/report/bloc/report_event.dart`: Report events
+- `lib/features/report/bloc/report_state.dart`: Report states
+
+### 3. Other Feature-Specific BLoCs
+- CitizenHomeBloc: Manages citizen dashboard
+- NearbyIssuesBloc: Handles map and nearby issues
+- OfficerDashboardBloc: Manages officer dashboard
+
+The BLoC pattern provides clear separation of UI, business logic, and data, making the codebase maintainable and testable.
+
+## API Integration
+
+GramPulse communicates with a RESTful backend API:
+
+### 1. ApiService
+- HTTP client for API calls
+- Token management
+- Request/response handling
+- Error handling
+
+**Key file**: `lib/core/services/api_service.dart`
+
+### 2. AuthService
+- Authentication API calls
+- Token storage
+- User profile management
+
+**Key file**: `lib/core/services/auth_service.dart`
+
+### 3. ReportService
+- Report CRUD operations
+- Comment management
+- Status updates
+- File uploads
+
+**Key file**: `lib/core/services/report_service.dart`
+
+### API Response Format
+All API responses follow a standardized format:
 ```json
 {
-  "incident_id": "uuid",
-  "encrypted_vote": "0x...",
-  "fhe_params": {
-    "scheme": "TFHE",
-    "key_id": "public_key_hash",
-    "nonce": "random_nonce"
-  },
-  "zk_proof": "0x...",
-  "timestamp": 1736764800
+  "success": true|false,
+  "message": "Response message",
+  "data": {...},
+  "statusCode": 200
 }
 ```
 
-**Privacy Guarantees**:
-
-- Individual vote choices encrypted client-side before transmission
-- Homomorphic operations enable computation on encrypted data
-- Only aggregated totals decrypted via multi-party computation
-- Zero-knowledge proofs validate vote ranges without revealing values
-
-**Rationale**: In rural India, fear of retaliation from local power structures prevents citizens from reporting corruption. FHE ensures even database administrators cannot access individual voting choices, eliminating coercion risks while maintaining democratic accountability.
-
----
-
-### B. Optimism L2 Integration (SLA Enforcement)
-
-**Status**: Smart Contract Implementation Complete
-
-**Contract**: `contracts/SLAEnforcement.sol`
-
-**Implementation**:
-
-```solidity
-pragma solidity ^0.8.20;
-
-contract SLAEnforcement {
-    uint256 public constant SLA_DEADLINE = 72 hours;
-    
-    struct Complaint {
-        string incidentId;
-        address reporter;
-        string category;
-        uint256 submissionTime;
-        uint256 deadline;
-        ComplaintStatus status;
-        address assignedOfficer;
-        bool slaBreach;
-    }
-    
-    enum ComplaintStatus { New, Acknowledged, InProgress, Resolved, Breached }
-    
-    mapping(string => Complaint) public complaints;
-    mapping(address => uint256) public officerBreaches;
-    
-    event ComplaintSubmitted(string indexed incidentId, address indexed reporter, uint256 deadline);
-    event SLABreached(string indexed incidentId, address indexed officer, uint256 breachTime);
-    
-    function submitComplaint(
-        string memory incidentId,
-        string memory category,
-        address assignedOfficer
-    ) external {
-        require(bytes(complaints[incidentId].incidentId).length == 0, "Duplicate complaint");
-        
-        complaints[incidentId] = Complaint({
-            incidentId: incidentId,
-            reporter: msg.sender,
-            category: category,
-            submissionTime: block.timestamp,
-            deadline: block.timestamp + SLA_DEADLINE,
-            status: ComplaintStatus.New,
-            assignedOfficer: assignedOfficer,
-            slaBreach: false
-        });
-        
-        emit ComplaintSubmitted(incidentId, msg.sender, block.timestamp + SLA_DEADLINE);
-    }
-    
-    function checkSLA(string memory incidentId) external {
-        Complaint storage complaint = complaints[incidentId];
-        
-        if (block.timestamp > complaint.deadline && complaint.status != ComplaintStatus.Resolved) {
-            complaint.slaBreach = true;
-            complaint.status = ComplaintStatus.Breached;
-            officerBreaches[complaint.assignedOfficer]++;
-            emit SLABreached(incidentId, complaint.assignedOfficer, block.timestamp);
-        }
-    }
-    
-    function resolveComplaint(string memory incidentId) external {
-        Complaint storage complaint = complaints[incidentId];
-        require(msg.sender == complaint.assignedOfficer, "Unauthorized");
-        require(complaint.status != ComplaintStatus.Resolved, "Already resolved");
-        
-        complaint.status = ComplaintStatus.Resolved;
-    }
-}
-```
-
-**Deployment Specifications**:
-
-- Network: Optimism Sepolia Testnet
-- Gas Optimization: Batch SLA checks, minimal storage operations
-- Expected Transaction Cost: ~0.001 USD per SLA verification
-
-**Rationale**: Traditional governance systems lack accountability mechanisms. Blockchain-based SLA enforcement creates immutable audit trails and automatic penalty triggers, eliminating discretionary enforcement gaps.
-
----
-
-### C. Shardeum Integration (Scalable Storage)
-
-**Status**: Service Implementation Complete
-
-**Module**: `lib/features/shardeum/shardeum_service.dart`
-
-**Data Schema**:
-
-```typescript
-interface GrievanceRecord {
-  id: string;
-  citizenAddress: string;
-  issueCategory: string;
-  location: {
-    latitude: number;
-    longitude: number;
-    villageName: string;
-  };
-  descriptionHash: string;
-  mediaHash?: string;
-  encryptedVoteData: string;
-  timestamp: number;
-  slaContractAddress: string;
-  status: "new" | "in_progress" | "resolved";
-}
-```
-
-**Implementation**:
-
-```dart
-class ShardeumService {
-  static const String RPC_URL = "https://liberty20.shardeum.org";
-  
-  Future<String> storeGrievance({required GrievanceRecord record}) async {
-    final web3 = Web3Client(RPC_URL, Client());
-    final data = encodeGrievanceData(record);
-    
-    final txHash = await web3.sendTransaction(
-      credentials,
-      Transaction(
-        to: EthereumAddress.fromHex(STORAGE_CONTRACT_ADDRESS),
-        data: data,
-        maxGas: 200000,
-        gasPrice: EtherAmount.fromUnitAndValue(GasUnit.gwei, 1),
-      ),
-    );
-    
-    return txHash;
-  }
-}
-```
-
-**Performance Characteristics**:
-
-- Transaction Cost: ~0.0001 USD vs Ethereum's 5+ USD
-- Throughput: Linear scaling with node additions
-- Finality: ~10 seconds
-
-**Rationale**: Shardeum's dynamic state sharding enables linear scalability, making blockchain storage economically viable for government-scale deployments across 600,000+ villages.
-
----
-
-### D. Flutter Mobile Application
-
-**Status**: Deployed to Physical Device (Samsung SM-A225F)
-
-**Build Number**: 48  
-**Application Size**: 47.2 MB  
-**Device Logs**:
-
-```
-Built build\app\outputs\flutter-apk\app-debug.apk
-Installed on Samsung SM-A225F (RZ8R80CE9VV)
-I/flutter: [CitizenHomeBloc] Loaded - User: Test User
-I/flutter: [QuadraticVoting] Subscribed to real-time votes
-I/flutter: [QuadraticVoting] Subscribed to credit updates
-```
-
-**Code Structure**:
-
-```
-lib/
-├── features/
-│   ├── auth/                    # Phone OTP authentication
-│   ├── citizen/
-│   │   ├── presentation/
-│   │   │   ├── screens/
-│   │   │   │   ├── citizen_home_screen.dart
-│   │   │   │   ├── report_issue_screen.dart
-│   │   │   │   └── issue_detail_screen.dart
-│   │   │   └── widgets/
-│   │   │       ├── voice_recorder_widget.dart
-│   │   │       └── issue_card.dart
-│   │   └── bloc/
-│   ├── voting/
-│   │   ├── services/
-│   │   │   ├── quadratic_voting_service.dart    # 678 lines
-│   │   │   └── inco_voting_service.dart
-│   │   └── presentation/
-│   │       ├── screens/
-│   │       │   └── voting_dashboard_screen.dart
-│   │       └── widgets/
-│   │           └── voting_widget.dart
-│   ├── volunteer/
-│   └── officer/
-└── core/
-    ├── services/
-    │   ├── supabase_service.dart
-    │   └── quadratic_voting_service.dart
-    └── utils/
-        └── offline_sync_manager.dart
-```
-
-**Quadratic Voting Implementation** (678 lines):
-
-```dart
-class QuadraticVotingService {
-  int calculateCost(int votes) => votes * votes;
-  
-  Future<VoteResult> castVote({
-    required String userId,
-    required String incidentId,
-    required int votes,
-    bool useEncryption = false,
-  }) async {
-    final cost = calculateCost(votes);
-    final userCredits = await getUserCredits(userId);
-    
-    if (userCredits.balance < cost) {
-      return VoteResult.failure('Insufficient credits');
-    }
-    
-    await _updateCredits(userId, -cost);
-    
-    if (useEncryption) {
-      final encrypted = await _generateEncryptedHash(votes);
-      await _storeEncryptedVote(incidentId, encrypted);
-    }
-    
-    await _supabase.client.from('incident_votes').insert({
-      'user_id': userId,
-      'incident_id': incidentId,
-      'votes_cast': votes,
-      'credits_spent': cost,
-    });
-    
-    return VoteResult.success(votes: votes, cost: cost);
-  }
-  
-  Future<List<IncidentWithVotes>> getIncidentsWithVotes() async {
-    final response = await _supabase.client
-      .from('incidents')
-      .select('*, categories(name), users(name)')
-      .order('weighted_votes', ascending: false);
-    
-    final List<IncidentWithVotes> incidents = [];
-    for (final incident in response) {
-      final stats = await getIncidentVotes(incident['id']);
-      incidents.add(IncidentWithVotes(
-        id: incident['id'],
-        title: incident['title'],
-        voteStats: stats,
-      ));
-    }
-    
-    return incidents;
-  }
-  
-  void subscribeToVotes(String incidentId) {
-    _votesChannel = _supabase.client
-      .channel('votes_$incidentId')
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'incident_votes',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.eq,
-          column: 'incident_id',
-          value: incidentId,
-        ),
-        callback: (payload) => _updateVoteStats(incidentId),
-      )
-      .subscribe();
-  }
-}
-```
-
-**Database Schema**:
-
-```sql
--- User voting credits
-CREATE TABLE user_credits (
-  user_id UUID PRIMARY KEY REFERENCES auth.users(id),
-  balance INTEGER DEFAULT 100,
-  total_earned INTEGER DEFAULT 100,
-  total_spent INTEGER DEFAULT 0,
-  last_weekly_refresh TIMESTAMP DEFAULT NOW()
-);
-
--- Individual votes with quadratic cost
-CREATE TABLE incident_votes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id),
-  incident_id UUID REFERENCES incidents(id),
-  votes_cast INTEGER NOT NULL,
-  credits_spent INTEGER NOT NULL,
-  encrypted_hash TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(user_id, incident_id)
-);
-
--- Auto-update weighted votes
-CREATE TRIGGER incident_votes_trigger
-AFTER INSERT OR UPDATE OR DELETE ON incident_votes
-FOR EACH ROW EXECUTE FUNCTION update_incident_votes();
-
--- Enable real-time subscriptions
-ALTER PUBLICATION supabase_realtime ADD TABLE incident_votes;
-ALTER PUBLICATION supabase_realtime ADD TABLE user_credits;
-```
-
-**Performance Metrics**:
-
-- Cold Start Time: <2 seconds (mid-range Android device)
-- Vote Update Latency: <500ms (real-time Supabase subscriptions)
-- Offline Capability: 10 pending issues cached locally
-- Memory Footprint: ~150 MB active usage
-
----
-
-### E. React Administrative Dashboard
-
-**Status**: Component Architecture Complete
-
-**Implementation**:
-
-```typescript
-const SLAStatusTable: React.FC = () => {
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
-  
-  useEffect(() => {
-    const subscription = supabase
-      .from('incidents')
-      .on('*', (payload) => {
-        setComplaints((prev) => [...prev, payload.new]);
-      })
-      .subscribe();
-    
-    return () => subscription.unsubscribe();
-  }, []);
-  
-  return (
-    <Table>
-      <thead>
-        <tr>
-          <th>Incident ID</th>
-          <th>Category</th>
-          <th>SLA Deadline</th>
-          <th>Votes (Weight)</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {complaints.map((c) => (
-          <tr key={c.id} className={c.slaBreach ? 'breach' : ''}>
-            <td>{c.id.slice(0, 8)}...</td>
-            <td>{c.category}</td>
-            <td><SLACountdown deadline={c.deadline} /></td>
-            <td>
-              <VoteBadge 
-                votes={c.weighted_votes} 
-                intensity={c.urgency_score} 
-              />
-            </td>
-            <td><StatusBadge status={c.status} /></td>
-            <td>
-              <Button onClick={() => markResolved(c.id)}>
-                Resolve
-              </Button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-  );
-};
-```
-
----
-
-## End-to-End Workflow
-
-**Scenario**: Village water pump failure reported and prioritized through quadratic voting
-
-**Step 1: Voice Input Capture**
-
-```
-Citizen opens application
-Taps microphone icon
-Speaks: "Water pump broken near temple, no water for 3 days"
-Audio processed via Google Speech-to-Text API
-ML classifier categorizes as: Water Infrastructure
-```
-
-**Step 2: Issue Submission**
-
-```dart
-await SupabaseService().createIncident(
-  title: "Broken Water Pump",
-  description: "Water pump broken near temple, no water for 3 days",
-  category: "Water",
-  location: {lat: 19.0760, lng: 72.8777},
-  reporter_id: "user_uuid",
-);
-```
-
-**Step 3: Community Voting** (Quadratic Cost Model)
-
-```dart
-// Farmer A (high urgency): 10 votes, 100 credits
-await QuadraticVotingService().castVote(
-  userId: "citizen_a",
-  incidentId: "INC-2025-0742",
-  votes: 10,
-);
-
-// Family B (medium urgency): 5 votes, 25 credits
-await QuadraticVotingService().castVote(
-  userId: "citizen_b",
-  incidentId: "INC-2025-0742",
-  votes: 5,
-);
-
-// Neighbor C (low urgency): 3 votes, 9 credits
-await QuadraticVotingService().castVote(
-  userId: "citizen_c",
-  incidentId: "INC-2025-0742",
-  votes: 3,
-);
-
-// Aggregated Result:
-// Total Votes: 18
-// Total Credits Spent: 134
-// Urgency Score: 134/18 = 7.44 (high intensity indicator)
-```
-
-**Step 4: Real-Time Dashboard Update**
-
-```
-Officer Dashboard Display:
-┌──────────────────────────────────────────┐
-│ HIGH URGENCY ALERT                       │
-│ INC-2025-0742: Broken Water Pump         │
-│ 18 votes (134 credits spent)             │
-│ SLA: 71h 45m remaining                   │
-│ 3 unique voters (average intensity: 7.4) │
-│ Status: NEW                              │
-└──────────────────────────────────────────┘
-```
-
-**Step 5: Blockchain Logging** (Future Integration)
-
-```solidity
-SLAEnforcement.submitComplaint(
-  "INC-2025-0742",
-  "Water",
-  officerAddress
-);
-// Initiates 72-hour countdown
-// Transaction: 0x[HASH]
-```
-
-**Step 6: Officer Resolution**
-
-```dart
-await OfficerService().markResolved(
-  incidentId: "INC-2025-0742",
-  resolution: "Pump repaired by contractor",
-  completedIn: 48, // hours
-);
-
-// System actions:
-// - 50% credit refund to voters
-// - Officer reputation increase
-// - SLA compliance recorded
-```
-
-**Timeline**:
-
-- Voice input to database: 5 seconds
-- Vote cast to dashboard update: <1 second (real-time)
-- Issue resolution: 48 hours (within 72-hour SLA)
-
----
-
-## Installation and Deployment
+## Installation and Setup
 
 ### Prerequisites
+- Flutter 3.7.0 or higher
+- Dart SDK
+- Android Studio or VS Code
+- Node.js and npm (for backend)
+- MongoDB (for backend)
 
-```bash
-# Required
-Flutter 3.7.0+
-Node.js 18+
-Dart 3.0+
-Android SDK / Xcode
-Git
+### Flutter Setup
+1. Clone the repository
+   ```
+   git clone https://github.com/your-username/grampulse.git
+   cd grampulse
+   ```
 
-# Optional (blockchain deployment)
-Hardhat
-Optimism Sepolia ETH (faucet)
-Shardeum Liberty SHM tokens
-```
+2. Install dependencies
+   ```
+   flutter pub get
+   ```
 
-### Mobile Application Setup
+3. Configure backend URL
+   Open `lib/core/services/api_service.dart` and update the `baseUrl`:
+   ```dart
+   // For Android emulator
+   static const String baseUrl = 'http://10.0.2.2:3000/api';
+   
+   // For iOS simulator
+   // static const String baseUrl = 'http://localhost:3000/api';
+   
+   // For physical device (replace with your computer's IP)
+   // static const String baseUrl = 'http://192.168.1.xxx:3000/api';
+   ```
 
-```bash
-# Clone repository
-git clone https://github.com/your-org/grampulse.git
-cd grampulse
+## Running the Application
 
-# Install dependencies
-flutter pub get
+### Starting the Backend
+1. Navigate to the backend directory
+   ```
+   cd path/to/GramPulse-Backend
+   ```
 
-# Configure environment
-cp .env.example .env
-# Edit .env:
-# SUPABASE_URL=https://mwciuegvujixznurjqbx.supabase.co
-# SUPABASE_ANON_KEY=your_key
-# GOOGLE_SPEECH_API_KEY=your_key
+2. Install dependencies
+   ```
+   npm install
+   ```
 
-# Deploy to device
-flutter devices
-flutter run -d <DEVICE_ID>
+3. Start the server
+   ```
+   npm start
+   ```
 
-# Build release
-flutter build apk --release
-```
+### Running the Flutter App
+1. Start an emulator or connect a physical device
 
-### Database Configuration
+2. Run the Flutter app
+   ```
+   flutter run
+   ```
 
-```bash
-# Install Supabase CLI
-npm install -g supabase
+## Backend Integration
 
-# Link project
-supabase link --project-ref mwciuegvujixznurjqbx
+The Flutter frontend integrates with a Node.js/Express backend:
 
-# Apply schema
-cd sql
-supabase db push
-psql $DATABASE_URL < quadratic_voting_schema.sql
+### API Endpoints
 
-# Fix RLS policies
-psql $DATABASE_URL < fix_rls_policies.sql
+#### Authentication
+- `POST /api/auth/request-otp`: Request OTP for phone verification
+- `POST /api/auth/verify-otp`: Verify OTP and get JWT token
+- `GET /api/users/me`: Get current user profile
+- `POST /api/users/complete-profile`: Complete user profile
 
-# Enable real-time
-ALTER PUBLICATION supabase_realtime ADD TABLE incidents;
-ALTER PUBLICATION supabase_realtime ADD TABLE incident_votes;
-ALTER PUBLICATION supabase_realtime ADD TABLE user_credits;
-```
+#### Reports
+- `GET /api/reports`: Get all reports (with optional filters)
+- `GET /api/reports/me`: Get reports created by current user
+- `GET /api/reports/:id`: Get a specific report
+- `POST /api/reports`: Create a new report
+- `PUT /api/reports/:id`: Update a report
+- `DELETE /api/reports/:id`: Delete a report
+- `POST /api/reports/:id/comments`: Add a comment to a report
+- `PUT /api/reports/:id/status`: Update report status
+- `PUT /api/reports/:id/assign`: Assign report to an officer
 
-### Smart Contract Deployment (Optional)
+### Authentication Flow
+1. The app sends a phone number to `/api/auth/request-otp`
+2. The backend generates and sends a 6-digit OTP
+3. The app sends the OTP to `/api/auth/verify-otp`
+4. If valid, the backend returns a JWT token and user info
+5. The app stores the token in SharedPreferences
+6. Subsequent API calls include the token in the Authorization header
 
-```bash
-cd contracts
-npm install
-npx hardhat compile
+## Detailed File Descriptions
 
-# Deploy to Optimism Sepolia
-npx hardhat run scripts/deploy.ts --network optimism-sepolia
+### Core Services
 
-# Verify contract
-npx hardhat verify --network optimism-sepolia <CONTRACT_ADDRESS>
-```
+#### 1. `lib/core/services/api_service.dart`
+This file implements a generic HTTP client for communicating with the backend API. Key components include:
 
-### React Dashboard (Optional)
+- **ApiResponse<T> class**: A generic wrapper for standardized API responses
+- **ApiService class**: Handles HTTP requests with proper error handling
+- **Token Management**: Automatically adds authentication tokens to requests
+- **HTTP Methods**: Implementation of GET, POST, PUT, DELETE methods
+- **File Upload**: Support for multipart requests with file uploads
+- **Response Processing**: Standardized handling of API responses
 
-```bash
-cd dashboard
-npm install
-
-# Configure environment
-cp .env.example .env
-
-# Development server
-npm run dev
-
-# Production build
-npm run build
-npm run deploy
-```
-
----
-
-## Deployment Status
-
-| Component | Platform | Status | Details |
-|-----------|----------|--------|---------|
-| Mobile App | Samsung SM-A225F | LIVE | Build 48, Device ID: RZ8R80CE9VV |
-| Backend API | Supabase | LIVE | mwciuegvujixznurjqbx.supabase.co |
-| Database | PostgreSQL | LIVE | 10 tables, real-time enabled |
-| SLA Contract | Optimism Sepolia | READY | Solidity code complete |
-| Storage Contract | Shardeum Liberty 2.0 | READY | Service integrated |
-| FHE Voting | Inco Network | READY | Service implemented |
-| Admin Dashboard | Vercel | READY | Components complete |
-
-### Verification
-
-**Application Deployment**:
-
-```bash
-flutter devices
-# Output: Samsung SM-A225F (RZ8R80CE9VV)
-
-flutter run -d RZ8R80CE9VV
-# Application launches with voting dashboard
-```
-
-**Database Verification**:
-
-```sql
--- Connect to Supabase
-psql postgres://postgres:[PASSWORD]@db.mwciuegvujixznurjqbx.supabase.co:5432/postgres
-
--- Verify tables
-\dt
-
--- Check voting records
-SELECT * FROM incident_votes LIMIT 5;
-
--- Verify real-time subscriptions
-SELECT * FROM pg_publication_tables WHERE pubname = 'supabase_realtime';
-```
-
-**Quadratic Voting Test**:
-
+Usage example:
 ```dart
-final service = QuadraticVotingService();
-
-// Cost calculation test
-assert(service.calculateCost(10) == 100);
-
-// Vote submission test
-final result = await service.castVote(
-  userId: 'test-user-id',
-  incidentId: 'test-incident-id',
-  votes: 5,
-);
-assert(result.success);
-```
-
----
-
-## Security and Privacy Architecture
-
-### Fully Homomorphic Encryption (FHE) Rationale
-
-**Threat Model**: In rural India, local power structures retaliate against citizens who report corruption or vote for specific issues. Traditional anonymous systems fail due to:
-
-- Network traffic analysis
-- Voting pattern correlation
-- Database administrator access
-- Metadata correlation attacks
-
-**Solution Architecture**:
-
-1. **Client-Side Encryption**: Vote encrypted on device before network transmission
-2. **Homomorphic Computation**: Server aggregates votes without decryption
-3. **Threshold Decryption**: Only aggregated results decrypted via multi-party computation
-4. **Zero-Knowledge Proofs**: Vote validity verified without revealing value
-
-**Implementation**:
-
-```dart
-// Client device (offline)
-final voteChoice = 7;
-final publicKey = await IncoNetwork.getPublicKey();
-final encryptedVote = fheEncrypt(voteChoice, publicKey);
-
-// Server storage
-await blockchain.storeEncryptedVote(encryptedVote);
-
-// Aggregation (homomorphic operation)
-List<EncryptedVote> votes = fetchVotes("INC-2025-0742");
-EncryptedTotal total = fheAdd(votes);
-
-// Decryption (threshold signatures)
-int result = await IncoNetwork.requestDecryption(total);
-```
-
-**Mathematical Guarantee**:
-
-- Homomorphic property: `Enc(a) + Enc(b) = Enc(a+b)`
-- Zero-knowledge range proofs ensure votes in [1, 10] without revealing value
-- Even with full database access, individual votes computationally infeasible to derive
-
-**Threat Coverage**:
-
-- Network eavesdropping: Encrypted in transit
-- Database breach: Only ciphertexts stored
-- Insider threat: Administrators cannot decrypt individual votes
-- Correlation attacks: No metadata linking votes to users
-- Coercion: Citizens can prove participation without revealing choice
-
-### Row-Level Security (RLS)
-
-```sql
--- Citizens view only their own credits
-CREATE POLICY "Users can view own credits" ON user_credits
-  FOR SELECT USING (auth.uid() = user_id);
-
--- Officers view only assigned issues
-CREATE POLICY "Officers assigned" ON incidents
-  FOR SELECT USING (
-    auth.uid() IN (
-      SELECT user_id FROM assignments WHERE incident_id = id
-    )
-  );
-
--- Votes publicly visible (transparency) but anonymous
-CREATE POLICY "Anyone can view votes" ON incident_votes
-  FOR SELECT USING (true);
-```
-
-### Audit Trail
-
-```sql
--- Immutable admin action log
-CREATE TABLE admin_audit_log (
-  id UUID PRIMARY KEY,
-  admin_id UUID REFERENCES auth.users(id),
-  action TEXT NOT NULL,
-  target_id UUID,
-  timestamp TIMESTAMP DEFAULT NOW(),
-  ip_address INET
+final apiService = ApiService();
+final response = await apiService.get<User>(
+  '/users/me',
+  (data) => User.fromJson(data),
 );
 ```
 
----
+#### 2. `lib/core/services/auth_service.dart`
+This service handles all authentication-related operations:
 
-## Roadmap
+- **User Model**: Defines the user data structure
+- **Authentication Methods**: OTP request, verification, and profile completion
+- **Session Management**: Token storage and retrieval
+- **Profile Management**: User profile updates and retrieval
+- **Authentication State**: Checks if the user is authenticated
 
-### Q1 2025: Pilot Validation
-
-- [x] Core application deployed
-- [x] Quadratic voting operational
-- [x] Database schema implemented
-- [ ] Partner with 3 Panchayats in Maharashtra
-- [ ] Train 50 citizens and 5 officers
-- [ ] Collect UX feedback on voice interface
-
-### Q2 2025: Blockchain Integration
-
-- [ ] Deploy SLA contracts to Optimism mainnet
-- [ ] Integrate Shardeum for grievance storage
-- [ ] Launch Inco FHE for encrypted voting
-- [ ] Web3 wallet integration (optional)
-- [ ] Officer performance NFTs
-
-### Q3 2025: Feature Expansion
-
-- [ ] Multi-language voice (Hindi, Marathi, Tamil, Telugu)
-- [ ] SMS fallback via USSD codes
-- [ ] Volunteer reputation system (on-chain)
-- [ ] AI complaint categorization (GPT-4)
-- [ ] National Grievance Portal integration
-
-### Q4 2025: National Scaling
-
-- [ ] Deploy to 50 villages (5 states)
-- [ ] Ministry of Panchayati Raj partnership
-- [ ] Open-source core protocol
-- [ ] Public API for third-party developers
-- [ ] Mobile data reimbursement program
-
-### 2026: Advanced Features
-
-- [ ] DAO-based fund allocation
-- [ ] Predictive analytics for issue prevention
-- [ ] Satellite imagery integration
-- [ ] Cross-village collaboration tools
-- [ ] Blockchain-based digital identity
-
----
-
-## Team and Technical Competencies
-
-**Project Lead**: Full-stack development, blockchain integration, product architecture
-
-**Demonstrated Skills**:
-
-- Flutter mobile development (15,000+ lines)
-- Solidity smart contracts (EVM-compatible)
-- PostgreSQL database design (10+ tables, triggers, RLS)
-- Real-time systems (WebSocket subscriptions)
-- Applied cryptography (FHE, zero-knowledge proofs)
-- DevOps (CI/CD, device deployment)
-
----
-
-## Verification Checklist
-
-**Production Implementation**:
-
-- [x] Flutter application deployed to physical device (Samsung SM-A225F)
-- [x] Quadratic voting service (678 lines, Cost = Votes²)
-- [x] Database schema with triggers and RLS policies
-- [x] Real-time subscriptions operational (Supabase Realtime)
-- [x] Voting UI integrated in citizen dashboard
-- [x] BLoC state management pattern implemented
-- [x] Phone OTP authentication functional
-- [x] Feature-based code organization
-- [x] Git commit history demonstrating incremental development
-
-**Pending Blockchain Deployment**:
-
-- [ ] Inco FHE service (code ready, testnet access pending)
-- [ ] Optimism SLA contract (Solidity complete, deployment pending)
-- [ ] Shardeum storage (service implemented, testnet pending)
-- [ ] React dashboard (components complete, hosting pending)
-
----
-
-## Code Quality Metrics
-
-**Architecture Patterns**:
-
-- BLoC (Business Logic Component) for state management
-- Repository pattern for data access
-- Singleton pattern for services
-- Factory pattern for model creation
-- Observer pattern for real-time updates
-
-**Line Counts** (verified):
-
-```
-lib/core/services/quadratic_voting_service.dart: 678 lines
-lib/features/citizen/presentation/screens/citizen_home_screen.dart: 700+ lines
-sql/quadratic_voting_schema.sql: 150+ lines
-contracts/SLAEnforcement.sol: 120+ lines
-
-Total Flutter code: ~15,000 lines
-Total project: ~20,000 lines
+Usage example:
+```dart
+final authService = AuthService();
+final response = await authService.requestOtp('1234567890');
 ```
 
-**Test Coverage**:
+#### 3. `lib/core/services/report_service.dart`
+This service manages all report-related operations:
+
+- **Report Models**: Defines data structures for reports, comments, and locations
+- **Report Management**: CRUD operations for reports
+- **Comment System**: Adding and retrieving comments
+- **Status Updates**: Updating report status
+- **Assignment**: Assigning reports to officers
+- **Filtering**: Getting reports with various filters
+
+Usage example:
+```dart
+final reportService = ReportService();
+final response = await reportService.createReport(
+  title: 'Water shortage',
+  description: 'No water supply for 3 days',
+  category: 'WATER',
+  // Other required fields
+);
+```
+
+### State Management (BLoC)
+
+#### 1. `lib/features/auth/bloc/auth_bloc.dart`
+This file implements the authentication BLoC pattern:
+
+- **AuthEvent**: Abstract class for auth events (RequestOtp, VerifyOtp, etc.)
+- **AuthState**: Abstract class for auth states (Authenticated, Unauthenticated, etc.)
+- **AuthBloc**: Handles state transitions based on events
+- **Event Handlers**: Implementation of event handlers for auth flow
+
+The AuthBloc coordinates the entire authentication flow, from OTP request to login to logout.
+
+Usage example:
+```dart
+// Request OTP
+context.read<AuthBloc>().add(RequestOtp('1234567890'));
+
+// Verify OTP
+context.read<AuthBloc>().add(VerifyOtp('1234567890', '123456'));
+
+// Complete profile
+context.read<AuthBloc>().add(CompleteProfile(
+  name: 'John Doe',
+  role: 'citizen',
+));
+
+// Logout
+context.read<AuthBloc>().add(Logout());
+```
+
+#### 2. `lib/features/report/bloc/report_bloc.dart`
+This file implements the report management BLoC pattern:
+
+- **ReportEvent**: Abstract class for report events (CreateReport, UpdateReport, etc.)
+- **ReportState**: Abstract class for report states (ReportsLoaded, ReportError, etc.)
+- **ReportBloc**: Handles state transitions based on events
+- **Event Handlers**: Implementation of event handlers for report operations
+
+The ReportBloc manages all report-related state, from creation to updates to filtering.
+
+Usage example:
+```dart
+// Load all reports
+context.read<ReportBloc>().add(LoadAllReports());
+
+// Create a new report
+context.read<ReportBloc>().add(CreateReport(
+  title: 'Road damage',
+  description: 'Pothole on main street',
+  category: 'ROAD',
+  // Other required fields
+));
+
+// Update report status
+context.read<ReportBloc>().add(UpdateReportStatus(
+  reportId: 'report-id',
+  status: 'IN_PROGRESS',
+));
+```
+
+### Screens
+
+#### 1. Authentication Screens
+
+- **SplashScreen**: Initial loading screen with app logo
+- **LanguageSelectionScreen**: Allows users to select their preferred language
+- **LoginScreen**: Phone number input for OTP authentication
+- **OtpVerificationScreen**: OTP input and verification
+- **ProfileSetupScreen**: User profile creation with name, email, and role
+- **RoleSelectionScreen**: Role selection with descriptions
+
+#### 2. Citizen Screens
+
+- **CitizenShellScreen**: Main shell with bottom navigation
+- **CitizenHomeScreen**: Dashboard showing reports summary and quick actions
+- **ExploreScreen**: Map view of nearby issues
+- **MyReportsScreen**: List of user's reported issues
+- **ReportIssueScreen**: Form for creating new reports
+- **ProfileScreen**: User profile management
+
+#### 3. Volunteer Screens
+
+- **VolunteerShellScreen**: Main shell with bottom navigation
+- **VolunteerDashboardScreen**: Overview of volunteer tasks
+- **VerificationQueueScreen**: List of reports needing verification
+- **AssistCitizenScreen**: Interface for helping citizens create reports
+- **PerformanceScreen**: Volunteer performance metrics
+
+#### 4. Officer Screens
+
+- **OfficerShellScreen**: Main shell with bottom navigation
+- **OfficerDashboardScreen**: Overview of assigned cases
+- **InboxScreen**: New reports assigned to the officer
+- **WorkOrdersScreen**: Active work orders and resolutions
+- **AnalyticsScreen**: Performance and resolution metrics
+
+#### 5. Report Screens
+
+- **ReportDetailScreen**: Detailed view of a report with status timeline
+- **ReportMapScreen**: Map view of a specific report location
+- **CommentSectionScreen**: Comments and updates on a report
+- **StatusUpdateScreen**: Interface for updating report status
+
+### Navigation & Routing
+
+The app uses Go Router for declarative routing:
+
+#### `lib/app/router.dart`
+
+This file defines the app's routing structure:
+
+- **Route Definitions**: Path, name, and builder for each route
+- **Nested Routes**: Shell routes with nested child routes
+- **Authentication Guards**: Redirects based on authentication state
+- **Role-Based Access**: Route protection based on user role
+- **Parameter Passing**: Passing parameters between routes
+
+The router implements sophisticated logic for:
+1. Redirecting unauthenticated users to login
+2. Directing authenticated users to appropriate role-specific screens
+3. Handling deep links and navigation history
+4. Enforcing role-based access control
+
+### Main Application
+
+#### `lib/app/app.dart`
+
+The main application widget that:
+
+- Sets up the global providers (AuthBloc, ReportBloc)
+- Configures the router
+- Sets up the theme
+- Initializes localization
+- Configures system UI settings
+
+#### `lib/main.dart`
+
+The entry point of the application that:
+
+- Initializes services (Hive, SharedPreferences)
+- Sets up platform-specific configurations
+- Launches the main app widget
+
+## Data Models
+
+### User Model
 
 ```dart
-test('Quadratic cost calculation', () {
-  final service = QuadraticVotingService();
-  expect(service.calculateCost(1), 1);
-  expect(service.calculateCost(5), 25);
-  expect(service.calculateCost(10), 100);
-});
-```
-
----
-
-## Appendix: Key Code Implementations
-
-### A. Quadratic Cost Formula
-
-```dart
-int calculateCost(int votes) {
-  if (votes < 0) return 0;
-  return votes * votes;
+class User {
+  final String id;
+  final String phone;
+  final String? name;
+  final String? email;
+  final String role;
+  final String? profilePicture;
+  final bool isProfileComplete;
+  
+  // Constructor and fromJson implementation
 }
 ```
 
-### B. Real-Time Vote Subscription
+### Report Model
 
 ```dart
-void subscribeToVotes(String incidentId) {
-  _votesChannel = _supabase.client
-    .channel('votes_$incidentId')
-    .onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'incident_votes',
-      filter: PostgresChangeFilter(
-        type: PostgresChangeFilterType.eq,
-        column: 'incident_id',
-        value: incidentId,
-      ),
-      callback: (payload) => _updateVoteStats(incidentId),
-    )
-    .subscribe();
+class Report {
+  final String id;
+  final String title;
+  final String description;
+  final String category;
+  final String status;
+  final String address;
+  final String district;
+  final String state;
+  final String pincode;
+  final Location? location;
+  final List<String>? images;
+  final String userId;
+  final String? userName;
+  final List<Comment> comments;
+  final String? assignedOfficerId;
+  final String? assignedOfficerName;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  
+  // Constructor and fromJson implementation
 }
 ```
 
-### C. Database Trigger
+### Comment Model
 
-```sql
-CREATE OR REPLACE FUNCTION update_incident_votes()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE incidents
-  SET weighted_votes = (
-    SELECT COALESCE(SUM(votes_cast), 0)
-    FROM incident_votes
-    WHERE incident_id = NEW.incident_id
-  )
-  WHERE id = NEW.incident_id;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-### D. Optimism SLA Contract
-
-```solidity
-function submitComplaint(
-  string memory incidentId,
-  string memory category,
-  address assignedOfficer
-) external {
-  complaints[incidentId] = Complaint({
-    incidentId: incidentId,
-    reporter: msg.sender,
-    category: category,
-    deadline: block.timestamp + 72 hours,
-    status: ComplaintStatus.New,
-    assignedOfficer: assignedOfficer
-  });
-  emit ComplaintSubmitted(incidentId, msg.sender, block.timestamp + 72 hours);
+```dart
+class Comment {
+  final String id;
+  final String text;
+  final String userId;
+  final String? userName;
+  final String? userRole;
+  final String? userProfilePicture;
+  final DateTime createdAt;
+  
+  // Constructor and fromJson implementation
 }
 ```
 
----
+### Location Model
+
+```dart
+class Location {
+  final double latitude;
+  final double longitude;
+  
+  // Constructor and fromJson/toJson implementation
+}
+```
+
+## Usage Scenarios
+
+### 1. Citizen Reporting an Issue
+
+1. Citizen logs in with phone number and OTP
+2. Navigates to "Report Issue" screen
+3. Fills out report form with issue details
+4. Attaches photos and pinpoints location on map
+5. Submits report
+6. ReportBloc processes the creation event
+7. ReportService sends API request to backend
+8. Citizen receives confirmation and is redirected to report details
+
+### 2. Officer Processing a Report
+
+1. Officer logs in with phone number and OTP
+2. Views assigned reports in inbox
+3. Selects a report to view details
+4. Updates report status (e.g., "IN_PROGRESS")
+5. Adds comments for citizen visibility
+6. Marks report as resolved when complete
+7. ReportBloc processes status update events
+8. ReportService sends API requests to backend
+
+### 3. Volunteer Verifying Reports
+
+1. Volunteer logs in with phone number and OTP
+2. Views verification queue
+3. Selects a report to verify
+4. Checks report details and location
+5. Marks report as verified or flags it for more information
+6. Adds comments with verification notes
+7. ReportBloc processes verification events
+8. ReportService sends API requests to backend
+
+## Technical Implementation Details
+
+### Authentication Flow
+
+1. **OTP Request**:
+   ```dart
+   // AuthBloc handles the RequestOtp event
+   Future<void> _onRequestOtp(RequestOtp event, Emitter<AuthState> emit) async {
+     emit(AuthLoading());
+     try {
+       final response = await _authService.requestOtp(event.phone);
+       if (response.success) {
+         emit(OtpRequested(event.phone));
+       } else {
+         emit(AuthError(response.message));
+       }
+     } catch (e) {
+       emit(AuthError(e.toString()));
+     }
+   }
+   ```
+
+2. **OTP Verification**:
+   ```dart
+   // AuthBloc handles the VerifyOtp event
+   Future<void> _onVerifyOtp(VerifyOtp event, Emitter<AuthState> emit) async {
+     emit(AuthLoading());
+     try {
+       final response = await _authService.verifyOtp(event.phone, event.otp);
+       if (response.success && response.data != null) {
+         final user = response.data!;
+         emit(Authenticated(user, isProfileComplete: user.isProfileComplete));
+       } else {
+         emit(OtpVerificationFailed(response.message));
+       }
+     } catch (e) {
+       emit(AuthError(e.toString()));
+     }
+   }
+   ```
+
+### API Request/Response Handling
+
+```dart
+// ApiService processes HTTP responses
+ApiResponse<T> _processResponse<T>(
+  http.Response response,
+  T Function(dynamic)? fromJson,
+) {
+  try {
+    final responseBody = json.decode(response.body);
+    
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      // Successful response
+      return ApiResponse(
+        success: responseBody['success'] ?? true,
+        message: responseBody['message'] ?? 'Success',
+        data: responseBody['data'] != null && fromJson != null 
+            ? fromJson(responseBody['data']) 
+            : null,
+        statusCode: response.statusCode,
+      );
+    } else {
+      // Error response
+      return ApiResponse(
+        success: false,
+        message: responseBody['message'] ?? 'Server error',
+        statusCode: response.statusCode,
+      );
+    }
+  } catch (e) {
+    // Invalid JSON or other parsing error
+    return ApiResponse(
+      success: false,
+      message: 'Failed to parse response: ${e.toString()}',
+      statusCode: response.statusCode,
+    );
+  }
+}
+```
+
+### Role-Based Routing
+
+```dart
+// Router handles role-based redirects
+if (authState is Authenticated) {
+  // If authenticated with complete profile but in auth path, redirect to home
+  if (inAuthPath) {
+    switch (authState.user.role) {
+      case 'citizen':
+        return '/citizen';
+      case 'volunteer':
+        return '/volunteer';
+      case 'officer':
+        return '/officer';
+      case 'admin':
+        return '/admin';
+      default:
+        return '/citizen';
+    }
+  }
+  
+  // Verify role-specific access
+  if (location.startsWith('/citizen') && authState.user.role != 'citizen') {
+    // Redirect to appropriate role-specific home
+  }
+  
+  // Similar checks for other roles
+}
+```
+
+## Conclusion
+
+GramPulse is a comprehensive mobile application designed to bridge the gap between rural citizens and government authorities. With its multi-role approach, secure authentication, and robust feature set, it provides an effective platform for citizens to report issues, volunteers to verify them, and officials to resolve them.
+
+The application showcases modern Flutter development practices, including:
+
+- Clean architecture with separation of concerns
+- BLoC pattern for state management
+- Service-oriented design for API integration
+- Declarative routing with Go Router
+- Multi-language support
+- Responsive UI design
+
+By connecting citizens directly with officials and enabling volunteer participation, GramPulse aims to improve rural governance and address local issues more efficiently.
+
+## Contributing
+
+GramPulse is open to contributions. To contribute:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
 
 ## License
 
-MIT License (open source after pilot validation)
-
----
-
-## Contact
-
-**Technical Documentation**: This README and inline code comments  
-**Source Code Repository**: Available upon request  
-**Live Demonstration**: Samsung device RZ8R80CE9VV (on-site demo available)  
-**Partnership Inquiries**: Contact information available in submission materials
-
----
-
-**Project Status**: Production deployment on physical hardware with functional quadratic voting system. Blockchain layer implementation complete and ready for testnet deployment pending network access.
-
-**Target Impact**: 800 million rural Indian citizens across 600,000+ villages.
+This project is licensed under the MIT License - see the LICENSE file for details.
