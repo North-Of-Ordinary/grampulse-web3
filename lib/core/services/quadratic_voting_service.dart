@@ -274,9 +274,11 @@ class QuadraticVotingService {
         );
       }
       
+      // Calculate new balance before database operations
+      final newBalance = userCredits.balance - cost;
+      
       try {
         // Deduct credits
-        final newBalance = userCredits.balance - cost;
         await _supabase.client
             .from('user_credits')
             .update({
