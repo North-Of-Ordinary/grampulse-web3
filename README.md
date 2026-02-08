@@ -583,8 +583,6 @@ class OfflineSyncService {
 
 https://github.com/user-attachments/assets/3644c761-3577-48a2-a3c5-195467c170fb
 
-https://github.com/user-attachments/assets/734add4e-c497-425c-8635-66b0fda08777
-
 https://github.com/user-attachments/assets/406e2912-2d08-4adb-9071-2b8e3b5c2bde
 
 ---
