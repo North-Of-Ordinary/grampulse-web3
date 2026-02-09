@@ -2,6 +2,9 @@
 
 **GramPulse** is a blockchain-secured, privacy-preserving grievance management platform that enables rural citizens to report local issues via voice, ensures zero retaliation through Fully Homomorphic Encryption (FHE), enforces Service Level Agreements (SLAs) via on-chain smart contracts, and provides transparent accountability dashboards for Panchayat officers. The system leverages Inco Network for encrypted data processing, Optimism for SLA enforcement, and Shardeum for scalable grievance storage.
 
+### Got to know a little more ?
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/North-Of-Ordinary/grampulse-web3)
+
 ---
 
 ## Shardeum Smart Contract Url
@@ -30,7 +33,6 @@ https://github.com/user-attachments/assets/11d28f56-b88c-455e-b036-c665c39bc4e2
 - [Installation & Running Instructions](#installation--running-instructions)
 - [Testnet & Demo Links](#testnet--demo-links)
 - [Security & Privacy](#security--privacy)
-- [Future Roadmap](#future-roadmap)
 - [Team](#team)
 
 ## System Architecture
