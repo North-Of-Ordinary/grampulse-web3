@@ -8,10 +8,7 @@
 https://explorer-mezame.shardeum.org/address/0x5ff04cbCB3F80dfE59143e994f8e63009d7f2fA1?tab=txs
 <img width="1881" height="856" alt="image" src="https://github.com/user-attachments/assets/690f128f-ae55-44d7-8528-a7b1c2436c17" />
 
-## ThinkRoot Deployment url
-### 1. https://grampulse-az05rp.thinkroot.app/
-
-### 2. https://8001-152d4a20-8b8e-416f-b18d-9e9969fe9c68-q-dexg9cg4fqvsgz.thinkroot.app/
+## ThinkRoot Deployment
 
 https://github.com/user-attachments/assets/900c7733-7a28-4ab6-a5d8-b1aa5e4d592f
 
@@ -970,7 +967,6 @@ docker-compose up -d
 | **Example Transaction (Optimism)** | Optimism Sepolia Explorer | [`View Tx`](https://sepolia-optimism.etherscan.io/tx/0x...) | 🟢 Verified |
 | **Live Dashboard** | ThinkRoot Deployment | [https://grampulse-az05rp.thinkroot.app/](https://grampulse-az05rp.thinkroot.app/) | 🟢 Live |
 | **IPFS Gateway** | IPFS | `https://ipfs.io/ipfs/QmXyz...` | 🟢 Active |
-| **Demo Video** | YouTube | `[Watch Demo](https://youtube.com/...)` | 🟡 Coming Soon |
 
 ### **Test Credentials**
 ```
@@ -1049,36 +1045,6 @@ Personal data (voice recordings, photos) stored on:
 
 ---
 
-## Future Roadmap
-
-### **Phase 1: Pilot Deployment (Q2 2026)**
-- [ ] Onboard 2-3 Gram Panchayats in Kerala
-- [ ] Train 10 officers and 50 citizens
-- [ ] Deploy on mainnet (Optimism + Shardeum)
-- [ ] Enable Hindi, Tamil, Malayalam voice support
-
-### **Phase 2: Scale & Integrate (Q3 2026)**
-- [ ] Expand to 50+ Panchayats across 3 states
-- [ ] Integrate with e-Gram SWARAJ portal (Govt of India)
-- [ ] Add SMS-based complaint submission (for non-smartphone users)
-- [ ] Implement quadratic voting for community prioritization
-- [ ] Launch incentive layer (token rewards for officers meeting SLA)
-
-### **Phase 3: Advanced Features (Q4 2026)**
-- [ ] AI-powered complaint categorization
-- [ ] Predictive SLA breach alerts
-- [ ] Multi-signature resolution approvals
-- [ ] DAO governance for platform upgrades
-- [ ] Integration with UPI for fine payments (SLA breaches)
-
-### **Phase 4: Institutional Adoption (2027)**
-- [ ] Partnership with Ministry of Panchayati Raj
-- [ ] National rollout across 250,000+ Gram Panchayats
-- [ ] Open-source SDK for state governments
-- [ ] Compliance with Digital India Stack standards
-
----
-
 ## **Team**
 
 | Name                  | Contact                                                                                   | GitHub                                                                                       |
@@ -1088,6 +1054,9 @@ Personal data (voice recordings, photos) stored on:
 | **Vishal Seshadri B** | [vishalspl09@gmail.com](mailto:vishalspl09@gmail.com)                                     | [https://github.com/Vishalspl-0903](https://github.com/Vishalspl-0903)                       |
 | **Krish S**           | [subrakrish8@gmail.com](mailto:subrakrish8@gmail.com)                                     | [https://github.com/krish-subramoniam](https://github.com/krish-subramoniam)                 |
 | **Keerthivasan S V**  | [cb.sc.u4aie23037@cb.students.amrita.edu](mailto:cb.sc.u4aie23037@cb.students.amrita.edu) | [https://github.com/Keerthivasan-Venkitajalam](https://github.com/Keerthivasan-Venkitajalam) |
+| **Sanggit Saaran K C S**  | [cb.sc.u4aie23047@cb.students.amrita.edu](mailto:cb.sc.u4aie23047@cb.students.amrita.edu) | [https://github.com/sanggitsaaran](https://github.com/sanggitsaaran) |
+| **SHRIMONESH**  | [cb.en.u4elc23054@cb.students.amrita.edu](mailto:cb.en.u4elc23054@cb.students.amrita.edu) | [https://github.com/SHRIMONESH](https://github.com/SHRIMONESH) |
+
 
 **Institution:**
 Amrita Vishwa Vidyapeetham
@@ -1129,4 +1098,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**For hackathon judges:** All contract addresses, transaction hashes, and deployment links are verifiable on respective testnets. Full source code available at [github.com/naveen-astra/grampulse-defy](https://github.com/naveen-astra/grampulse-defy).
+All contract addresses, transaction hashes, and deployment links are verifiable on respective testnets. Full source code available at [github.com/naveen-astra/grampulse-defy](https://github.com/naveen-astra/grampulse-defy).
